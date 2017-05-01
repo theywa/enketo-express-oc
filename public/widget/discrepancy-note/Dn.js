@@ -31,6 +31,7 @@ Comment.prototype._init = function() {
 
     if ( this.$linkedQuestion.length === 1 ) {
         this.notes = this._parseModelFromString( this.element.value );
+        this.defaultAssignee = this._getDefaultAssignee( this.notes );
         this.$commentQuestion.addClass( 'hide' ).attr( 'role', 'comment' );
         // Any <button> inside a <label> receives click events if the <label> is clicked!
         // See http://codepen.io/MartijnR/pen/rWJeOG?editors=1111
@@ -44,6 +45,24 @@ Comment.prototype._init = function() {
         this._setCloseHandler();
         this._setConstraintEvaluationHandler();
     }
+};
+
+/**
+ * This function should only be called by init (upon load).
+ * @return {string} [description]
+ */
+Comment.prototype._getDefaultAssignee = function( notes ) {
+    var defaultAssignee = '';
+
+    notes.queries.concat( notes.logs ).sort( this._datetimeDesc.bind( this ) ).some( function( item ) {
+        if ( item.user === SYSTEM_USER ) {
+            return false;
+        }
+        defaultAssignee = item.user || '';
+        return true;
+    } );
+
+    return defaultAssignee;
 };
 
 Comment.prototype._getLinkedQuestion = function( element ) {
@@ -351,8 +370,7 @@ Comment.prototype._hideCommentModal = function( $linkedQuestion ) {
 
 Comment.prototype._getUserOptions = function() {
     var userNodes;
-    var lastQuery = this.notes.queries.concat( this.notes.logs )[ 0 ];
-    var lastAssignee = ( lastQuery && lastQuery.assigned_to ) ? lastQuery.assigned_to : '';
+    var defaultAssignee = this.defaultAssignee;
 
     if ( !users ) {
         try {
@@ -370,7 +388,7 @@ Comment.prototype._getUserOptions = function() {
 
     return '<option value=""></option>' +
         users.map( function( user ) {
-            return '<option value="' + user + '"' + ( user === lastAssignee ? ' selected' : '' ) + '>' + user + '</option>';
+            return '<option value="' + user + '"' + ( user === defaultAssignee ? ' selected' : '' ) + '>' + user + '</option>';
         } );
 };
 
