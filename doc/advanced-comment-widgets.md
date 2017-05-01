@@ -23,24 +23,24 @@ The advanced comment widgets extend the generic comment feature by: populating t
       "date_time": "2016-09-01 15:01.123 -06:00",
       "comment": "This value seems impossible.",
       "status": "new",
-      "assigned_to": "Maurice Moss (moss)",
+      "assigned_to": "moss",
       "notify": false
     }
   ],
   "logs": [
     {
       "type": "comment",
-      "assigned_to": "Ada Clare (aclare)",
+      "assigned_to": "jen",
       "date_time": "2016-04-22 14:44:20.123 -06:00",
       "comment": "This is an older comment.", 
       "status": "updated",
-      "user": "Maurice Moss (moss)"
+      "user": "moss"
     },
     { 
       "type": "audit",  
       "message": "Item data value updated from old_value to new_value.",  
       "date_time" : "2016-05-18 12:44:20.456 -06:00",
-      "user" : "Jen Barber (jen)",
+      "user" : "jen",
     }
   ]
 }

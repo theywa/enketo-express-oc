@@ -4,7 +4,7 @@ var Widget = require( '../../../node_modules/enketo-core/src/js/Widget' );
 var $ = require( 'jquery' );
 var t = require( 'translator' ).t;
 var settings = require( '../../js/src/module/settings' );
-var users;
+var usersOptionsHtml;
 var SYSTEM_USER = 'root';
 
 /**
@@ -31,6 +31,7 @@ Comment.prototype._init = function() {
 
     if ( this.$linkedQuestion.length === 1 ) {
         this.notes = this._parseModelFromString( this.element.value );
+        this.defaultAssignee = this._getDefaultAssignee( this.notes );
         this.$commentQuestion.addClass( 'hide' ).attr( 'role', 'comment' );
         // Any <button> inside a <label> receives click events if the <label> is clicked!
         // See http://codepen.io/MartijnR/pen/rWJeOG?editors=1111
@@ -44,6 +45,24 @@ Comment.prototype._init = function() {
         this._setCloseHandler();
         this._setConstraintEvaluationHandler();
     }
+};
+
+/**
+ * This function should only be called by init (upon load).
+ * @return {string} [description]
+ */
+Comment.prototype._getDefaultAssignee = function( notes ) {
+    var defaultAssignee = '';
+
+    notes.queries.concat( notes.logs ).sort( this._datetimeDesc.bind( this ) ).some( function( item ) {
+        if ( item.user === SYSTEM_USER ) {
+            return false;
+        }
+        defaultAssignee = item.user || '';
+        return true;
+    } );
+
+    return defaultAssignee;
 };
 
 Comment.prototype._getLinkedQuestion = function( element ) {
@@ -351,27 +370,33 @@ Comment.prototype._hideCommentModal = function( $linkedQuestion ) {
 
 Comment.prototype._getUserOptions = function() {
     var userNodes;
-    var lastQuery = this.notes.queries.concat( this.notes.logs )[ 0 ];
-    var lastAssignee = ( lastQuery && lastQuery.assigned_to ) ? lastQuery.assigned_to : '';
+    var users;
+    var defaultAssignee = this.defaultAssignee;
 
-    if ( !users ) {
+    if ( !usersOptionsHtml ) {
         try {
             userNodes = this.options.helpers.evaluate( 'instance("_users")/root/item', 'nodes', null, null, true );
+            // doing this in 2 steps as it is likely useful later on to store the users array separately.
             users = userNodes.map( function( item ) {
-                return item.querySelector( 'first_name' ).textContent + ' ' +
-                    item.querySelector( 'last_name' ).textContent +
-                    ' (' + item.querySelector( 'user_name' ).textContent + ')';
+                return {
+                    firstName: item.querySelector( 'first_name' ).textContent,
+                    lastName: item.querySelector( 'last_name' ).textContent,
+                    userName: item.querySelector( 'user_name' ).textContent
+                };
             } );
+            usersOptionsHtml = '<option value=""></option>' +
+                users.map( function( user ) {
+                    var readableName = user.firstName + ' ' + user.lastName + ' (' + user.userName + ')';
+                    var selected = user.userName === defaultAssignee ? ' selected' : '';
+                    return '<option value="' + user.userName + '"' + selected + '>' + readableName + '</option>';
+                } );
         } catch ( e ) {
-            users = [];
+            //users = [];
             console.error( e );
         }
     }
 
-    return '<option value=""></option>' +
-        users.map( function( user ) {
-            return '<option value="' + user + '"' + ( user === lastAssignee ? ' selected' : '' ) + '>' + user + '</option>';
-        } );
+    return usersOptionsHtml;
 };
 
 Comment.prototype._getCurrentErrorMsg = function() {
