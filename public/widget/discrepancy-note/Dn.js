@@ -218,6 +218,27 @@ Comment.prototype._isCommentModalShown = function( $linkedQuestion ) {
     return $linkedQuestion.find( '.or-comment-widget' ).length === 1;
 };
 
+/**
+ * If the linked question is not shown full width, ensure that the comment question is.
+ * This correction is meant for the Grid Theme.
+ * 
+ */
+Comment.prototype._getFullWidthStyleCorrection = function() {
+    var $form = this.$linkedQuestion.closest( 'form' );
+    var formWidth = $form.width();
+    var firstQuestionLeft = $( $form[ 0 ].querySelector( '.question' ) ).position().left;
+    var linkedQuestionWidth = this.$linkedQuestion.outerWidth();
+    var linkedQuestionLeft = this.$linkedQuestion.position().left;
+
+    // By correcting the left with the firstQuestionLeft, we can make this function agnostic to themes.
+
+    return {
+        width: ( formWidth * 100 / linkedQuestionWidth ) + '%',
+        left: ( ( firstQuestionLeft - linkedQuestionLeft ) * 100 / linkedQuestionWidth ) + '%'
+    };
+};
+
+
 Comment.prototype._showCommentModal = function( linkedQuestionErrorMsg ) {
     var $widget;
     var $content;
@@ -280,7 +301,7 @@ Comment.prototype._showCommentModal = function( linkedQuestionErrorMsg ) {
 
     $widget = $(
         '<section class="widget or-comment-widget"></section>'
-    ).append( $overlay ).append( $content );
+    ).append( $overlay ).append( $content ).css( this._getFullWidthStyleCorrection() );
 
     this.$linkedQuestion
         .find( '.or-comment-widget' ).remove().end()

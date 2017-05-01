@@ -10,7 +10,7 @@ $padding: 30px;
 
         .question {
             width: 100%;
-            flex: 100%;
+            flex: 100% !important;
         }
 
         &__query-btns {
