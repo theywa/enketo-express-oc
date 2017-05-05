@@ -167,17 +167,17 @@ describe( 'DN object', function() {
             [ '{"queries":[], "logs":[{"type": "comment", "status": "updated", "user": "root", "date_time":2}]}', '' ],
             [ '{"queries":[{"type": "comment", "status": "updated", "user": "root", "date_time":2}], "logs":[]}', '' ],
             // first has empty user
-            [ '{"queries":[], "logs":[{"type": "audit", "user": "", "date_time":2000},{"type": "comment", "user": "Jen Barber (jen)", "date_time":1000}]}', '' ],
-            [ '{"queries":[{"type": "audit", "user": "", "date_time":2},{"type": "comment", "user": "Jen Barber (jen)",  "date_time":1}], "logs":[]}', '' ],
+            [ '{"queries":[], "logs":[{"type": "audit", "user": "", "date_time":2000},{"type": "comment", "user": "jen", "date_time":1000}]}', '' ],
+            [ '{"queries":[{"type": "audit", "user": "", "date_time":2},{"type": "comment", "user": "jen",  "date_time":1}], "logs":[]}', '' ],
             // first has no user
-            [ '{"queries":[], "logs":[{"type": "audit", "date_time":2},{"type": "comment", "user": "Jen Barber (jen)", "date_time":1}]}', '' ],
-            [ '{"queries":[{"type": "audit", "date_time":2},{"type": "comment", "user": "Jen Barber (jen)", "date_time":1}], "logs":[]}', '' ],
+            [ '{"queries":[], "logs":[{"type": "audit", "date_time":2},{"type": "comment", "user": "jen", "date_time":1}]}', '' ],
+            [ '{"queries":[{"type": "audit", "date_time":2},{"type": "comment", "user": "jen", "date_time":1}], "logs":[]}', '' ],
             // first root ignored, next is taken
-            [ '{"queries":[], "logs":[{"type": "audit", "user": "root", "date_time":2},{"type": "comment", "user": "Jen Barber (jen)", "date_time":1}]}', 'Jen Barber (jen)' ],
-            [ '{"queries":[{"type": "audit", "user": "root", "date_time":2},{"type": "comment", "user": "Jen Barber (jen)", "date_time":1}], "logs":[]}', 'Jen Barber (jen)' ],
+            [ '{"queries":[], "logs":[{"type": "audit", "user": "root", "date_time":2},{"type": "comment", "user": "jen", "date_time":1}]}', 'jen' ],
+            [ '{"queries":[{"type": "audit", "user": "root", "date_time":2},{"type": "comment", "user": "jen", "date_time":1}], "logs":[]}', 'jen' ],
             // same, but switched order (same date_time) to test ordering
-            [ '{"queries":[], "logs":[{"type": "comment", "user": "Jen Barber (jen)", "date_time":1}, {"type": "audit", "user": "root", "date_time":2}]}', 'Jen Barber (jen)' ],
-            [ '{"queries":[{"type": "comment", "user": "Jen Barber (jen)", "date_time":1}, {"type": "audit", "user": "root", "date_time":2}], "logs":[]}', 'Jen Barber (jen)' ],
+            [ '{"queries":[], "logs":[{"type": "comment", "user": "jen", "date_time":1}, {"type": "audit", "user": "root", "date_time":2}]}', 'jen' ],
+            [ '{"queries":[{"type": "comment", "user": "jen", "date_time":1}, {"type": "audit", "user": "root", "date_time":2}], "logs":[]}', 'jen' ],
         ].forEach( function( test ) {
             it( 'works', function() {
                 var notes = dn._parseModelFromString( test[ 0 ] );

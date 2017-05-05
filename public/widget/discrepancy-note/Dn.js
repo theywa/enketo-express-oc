@@ -53,7 +53,6 @@ Comment.prototype._init = function() {
  */
 Comment.prototype._getDefaultAssignee = function( notes ) {
     var defaultAssignee = '';
-    var OLDSTYLE = /[\w\s]+\s?\(\s?(\w+)\s?\)/;
 
     notes.queries.concat( notes.logs ).sort( this._datetimeDesc.bind( this ) ).some( function( item ) {
         if ( item.user === SYSTEM_USER ) {
@@ -62,11 +61,6 @@ Comment.prototype._getDefaultAssignee = function( notes ) {
         defaultAssignee = item.user || '';
         return true;
     } );
-
-    // if old-style "Martijn van de Rijdt (mrijdt)" name is used, extract username
-    if ( OLDSTYLE.test( defaultAssignee ) ) {
-        defaultAssignee = OLDSTYLE.exec( defaultAssignee )[ 1 ];
-    }
 
     return defaultAssignee;
 };
