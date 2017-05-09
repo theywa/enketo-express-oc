@@ -5,13 +5,41 @@
 var Form = require( 'enketo-core/src/js/Form' );
 var $ = require( 'jquery' );
 
+/**
+ * This function doesn't actually evaluate constraints. It triggers
+ * an event on nodes that have constraint dependency on the changed node(s).
+ * This event is used in the discrepancy notes widget.
+ * 
+ * @param  {[type]} updated [description]
+ */
 var constraintUpdate = function( updated ) {
     var $nodes;
     var that = this;
-
     updated = updated || {};
-    $nodes = this.getRelatedNodes( 'data-constraint', '', updated );
-    $nodes.trigger( 'constraintevaluated.oc', updated );
+    $nodes = this.getRelatedNodes( 'data-constraint', '', updated )
+        // The filter below is commented out, because at the moment this.getRelatedNodes already takes
+        // care of this (in enketo-core). However, it is not unrealistic to expect that in the future we will 
+        // not be able to rely on that as it may be considered a performance hack too far. In that case, uncomment below.
+        // 
+        // Filter out the nodes that are inside a repeat instance other than
+        // the repeat instance that contains the node that triggered the dataupdate
+        // https://github.com/kobotoolbox/enketo-express/issues/741
+        /*.filter( function() {
+            var $input;
+            var $repeat;
+            var repeatIndex;
+            if ( !updated.repeatPath ) {
+                return true;
+            }
+            $input = $( this );
+            $repeat = $input.closest( '.or-repeat[name="' + updated.repeatPath + '"]' );
+            if ( !$repeat.length ) {
+                return true;
+            }
+            repeatIndex = $( '.or-repeat[name="' + updated.repeatPath + '"]' ).index( $repeat );
+            return repeatIndex === updated.repeatIndex;
+        } )*/
+        .trigger( 'constraintevaluated.oc', updated );
 };
 var originalInit = Form.prototype.init;
 
