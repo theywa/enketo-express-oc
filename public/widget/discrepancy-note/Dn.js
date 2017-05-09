@@ -276,7 +276,6 @@ Comment.prototype._showCommentModal = function( linkedQuestionErrorMsg ) {
     var closeText = t( 'widget.dn.closeQueryText' ) || 'Close Query';
     var assignText = t( 'widget.dn.assignto' ) || 'Assign To'; // TODO: add string to kobotoolbox/enketo-express
     var notifyText = t( 'widget.dn.notifyText' ) || 'Email?'; // TODO: add string to kobotoolbox/enketo-express
-    var historyText = t( 'widget.dn.historyText' ) || 'History'; // TODO: add string to kobotoolbox/enketo-express
     var $closeButton = $( '<button class="btn-icon-only or-comment-widget__content__btn-close-x" type="button">&times;</button>' );
     var $newQueryButton = $( '<button name="new" class="btn btn-primary or-comment-widget__content__btn-submit" type="button">' +
         submitText + '</button>' );
@@ -309,7 +308,7 @@ Comment.prototype._showCommentModal = function( linkedQuestionErrorMsg ) {
         '</span><select name="dn-assignee" class="ignore">' + this._getUserOptions() + '</select>' );
     $notify = $( '<div class="or-comment-widget__content__user__dn-notify option-wrapper"><label><input name="dn-notify" ' +
         'class="ignore" value="true" type="checkbox"/><span class="option-label">' + notifyText + '</span></label></div>' );
-    this.$history = $( '<div class="or-comment-widget__content__history closed"><p>' + historyText + '</p><table></table></div>' );
+    this.$history = $( '<div class="or-comment-widget__content__history closed"><p></p><table></table></div>' );
     $user = $( '<div class="or-comment-widget__content__user">' ).append( $assignee ).append( $notify );
 
     $content = $( '<form onsubmit="return false;" class="or-comment-widget__content" autocomplete="off"></form>' )
@@ -568,6 +567,7 @@ Comment.prototype._getIsoDatetimeStr = function( dateTimeStr ) {
 Comment.prototype._renderHistory = function() {
     var that = this;
     var emptyText = t( 'widget.dn.emptyHistoryText' ) || 'No History';
+    var historyText = t( 'widget.dn.historyText' ) || 'History';
     var user = '<span class="icon fa-user"> </span>';
     var clock = '<span class="icon fa-clock-o"> </span>';
 
@@ -575,7 +575,7 @@ Comment.prototype._renderHistory = function() {
     var $more = over3 > 0 ? $( '<tr><td colspan="4"><span class="over">+' + over3 + '</span>' +
         '<button class="btn-icon-only btn-more-history"><i class="icon"> </i></button></td></tr>' ) : $();
     this.$history.find( 'table' ).empty()
-        .append( '<thead><tr><td></td><td></td><td>' + user + '</td><td>' + clock + '</td></tr></thead>' )
+        .append( '<thead><tr><td></td><td>' + historyText + '</td><td>' + user + '</td><td>' + clock + '</td></tr></thead>' )
         .append( '<tbody>' +
             ( this.notes.queries.concat( this.notes.logs ).sort( this._datetimeDesc.bind( this ) ).map( function( item ) {
                     return that._getRows( item, true );
@@ -634,6 +634,8 @@ Comment.prototype.destroy = function( element ) {
         .removeData( this.namespace )
         .off( '.' + this.namespace )
         .closest( '.question' ).removeClass( 'hide' );
+
+
 };
 
 module.exports = Comment;
