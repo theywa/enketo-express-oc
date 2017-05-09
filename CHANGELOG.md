@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.45.2] - 2017-05-09
+---------------------
+##### Added
+- Support for appearance 'hide-input' in ArcGIS geo widget.
+
+##### Fixed
+- Exception occurs when obtaining cleaned-of-irrelevants model string if repeat has a relevant and a repeat-count of 0.
+- Performance of forms with repeats (issue with dataupdate event data).
+
 [1.45.1] - 2017-05-01
 ---------------------
 ##### Changed
