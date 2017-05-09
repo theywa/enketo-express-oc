@@ -224,9 +224,10 @@ Comment.prototype._setConstraintEvaluationHandler = function() {
         /*
          * If during a session a query is closed, and this triggers a contraintUpdate of the linked question,
          * we do not want to generate an autoquery.
-         * TODO: is this check too imprecise for questions inside repeats?
+         * 
+         * updated.fullPath includes positions (of repeats) which we need to strip
          */
-        if ( currentStatus === 'closed' && updated.fullPath !== that.element.getAttribute( 'name' ) ) {
+        if ( currentStatus === 'closed' && updated.fullPath.replace( /\[\d+\]/g, '' ) !== that.element.getAttribute( 'name' ) ) {
             comment = t( 'widget.dn.closedmodified' );
             that._addQuery( comment, 'closed-modified', '', false, SYSTEM_USER );
         }
