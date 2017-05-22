@@ -2,6 +2,27 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+---------------------
+##### Added
+- Ability to jump to a specific question upon load in previews and edit views.
+
+##### Changed
+- Updated Swedish translations.
+
+[1.46.1] - 2017-05-18
+---------------------
+##### Fixed
+- Branches and Outputs not initialized when repeat is cloned.
+
+[1.46.0] - 2017-05-17
+---------------------
+##### Added
+- Image Map select widget.
+
+##### Fixed
+- Itemsets inside a repeat with a choice_filter (predicate) dependency outside the repeat are not initialized when repeat is cloned.
+
 [1.45.2] - 2017-05-09
 ---------------------
 ##### Added

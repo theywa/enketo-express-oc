@@ -67,6 +67,7 @@ router
         }
     } )
     .all( '*', _setReturnQueryParam )
+    .all( '*', _setGoToHash )
     .get( '/survey', getExistingSurvey )
     .get( '/survey/offline', getExistingSurvey )
     .get( '/survey/iframe', getExistingSurvey )
@@ -347,6 +348,13 @@ function _setDefaultsQueryParam( req, res, next ) {
     next();
 }
 
+function _setGoToHash( req, res, next ) {
+    var goTo = req.body.go_to || req.query.go_to;
+    req.goTo = ( goTo ) ? '#' + goTo : '';
+
+    next();
+}
+
 function _setIframe( req, res, next ) {
     var parentWindowOrigin = req.body.parent_window_origin || req.query.parent_window_origin;
 
@@ -412,6 +420,7 @@ function _generateWebformUrls( id, req ) {
     var OFFLINEPATH = 'x/';
     var FSPATH = 'fs/';
     var fsPart = ( req.fieldSubmission ) ? FSPATH : '';
+    var hash = req.goTo;
     var iframePart = ( req.iframe ) ? IFRAMEPATH : '';
     var protocol = req.headers[ 'x-forwarded-proto' ] || req.protocol;
     var baseUrl = protocol + '://' + req.headers.host + req.app.get( 'base path' ) + '/';
@@ -425,12 +434,12 @@ function _generateWebformUrls( id, req ) {
     switch ( req.webformType ) {
         case 'preview':
             queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam ] );
-            obj.preview_url = baseUrl + 'preview/' + iframePart + idPartOnline + queryString;
+            obj.preview_url = baseUrl + 'preview/' + iframePart + idPartOnline + queryString + hash;
             break;
         case 'edit':
             // no defaults query parameter in edit view
             queryString = _generateQueryString( [ 'instance_id=' + req.body.instance_id, req.parentWindowOriginParam, req.returnQueryParam, req.completeButtonParam, req.dnCloseButtonParam, req.reasonForChangeParam ] );
-            obj.edit_url = baseUrl + 'edit/' + fsPart + iframePart + idPartOnline + queryString;
+            obj.edit_url = baseUrl + 'edit/' + fsPart + iframePart + idPartOnline + queryString + hash;
             break;
         case 'single':
             queryParts = [ req.defaultsQueryParam, req.returnQueryParam, req.dnCloseButtonParam ];
