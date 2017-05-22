@@ -24,7 +24,8 @@ var formData;
 var $formprogress;
 var ignoreBeforeUnload = false;
 var formOptions = {
-    clearIrrelevantImmediately: true
+    clearIrrelevantImmediately: true,
+    goTo: settings.type === 'edit' || settings.type === 'preview'
 };
 
 require( './Form-model' );
@@ -36,6 +37,7 @@ function init( selector, data ) {
 
     formSelector = selector;
     formData = data;
+    $formprogress = $( '.form-progress' );
 
     return new Promise( function( resolve, reject ) {
 
@@ -57,8 +59,6 @@ function init( selector, data ) {
             if ( form.encryptionKey ) {
                 loadErrors.unshift( '<strong>' + t( 'error.encryptionnotsupported' ) + '</strong>' );
             }
-
-            $formprogress = $( '.form-progress' );
 
             _setReasonForChangeUi();
             rc.setLogoutLinkVisibility();

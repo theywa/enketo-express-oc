@@ -43,6 +43,7 @@ Comment.prototype._init = function() {
         this._setDisabledHandler();
         this._setValueChangeHandler();
         this._setCloseHandler();
+        this._setFocusHandler();
         this._setConstraintEvaluationHandler();
     }
 };
@@ -126,6 +127,13 @@ Comment.prototype._setCloseHandler = function() {
                 constraintMsg: constraintMsg
             } ), status, '', false, SYSTEM_USER );
         }
+    } );
+};
+
+Comment.prototype._setFocusHandler = function() {
+    var that = this;
+    $( this.element ).on( 'applyfocus', function() {
+        that.$commentButton.click();
     } );
 };
 
@@ -621,21 +629,6 @@ Comment.prototype._parseFullName = function( user ) {
 
     matches = user.match( /^(.+)\((.+)\)$/ );
     return ( matches && matches.length > 0 ) ? matches[ 1 ] : user;
-};
-
-Comment.prototype.destroy = function( element ) {
-    var $linkedQuestion = this._getLinkedQuestion( element );
-    var $commentButton = $linkedQuestion.find( '.btn-comment' );
-
-    this._hideCommentModal( $linkedQuestion );
-    $commentButton.remove();
-
-    $( element )
-        .removeData( this.namespace )
-        .off( '.' + this.namespace )
-        .closest( '.question' ).removeClass( 'hide' );
-
-
 };
 
 module.exports = Comment;
