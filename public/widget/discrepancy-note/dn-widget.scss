@@ -114,7 +114,8 @@ $padding: 30px;
                 width: 95px;
 
                 &:first-of-type {
-                    width: 30px;
+                    padding-left: 0;
+                    width: 70px;
                 }
 
                 &:nth-of-type(2) {
@@ -233,6 +234,10 @@ legend .btn-dn .icon {
                 thead td {
                     padding-left: 15px;
                     width: 70px;
+
+                    &:first-of-type {
+                        padding-left: 0;
+                    }
 
                     &:nth-of-type(3) {
                         width: 80px;

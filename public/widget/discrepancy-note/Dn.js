@@ -583,7 +583,7 @@ Comment.prototype._renderHistory = function() {
     var $more = over3 > 0 ? $( '<tr><td colspan="4"><span class="over">+' + over3 + '</span>' +
         '<button class="btn-icon-only btn-more-history"><i class="icon"> </i></button></td></tr>' ) : $();
     this.$history.find( 'table' ).empty()
-        .append( '<thead><tr><td></td><td>' + historyText + '</td><td>' + user + '</td><td>' + clock + '</td></tr></thead>' )
+        .append( '<thead><tr><td><b>' + historyText + '</b></td><td></td><td>' + user + '</td><td>' + clock + '</td></tr></thead>' )
         .append( '<tbody>' +
             ( this.notes.queries.concat( this.notes.logs ).sort( this._datetimeDesc.bind( this ) ).map( function( item ) {
                     return that._getRows( item, true );
