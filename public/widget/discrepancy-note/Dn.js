@@ -582,8 +582,10 @@ Comment.prototype._renderHistory = function() {
     var over3 = this.notes.queries.concat( this.notes.logs ).length - 3;
     var $more = over3 > 0 ? $( '<tr><td colspan="4"><span class="over">+' + over3 + '</span>' +
         '<button class="btn-icon-only btn-more-history"><i class="icon"> </i></button></td></tr>' ) : $();
+    var $colGroup = this.notes.queries.concat( this.notes.logs ).length > 0 ? $( '<colgroup><col style="width: 31px;"><col style="width: auto;"></colgroup>' ) : $();
     this.$history.find( 'table' ).empty()
-        .append( '<thead><tr><td></td><td>' + historyText + '</td><td>' + user + '</td><td>' + clock + '</td></tr></thead>' )
+        .append( $colGroup )
+        .append( '<thead><tr><td colspan="2"><strong>' + historyText + '</strong></td><td>' + user + '</td><td>' + clock + '</td></tr></thead>' )
         .append( '<tbody>' +
             ( this.notes.queries.concat( this.notes.logs ).sort( this._datetimeDesc.bind( this ) ).map( function( item ) {
                     return that._getRows( item, true );
