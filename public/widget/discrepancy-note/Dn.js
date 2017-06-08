@@ -582,13 +582,15 @@ Comment.prototype._renderHistory = function() {
     var over3 = this.notes.queries.concat( this.notes.logs ).length - 3;
     var $more = over3 > 0 ? $( '<tr><td colspan="4"><span class="over">+' + over3 + '</span>' +
         '<button class="btn-icon-only btn-more-history"><i class="icon"> </i></button></td></tr>' ) : $();
+    var $colGroup = this.notes.queries.concat( this.notes.logs ).length > 0 ? $( '<colgroup><col style="width: 31px;"><col style="width: auto;"></colgroup>' ) : $();
     this.$history.find( 'table' ).empty()
-        .append( '<thead><tr><td colspan="2"><b>' + historyText + '</b></td><td>' + user + '</td><td>' + clock + '</td></tr></thead>' )
+        .append( $colGroup )
+        .append( '<thead><tr><td colspan="2"><strong>' + historyText + '</strong></td><td>' + user + '</td><td>' + clock + '</td></tr></thead>' )
         .append( '<tbody>' +
             ( this.notes.queries.concat( this.notes.logs ).sort( this._datetimeDesc.bind( this ) ).map( function( item ) {
                     return that._getRows( item, true );
                 } )
-                .join( '' ) || '<tr><td colspan="2">' + emptyText + '</td><td></td><td></td></tr>' ) +
+                .join( '' ) || '<tr><td>' + emptyText + '</td><td></td><td></td><td></td></tr>' ) +
             '</tbody>'
         )
         .find( 'tbody' )
@@ -617,7 +619,7 @@ Comment.prototype._getRows = function( item ) {
     msg = item.comment || item.message;
     elapsed = this._getParsedElapsedTime( item.date_time );
     fullName = this._parseFullName( item.user ) || me;
-    return '<tr><td colspan="2">' + ( types[ item.type ] || '' ) + msg + '</td><td>' + fullName + '</td><td>' + elapsed + '</td></tr>';
+    return '<tr><td>' + ( types[ item.type ] || '' ) + '</td><td>' + msg + '</td><td>' + fullName + '</td><td>' + elapsed + '</td></tr>';
 };
 
 Comment.prototype._parseFullName = function( user ) {
