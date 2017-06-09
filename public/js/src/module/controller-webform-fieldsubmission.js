@@ -54,7 +54,16 @@ function init( selector, data ) {
             // set eventhandlers before initializing form
             _setEventHandlers( selector );
 
-            loadErrors = form.init();
+            // listen for "gotohidden.enketo" event and add error
+            $( formSelector ).on( 'gotohidden.enketo', function( e ) {
+                // In OC hidden go_to fields should show loadError except if go_to field is a disrepancy_note
+                // as those are always hidden upon load.
+                if ( !e.target.classList.contains( 'or-appearance-dn' ) ) {
+                    loadErrors.push( 'Failed to goto question "' + location.hash.substring( 1 ) + '" in form because it is hidden' );
+                }
+            } );
+
+            loadErrors = loadErrors.concat( form.init() );
 
             if ( form.encryptionKey ) {
                 loadErrors.unshift( '<strong>' + t( 'error.encryptionnotsupported' ) + '</strong>' );

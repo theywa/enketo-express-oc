@@ -133,7 +133,11 @@ Comment.prototype._setCloseHandler = function() {
 Comment.prototype._setFocusHandler = function() {
     var that = this;
     $( this.element ).on( 'applyfocus', function() {
-        that.$commentButton.click();
+        if ( that.$commentButton.is( ':visible' ) ) {
+            that.$commentButton.click();
+        } else {
+            throw new Error( 'Linked question for "' + location.hash.substring( 1 ) + '" is not visible.' );
+        }
     } );
 };
 
