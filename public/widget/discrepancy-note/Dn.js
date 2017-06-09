@@ -590,7 +590,7 @@ Comment.prototype._renderHistory = function() {
             ( this.notes.queries.concat( this.notes.logs ).sort( this._datetimeDesc.bind( this ) ).map( function( item ) {
                     return that._getRows( item, true );
                 } )
-                .join( '' ) || '<tr><td>' + emptyText + '</td><td></td><td></td><td></td></tr>' ) +
+                .join( '' ) || '<tr><td colspan="2">' + emptyText + '</td><td></td><td></td></tr>' ) +
             '</tbody>'
         )
         .find( 'tbody' )
