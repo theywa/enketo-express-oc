@@ -81,12 +81,6 @@ module.exports = function( grunt ) {
                     'gulp',
                     'cd ..'
                 ].join( '&&' )
-            },
-            'test-helper-server': {
-                command: 'node test/client/formdata-helper.js',
-                options: {
-                    async: true
-                }
             }
         },
         jsbeautifier: {
@@ -227,8 +221,8 @@ module.exports = function( grunt ) {
     grunt.registerTask( 'js', [ 'client-config-file:create', 'browserify:production' ] );
     grunt.registerTask( 'js-dev', [ 'client-config-file:create', 'browserify:development' ] );
     grunt.registerTask( 'css', [ 'system-sass-variables:create', 'sass' ] );
-    grunt.registerTask( 'test', [ 'env:test', 'js', 'css', 'mochaTest:all', 'shell:test-helper-server', 'karma:headless', 'shell:test-helper-server:kill', 'jsbeautifier:test', 'jshint' ] );
-    grunt.registerTask( 'test-browser', [ 'env:test', 'css', 'client-config-file:create', 'shell:test-helper-server', 'karma:browsers', 'shell:test-helper-server:kill' ] );
+    grunt.registerTask( 'test', [ 'env:test', 'js', 'css', 'mochaTest:all', 'karma:headless', 'jsbeautifier:test', 'jshint' ] );
+    grunt.registerTask( 'test-browser', [ 'env:test', 'css', 'client-config-file:create', 'karma:browsers' ] );
     grunt.registerTask( 'develop', [ 'env:develop', 'i18next', 'js-dev', 'concurrent:develop' ] );
     grunt.registerTask( 'test-and-build', [ 'env:test', 'mochaTest:all', 'karma:headless', 'env:production', 'default' ] );
 };

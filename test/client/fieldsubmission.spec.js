@@ -12,31 +12,8 @@ var FieldSubmissionQueue = require( '../../public/js/src/module/field-submission
 
 chai.use( chaiAsPromised );
 
-// To replace the helper function 'getFields' once PhantomJS has support for FormData.prototype.getAll.
-/*
 var getFieldValue = function( fd ) {
     return utils.blobToString( fd.getAll( 'xml_submission_fragment_file' )[ 0 ] );
-};
-*/
-
-// Convoluted helper function, needed until PhantomJS has support for a function that allows
-// inspecting a FormData instance.
-var getFieldValue = function( fd ) {
-    return new Promise( function( resolve, reject ) {
-        $.ajax( 'http://localhost:8089', {
-            type: 'POST',
-            data: fd,
-            cache: false,
-            contentType: false,
-            processData: false,
-        } ).done( function( data ) {
-            console.log( 'data received back', data );
-            resolve( data );
-        } ).fail( function( jqXHR, textStatus, errorThrown ) {
-            console.error( 'ajax error', jqXHR.getAllResponseHeaders(), jqXHR.status );
-            reject( new Error( textStatus ) );
-        } );
-    } );
 };
 
 describe( 'Field Submission', function() {
