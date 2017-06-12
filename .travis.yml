@@ -10,5 +10,9 @@ before_script:
   - chmod 777 ./setup/redis/travis-redis.sh
   - ./setup/redis/travis-redis.sh
   - grunt css
+addons: 
+  apt:
+    packages:
+      - google-chrome-stable
 services:
   - redis-server
