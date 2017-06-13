@@ -50,6 +50,11 @@ Model.prototype.getXmlFragmentStr = function( node ) {
         n = n.parentNode;
     }
 
+    // Remove comment nodes from tiny remaining fragment
+    $( clone ).find( '*' ).addBack().contents().filter( function() {
+        return this.nodeType === 8;
+    } ).remove();
+
     dataStr = ( new XMLSerializer() ).serializeToString( clone, 'text/xml' );
     // restore default namespaces
     dataStr = dataStr.replace( /\s(data-)(xmlns\=("|')[^\s\>]+("|'))/g, ' $2' );
