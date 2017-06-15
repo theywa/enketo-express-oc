@@ -257,16 +257,17 @@ Comment.prototype._isCommentModalShown = function( $linkedQuestion ) {
  */
 Comment.prototype._getFullWidthStyleCorrection = function() {
     var $form = this.$linkedQuestion.closest( 'form' );
-    var formWidth = $form.width();
-    var firstQuestionLeft = $( $form[ 0 ].querySelector( '.question' ) ).position().left;
+    var fullWidth = this.$linkedQuestion.closest( '.or-repeat' ).width() || $form.width();
+    // select the first question on the current page
+    var firstQuestionOnCurrentPage = $form[ 0 ].querySelector( '[role="page"].current.question, [role="page"].current .question' ) || $form[ 0 ].querySelector( '.question' );
+    var mostLeft = $( firstQuestionOnCurrentPage ).position().left;
     var linkedQuestionWidth = this.$linkedQuestion.outerWidth();
     var linkedQuestionLeft = this.$linkedQuestion.position().left;
 
-    // By correcting the left with the firstQuestionLeft, we can make this function agnostic to themes.
-
+    // By correcting the left we can make this function agnostic to themes.
     return {
-        width: ( formWidth * 100 / linkedQuestionWidth ) + '%',
-        left: ( ( firstQuestionLeft - linkedQuestionLeft ) * 100 / linkedQuestionWidth ) + '%'
+        width: ( fullWidth * 100 / linkedQuestionWidth ) + '%',
+        left: ( ( mostLeft - linkedQuestionLeft ) * 100 / linkedQuestionWidth ) + '%'
     };
 };
 
