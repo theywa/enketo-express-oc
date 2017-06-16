@@ -348,6 +348,12 @@ function _setEventHandlers( selector ) {
             var file;
             var update;
 
+            if ( updated.cloned ) {
+                // This event is fired when a repeat is cloned. It does not trigger
+                // a fieldsubmission.
+                return;
+            }
+
             if ( !updated.xmlFragment ) {
                 console.error( 'Could not submit field. XML fragment missing.' );
                 return;
