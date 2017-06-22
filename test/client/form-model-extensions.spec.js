@@ -11,6 +11,14 @@ describe( 'getting XML fragments', function() {
         expect( model.getXmlFragmentStr( model.xml.querySelector( 'c2' ) ) ).to.equal( '<data><c><c2>2</c2></c></data>' );
     } );
 
+    it( 'works for simple models with comments', function() {
+        var x = '<model><instance><data><a>a</a><b/><c><!-- comment --><c1>1</c1><c2>2<!-- comment --></c2></c><meta><instanceID/></meta></data></instance></model>';
+        var model = new Model( x );
+        model.init();
+        expect( model.getXmlFragmentStr( model.xml.querySelector( 'b' ) ) ).to.equal( '<data><b/></data>' );
+        expect( model.getXmlFragmentStr( model.xml.querySelector( 'c2' ) ) ).to.equal( '<data><c><c2>2</c2></c></data>' );
+    } );
+
     it( 'works for primary instances with a default namespace', function() {
         var x = '<model><instance><data xmlns="https://some.namespace.com/"><a>a</a><b/><c><c1>1</c1><c2>2</c2></c><meta><instanceID/></meta></data></instance></model>';
         var model = new Model( x );

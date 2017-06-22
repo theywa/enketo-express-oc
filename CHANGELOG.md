@@ -2,6 +2,35 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.47.3] - 2017-06-20
+---------------------
+##### Changed
+- Updated datepicker module.
+
+##### Fixed
+- Media files in a repeat group not displayed in repeat clones in offline-capable forms.
+- Duplicate logic evaluation when a repeat is added.
+
+[1.47.2] - 2017-06-19
+---------------------
+##### Changed
+- Allow parens in server URL.
+- Reduced swipe sensitivity to avoid accidental "click-swiping" with a mouse.
+
+##### Fixed
+- Page swipe bypasses block-page-navigation-on-new-constraint-error feature.
+- If form in Pages mode has only one page, this page is not shown. 
+- Datetime and date widgets do not update with calculated date when they are not readonly.
+
+[1.47.1] - 2017-06-09
+---------------------
+##### Changed
+- Add loadError if "go to" field cannot be found.
+- Localize %a and $b in format-date() to form locale at time of calculation.
+
+##### Fixed
+- Frozen UI if "go to" field is a comment field whose linked question is hidden.
+
 [1.47.0] - 2017-05-25
 ---------------------
 ##### Added

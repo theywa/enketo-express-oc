@@ -19,4 +19,4 @@ $(document).keydown(function(e) {
             }
         }
     }
-});
+} );

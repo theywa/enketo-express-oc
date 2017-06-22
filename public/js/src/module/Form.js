@@ -16,31 +16,35 @@ var constraintUpdate = function( updated ) {
     var $nodes;
     var that = this;
     updated = updated || {};
-    $nodes = this.getRelatedNodes( 'data-constraint', '', updated )
-        // The filter below is commented out, because at the moment this.getRelatedNodes already takes
-        // care of this (in enketo-core). However, it is not unrealistic to expect that in the future we will 
-        // not be able to rely on that as it may be considered a performance hack too far. In that case, uncomment below.
-        // 
-        // Filter out the nodes that are inside a repeat instance other than
-        // the repeat instance that contains the node that triggered the dataupdate
-        // https://github.com/kobotoolbox/enketo-express/issues/741
-        /*.filter( function() {
-            var $input;
-            var $repeat;
-            var repeatIndex;
-            if ( !updated.repeatPath ) {
-                return true;
-            }
-            $input = $( this );
-            $repeat = $input.closest( '.or-repeat[name="' + updated.repeatPath + '"]' );
-            if ( !$repeat.length ) {
-                return true;
-            }
-            repeatIndex = $( '.or-repeat[name="' + updated.repeatPath + '"]' ).index( $repeat );
-            return repeatIndex === updated.repeatIndex;
-        } )*/
-        .trigger( 'constraintevaluated.oc', updated );
+    // If the update object is a repeat node (cloned=true), do nothing
+    if ( !updated.cloned ) {
+        $nodes = this.getRelatedNodes( 'data-constraint', '', updated )
+            // The filter below is commented out, because at the moment this.getRelatedNodes already takes
+            // care of this (in enketo-core). However, it is not unrealistic to expect that in the future we will 
+            // not be able to rely on that as it may be considered a performance hack too far. In that case, uncomment below.
+            // 
+            // Filter out the nodes that are inside a repeat instance other than
+            // the repeat instance that contains the node that triggered the dataupdate
+            // https://github.com/kobotoolbox/enketo-express/issues/741
+            /*.filter( function() {
+                var $input;
+                var $repeat;
+                var repeatIndex;
+                if ( !updated.repeatPath ) {
+                    return true;
+                }
+                $input = $( this );
+                $repeat = $input.closest( '.or-repeat[name="' + updated.repeatPath + '"]' );
+                if ( !$repeat.length ) {
+                    return true;
+                }
+                repeatIndex = $( '.or-repeat[name="' + updated.repeatPath + '"]' ).index( $repeat );
+                return repeatIndex === updated.repeatIndex;
+            } )*/
+            .trigger( 'constraintevaluated.oc', updated );
+    }
 };
+
 var originalInit = Form.prototype.init;
 
 Form.prototype.evaluationCascadeAdditions = [ constraintUpdate ];
