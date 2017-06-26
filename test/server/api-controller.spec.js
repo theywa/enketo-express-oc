@@ -114,7 +114,7 @@ describe( 'api', function() {
         var version = test.version;
         var server = ( typeof test.server !== 'undefined' ) ? test.server : validServer;
         var id = typeof test.id !== 'undefined' ? ( test.id !== '{{random}}' ? test.id : Math.floor( Math.random() * 10000 ).toString() ) : validFormId;
-        var ret = typeof test.ret !== 'undefined' ? test.ret : 'http://example.com';
+        var ret = test.ret === true ? 'http://example.com' : test.ret;
         var instance = test.instance === true ? '<data/>' : test.instance;
         var instanceId = test.instanceId === true ? 'UUID:' + Math.random() : test.instanceId;
         var goTo = typeof test.goTo !== 'undefined' ? test.goTo : '';
@@ -416,6 +416,7 @@ describe( 'api', function() {
                     auth: true,
                     instance: true,
                     instanceId: 'AAA',
+                    ret: true,
                     status: 201,
                     res: {
                         property: 'edit_url',
@@ -429,6 +430,7 @@ describe( 'api', function() {
                     auth: true,
                     instance: true,
                     instanceId: true,
+                    ret: true,
                     id: '{{random}}',
                     status: 201,
                     res: {
@@ -469,7 +471,6 @@ describe( 'api', function() {
                 }, {
                     method: 'post',
                     auth: true,
-                    instance: true,
                     instanceId: true,
                     instance: '',
                     status: 400
@@ -477,15 +478,7 @@ describe( 'api', function() {
                     method: 'post',
                     auth: true,
                     instance: true,
-                    instanceId: true,
                     instanceId: '',
-                    status: 400
-                }, {
-                    method: 'post',
-                    auth: true,
-                    instance: true,
-                    instanceId: true,
-                    ret: '',
                     status: 400
                 }, {
                     method: 'post',
@@ -635,6 +628,7 @@ describe( 'api', function() {
                 method: 'get',
                 auth: true,
                 status: 200,
+                ret: true,
                 res: {
                     property: 'single_url',
                     expected: /\/single\/::[A-z0-9]{4}\?/
@@ -644,6 +638,7 @@ describe( 'api', function() {
                 endpoint: '/survey/single/iframe',
                 method: 'get',
                 auth: true,
+                ret: true,
                 status: 200,
                 res: {
                     property: 'single_iframe_url',
@@ -654,6 +649,7 @@ describe( 'api', function() {
                 endpoint: '/survey/single',
                 method: 'post',
                 auth: true,
+                ret: true,
                 status: 200,
                 res: {
                     property: 'single_url',
@@ -664,6 +660,7 @@ describe( 'api', function() {
                 endpoint: '/survey/single/iframe',
                 method: 'post',
                 auth: true,
+                ret: true,
                 status: 200,
                 res: {
                     property: 'single_iframe_url',
@@ -677,6 +674,7 @@ describe( 'api', function() {
                 endpoint: '/survey/single/once',
                 method: 'get',
                 auth: true,
+                ret: true,
                 status: 200,
                 res: {
                     property: 'single_once_url',
@@ -687,6 +685,7 @@ describe( 'api', function() {
                 endpoint: '/survey/single/once/iframe',
                 method: 'get',
                 auth: true,
+                ret: true,
                 status: 200,
                 res: {
                     property: 'single_once_iframe_url',
@@ -697,6 +696,7 @@ describe( 'api', function() {
                 endpoint: '/survey/single/once',
                 method: 'post',
                 auth: true,
+                ret: true,
                 status: 200,
                 res: {
                     property: 'single_once_url',
@@ -707,6 +707,7 @@ describe( 'api', function() {
                 endpoint: '/survey/single/once/iframe',
                 method: 'post',
                 auth: true,
+                ret: true,
                 status: 200,
                 res: {
                     property: 'single_once_iframe_url',
@@ -838,6 +839,7 @@ describe( 'api', function() {
                 endpoint: '/instance',
                 instance: true,
                 instanceId: true,
+                ret: true,
                 defaults: {
                     '/path/to/node': '2,3',
                 },
@@ -918,6 +920,7 @@ describe( 'api', function() {
             }, {
                 endpoint: '/survey/single/iframe',
                 parentWindowOrigin: 'http://example.com/',
+                ret: true,
                 method: 'post',
                 status: 200,
                 res: {
@@ -967,6 +970,7 @@ describe( 'api', function() {
                 instance: true,
                 instanceId: true,
                 parentWindowOrigin: 'http://example.com/',
+                ret: true,
                 method: 'post',
                 status: 201,
                 res: {
@@ -1007,6 +1011,7 @@ describe( 'api', function() {
                 parentWindowOrigin: 'http://example.com/',
                 instance: true,
                 instanceId: true,
+                ret: true,
                 method: 'post',
                 goTo: '//node',
                 status: 201,
@@ -1140,6 +1145,7 @@ describe( 'api', function() {
                 endpoint: '/instance/view',
                 method: 'post',
                 auth: true,
+                ret: true,
                 status: 400,
                 offline: true
             }, {
@@ -1147,6 +1153,7 @@ describe( 'api', function() {
                 method: 'post',
                 auth: true,
                 instance: true,
+                ret: true,
                 status: 400,
                 offline: true
             }, {
@@ -1154,6 +1161,7 @@ describe( 'api', function() {
                 method: 'post',
                 auth: true,
                 instance_id: true,
+                ret: true,
                 status: 400,
                 offline: true
             }, {
@@ -1168,6 +1176,37 @@ describe( 'api', function() {
                     expected: /\/view\/::[a-fA-F0-9]{32}\?instance_id=A$/
                 },
                 offline: true
+            },
+            // return_url
+            {
+                endpoint: '/instance/view',
+                method: 'post',
+                auth: true,
+                instance: true,
+                ret: true,
+                status: 201,
+                instanceId: 'A',
+                res: {
+                    property: 'view_url',
+                    expected: /\/view\/::[a-fA-F0-9]{32}\?instance_id=A&returnUrl=/
+                },
+                offline: true
+            },
+            // check parent window origin
+            {
+                endpoint: '/instance/view/iframe',
+                method: 'post',
+                auth: true,
+                instance: true,
+                status: 201,
+                instanceId: 'A',
+                parentWindowOrigin: 'http://example.com/',
+                ret: true,
+                res: {
+                    property: 'view_iframe_url',
+                    expected: /\/view\/i\/::[a-fA-F0-9]{32}\?instance_id=A&parentWindowOrigin=http%3A%2F%2Fexample.com%2F/
+                },
+                offline: true
             }, {
                 endpoint: '/instance/view',
                 method: 'post',
@@ -1179,6 +1218,22 @@ describe( 'api', function() {
                 res: {
                     property: 'view_url',
                     expected: /\/view\/::[a-fA-F0-9]{32}\?instance_id=A#\/\/node$/
+                },
+                offline: true
+            },
+            // check parent window origin
+            {
+                endpoint: '/instance/view/iframe',
+                method: 'post',
+                auth: true,
+                instance: true,
+                goTo: '//node',
+                parentWindowOrigin: 'http://example.com/',
+                status: 201,
+                instanceId: 'A',
+                res: {
+                    property: 'view_iframe_url',
+                    expected: /.+\?.*parentWindowOrigin=http%3A%2F%2Fexample.com%2F/
                 },
                 offline: true
             }

@@ -212,7 +212,7 @@ function _loadRecord( instanceId, confirmed ) {
  */
 function _submitRecord() {
     var record;
-    var redirect = settings.type === 'single';
+    var redirect = settings.type === 'single' || settings.type === 'edit' || settings.type === 'view';
     var beforeMsg;
     var authLink;
     var level;
@@ -513,6 +513,16 @@ function _setEventHandlers() {
         return false;
     } );
 
+    $( 'button#close-form:not(.disabled)' ).click( function() {
+        var msg = t( 'alert.submissionsuccess.redirectmsg' );
+        $doc.trigger( 'close' );
+        gui.alert( msg, t( 'alert.closing.heading' ), 'warning' );
+        setTimeout( function() {
+            location.href = decodeURIComponent( settings.returnUrl || settings.defaultReturnUrl );
+        }, 300 );
+        return false;
+    } );
+
     $( '.record-list__button-bar__button.upload' ).on( 'click', function() {
         records.uploadQueue();
     } );
@@ -560,7 +570,7 @@ function _setEventHandlers() {
     } );
 
     if ( inIframe() && settings.parentWindowOrigin ) {
-        $doc.on( 'submissionsuccess edited.enketo', postEventAsMessageToParentWindow );
+        $doc.on( 'submissionsuccess edited.enketo close', postEventAsMessageToParentWindow );
     }
 
     $doc.on( 'queuesubmissionsuccess', function() {
