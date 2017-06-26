@@ -136,6 +136,7 @@ module.exports = function( grunt ) {
                     'public/js/enketo-webform-dev-bundle.js': [ 'public/js/src/main-webform.js' ],
                     'public/js/enketo-webform-edit-dev-bundle.js': [ 'public/js/src/main-webform-edit.js' ],
                     'public/js/enketo-webform-fs-dev-bundle.js': [ 'public/js/src/main-webform-fieldsubmission.js' ],
+                    'public/js/enketo-webform-view-dev-bundle.js': [ 'public/js/src/main-webform-view.js' ],
                     'public/js/enketo-offline-fallback-dev-bundle.js': [ 'public/js/src/main-offline-fallback.js' ]
                 },
                 options: {
@@ -149,6 +150,7 @@ module.exports = function( grunt ) {
                     'public/js/enketo-webform-bundle.js': [ 'public/js/src/main-webform.js' ],
                     'public/js/enketo-webform-edit-bundle.js': [ 'public/js/src/main-webform-edit.js' ],
                     'public/js/enketo-webform-fs-bundle.js': [ 'public/js/src/main-webform-fieldsubmission.js' ],
+                    'public/js/enketo-webform-view-bundle.js': [ 'public/js/src/main-webform-view.js' ],
                     'public/js/enketo-offline-fallback-bundle.js': [ 'public/js/src/main-offline-fallback.js' ]
                 },
             },
@@ -168,6 +170,7 @@ module.exports = function( grunt ) {
                     'public/js/enketo-webform-bundle.min.js': [ 'public/js/enketo-webform-bundle.js' ],
                     'public/js/enketo-webform-edit-bundle.min.js': [ 'public/js/enketo-webform-edit-bundle.js' ],
                     'public/js/enketo-webform-fs-bundle.min.js': [ 'public/js/enketo-webform-fs-bundle.js' ],
+                    'public/js/enketo-webform-view-bundle.min.js': [ 'public/js/enketo-webform-view-bundle.js' ],
                     'public/js/enketo-offline-fallback-bundle.min.js': [ 'public/js/enketo-offline-fallback-bundle.js' ],
                 },
             },

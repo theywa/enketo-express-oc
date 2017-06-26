@@ -19,7 +19,7 @@ var formData;
 var $formprogress;
 var formOptions = {
     clearIrrelevantImmediately: true,
-    goTo: settings.type === 'edit' || settings.type === 'preview'
+    goTo: settings.type === 'edit' || settings.type === 'preview' || settings.type === 'view'
 };
 
 require( './Form-model' );
