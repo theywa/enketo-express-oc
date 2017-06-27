@@ -28,6 +28,7 @@ Comment.prototype._init = function() {
     this.$linkedQuestion = this._getLinkedQuestion( this.element );
     this.$commentQuestion = $( this.element ).closest( '.question' );
     this.ordinal = 0;
+    this.readOnly = this.element.readOnly;
 
     if ( this.$linkedQuestion.length === 1 ) {
         this.notes = this._parseModelFromString( this.element.value );
@@ -298,6 +299,7 @@ Comment.prototype._showCommentModal = function( linkedQuestionErrorMsg ) {
         closeText + '</button>' );
     var $flag = this.$linkedQuestion.find( '.btn-dn' ).clone( false );
     var status = this._getCurrentStatus( this.notes );
+    var readOnlyAttr = this.readOnly ? 'readonly ' : '';
 
     if ( status === 'new' || status === 'updated' || status === 'closed-modified' ) {
         $queryButtons.append( $updateQueryButton ).append( $closeQueryButton );
@@ -318,9 +320,9 @@ Comment.prototype._showCommentModal = function( linkedQuestionErrorMsg ) {
 
     $overlay = $( '<div class="or-comment-widget__overlay"></div>' );
     $assignee = $( '<label class="or-comment-widget__content__user__dn-assignee"><span>' + assignText +
-        '</span><select name="dn-assignee" class="ignore">' + this._getUserOptions() + '</select>' );
+        '</span><select name="dn-assignee" class="ignore" >' + this._getUserOptions( this.readOnly ) + '</select>' );
     $notify = $( '<div class="or-comment-widget__content__user__dn-notify option-wrapper"><label><input name="dn-notify" ' +
-        'class="ignore" value="true" type="checkbox"/><span class="option-label">' + notifyText + '</span></label></div>' );
+        'class="ignore" value="true" type="checkbox" ' + readOnlyAttr + '/><span class="option-label">' + notifyText + '</span></label></div>' );
     this.$history = $( '<div class="or-comment-widget__content__history closed"><p></p><table></table></div>' );
     $user = $( '<div class="or-comment-widget__content__user">' ).append( $assignee ).append( $notify );
 
@@ -381,10 +383,11 @@ Comment.prototype._hideCommentModal = function( $linkedQuestion ) {
         .prev( '.or-comment-widget__overlay' ).remove();
 };
 
-Comment.prototype._getUserOptions = function() {
+Comment.prototype._getUserOptions = function( readOnly ) {
     var userNodes;
     var users;
     var defaultAssignee = this.defaultAssignee;
+    var disabled = readOnly ? 'disabled' : '';
 
     if ( !usersOptionsHtml ) {
         try {
@@ -397,11 +400,11 @@ Comment.prototype._getUserOptions = function() {
                     userName: item.querySelector( 'user_name' ).textContent
                 };
             } );
-            usersOptionsHtml = '<option value=""></option>' +
+            usersOptionsHtml = '<option value="" ' + disabled + '></option>' +
                 users.map( function( user ) {
                     var readableName = user.firstName + ' ' + user.lastName + ' (' + user.userName + ')';
-                    var selected = user.userName === defaultAssignee ? ' selected' : '';
-                    return '<option value="' + user.userName + '"' + selected + '>' + readableName + '</option>';
+                    var selected = user.userName === defaultAssignee ? ' selected ' : '';
+                    return '<option value="' + user.userName + '"' + selected + disabled + '>' + readableName + '</option>';
                 } );
         } catch ( e ) {
             //users = [];
