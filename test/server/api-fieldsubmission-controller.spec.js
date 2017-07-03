@@ -281,11 +281,6 @@ describe( 'api', function() {
                 }, {
                     method: 'post',
                     auth: true,
-                    ret: '',
-                    status: 400
-                }, {
-                    method: 'post',
-                    auth: true,
                     server: '',
                     status: 400
                 }
