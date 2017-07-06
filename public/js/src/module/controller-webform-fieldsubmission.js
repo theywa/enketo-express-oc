@@ -69,7 +69,7 @@ function init( selector, data ) {
                 loadErrors.unshift( '<strong>' + t( 'error.encryptionnotsupported' ) + '</strong>' );
             }
 
-            _setReasonForChangeUi();
+            //_setReasonForChangeUi();
             rc.setLogoutLinkVisibility();
 
             if ( loadErrors.length > 0 ) {
@@ -278,6 +278,7 @@ function _complete( bypassConfirmation ) {
         } );
 }
 
+/*
 function _setReasonForChangeUi() {
     var $rfcButton;
     reasonForChangeFeature = settings.type === 'edit' && settings.reasonForChange === true;
@@ -288,7 +289,7 @@ function _setReasonForChangeUi() {
             .on( 'click', _showReasonForChangeDialog );
         $( '.form-header__button--print' ).before( $rfcButton );
     }
-}
+}*/
 
 function _removeCompleteButtonIfNeccessary() {
     if ( settings.type === 'edit' && !settings.completeButton ) {

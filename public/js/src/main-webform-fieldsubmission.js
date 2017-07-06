@@ -44,20 +44,27 @@ translator.init( survey )
         } else {
             return formParts;
         }
-
     } )
     .then( function( formParts ) {
         if ( formParts.form && formParts.model ) {
-            gui.swapTheme( formParts.theme || utils.getThemeFromFormStr( formParts.form ) )
+            return gui.swapTheme( formParts.theme || utils.getThemeFromFormStr( formParts.form ) )
                 .then( function() {
-                    _init( formParts );
-                } )
-                .then( connection.getMaximumSubmissionSize )
-                .then( _updateMaxSizeSetting );
+                    return formParts;
+                } );
         } else {
             throw new Error( t( 'error.unknown' ) );
         }
-    } ).catch( _showErrorOrAuthenticate );
+    } )
+    .then( function( formParts ) {
+        if ( /\/fs\/dnc?\//.test( window.location.pathname ) ) {
+            return _readonlify( formParts );
+        }
+        return formParts;
+    } )
+    .then( _init )
+    .then( connection.getMaximumSubmissionSize )
+    .then( _updateMaxSizeSetting )
+    .catch( _showErrorOrAuthenticate );
 
 function _updateMaxSizeSetting( maxSize ) {
     if ( maxSize ) {
@@ -73,6 +80,38 @@ function _showErrorOrAuthenticate( error ) {
     } else {
         gui.alert( error.message, t( 'alert.loaderror.heading' ) );
     }
+}
+
+/**
+ * Converts non-comment-type questions to readonly
+ * Disables calculations, deprecatedID mechanim and preload items.
+ * 
+ * @param  {[type]} formParts [description]
+ * @return {[type]}           [description]
+ */
+function _readonlify( formParts ) {
+    // Completely disable calculations in Enketo Core
+    require( 'enketo-core/src/js/calculation' ).update = function() {
+        console.log( 'Calculations disabled.' );
+    };
+    // Completely disable preload items
+    require( 'enketo-core/src/js/preload' ).init = function() {
+        console.log( 'Preloaders disabled.' );
+    };
+
+    formParts.form = $( formParts.form );
+    // Note: Enketo made a syntax error by adding the readonly attribute on a <select>
+    // Hence, we cannot use .prop('readonly', true). We'll continue the syntax error.
+    formParts.form.find( 'input, textarea, select' )
+        .filter( function() {
+            return $( this ).parent( '.or-appearance-dn' ).length === 0;
+        } )
+        .attr( 'readonly', 'readonly' );
+    // Properly make native selects readonly (for touchscreens)
+    formParts.form.find( 'option' ).prop( 'disabled', true );
+    // Prevent adding an Add/Remove UI on repeats
+    formParts.form.find( '.or-repeat-info' ).attr( 'data-repeat-fixed', 'fixed' );
+    return formParts;
 }
 
 function _init( formParts ) {

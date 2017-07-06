@@ -6,49 +6,39 @@ There are special fieldsubmission webform views that submit data to [OpenClinica
 
 The following custom Enketo API endpoints return a fieldsubmission webform view:
 
-### GET /survey/single/fieldsubmission
-Has an optional `dn_close_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"true"`. This parameter determines 
-whether a _Close_ button is present in the _Discrepancy Notes widget_.
-
-Only use for testing, use as [GET /survey/single](http://apidocs.enketo.org/v2/#/get-survey-single)*
-
-### GET /survey/single/fieldsubmission/iframe 
-Has an optional `dn_close_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"true"`. This parameter determines 
-whether a _Close_ button is present in the _Discrepancy Notes widget_.
-
-Only use for testing, use as [GET /survey/single/iframe](http://apidocs.enketo.org/v2/#/get-survey-single-iframe)*
-
-### POST /survey/single/fieldsubmission
-Has an optional `dn_close_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"true"`. This parameter determines 
-whether a _Close_ button is present in the _Discrepancy Notes widget_.
-
-Otherwise, use exactly as [POST /survey/single](http://apidocs.enketo.org/v2/#/post-survey-single)*
 
 ### POST /survey/single/fieldsubmission/iframe
-Has an optional `dn_close_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"true"`. This parameter determines 
-whether a _Close_ button is present in the _Discrepancy Notes widget_.
 
-Otherwise, use exactly as [POST /survey/single/iframe](http://apidocs.enketo.org/v2/#/post-survey-single-iframe)*
+Use exactly as [POST /survey/single/iframe](http://apidocs.enketo.org/v2/#/post-survey-single-iframe)
 
-### POST /instance/fieldsubmission
-Has an optional `complete_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"false"`. This parameter determines whether a _Complete_ button is present below the form in addition to the always-present _Close_ button.
-
-Has an optional `dn_close_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"true"`. This parameter determines 
-whether a _Close_ button is present in the _Discrepancy Notes widget_.
-
-Has an optional `reason_for_change` parameter which is either `"true"` or `"false"`. If omitted, considered `"false"`. This parameter determines whether the user is required to enter a reason for change.
-
-Otherwise, use exactly as [POST /instance](http://apidocs.enketo.org/v2/#/post-instance)*
 
 ### POST /instance/fieldsubmission/iframe
+
+Returns an `edit_url` that points to a full-fledged webform view with an existing record.
+
 Has an optional `complete_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"false"`. This parameter determines 
 whether a _Complete_ button is present below the form in addition to the always-present _Close_ button.
 
-Has an optional `dn_close_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"true"`. This parameter determines 
-whether a _Close_ button is present in the _Discrepancy Notes widget_.
+Otherwise, use exactly as [POST /instance/iframe](http://apidocs.enketo.org/v2/#/post-instance-iframe)
 
-Has an optional `reason_for_change` parameter which is either `"true"` or `"false"`. If omitted, considered `"false"`. This parameter determines whether the user is required to enter a reason for change.
 
-Otherwise, use exactly as [POST /instance/iframe](http://apidocs.enketo.org/v2/#/post-instance-iframe)*
+### POST /instance/fieldsubmission/view/dn/iframe
 
-\* The API `defaults` request parameter is not implemented. The response property name will differ. E.g. GET /survey/single/fieldsubmission will return ‘single_fieldsubmission_url’ instead of ‘single_url’.
+Returns an `edit_iframe_url` that points to a readonly view of an existing record where only the discrepancy notes widgets are enabled, and the discrepancy notes widgets **do not have** a Close button.
+
+Has an optional `complete_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"false"`. This parameter determines 
+whether a _Complete_ button is present below the form in addition to the always-present _Close_ button.
+
+Otherwise, use exactly as [POST /instance/view/iframe](https://apidocs.enketo.org/v2#/post-instance-view-iframe)
+
+
+### POST /instance/fieldsubmission/view/dnc/iframe
+
+Returns an `edit_iframe_url` that points to a readonly view of an existing record where only the discrepancy notes widgets are enabled, and the discrepancy notes widgets **have** a Close button.
+
+Has an optional `complete_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"false"`. This parameter determines 
+whether a _Complete_ button is present below the form in addition to the always-present _Close_ button.
+
+Otherwise, use exactly as [POST /instance/view/iframe](https://apidocs.enketo.org/v2#/post-instance-view-iframe)
+
+\* The API `defaults` request parameter is not implemented. The response property name will differ. E.g. POST /survey/single/fieldsubmission will return ‘single_fieldsubmission_iframe_url’ instead of ‘single_iframe_url’.

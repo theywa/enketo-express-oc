@@ -25,6 +25,8 @@ module.exports = function( app ) {
 router.param( 'enketo_id', routerUtils.enketoId );
 router.param( 'encrypted_enketo_id_single', routerUtils.encryptedEnketoIdSingle );
 router.param( 'encrypted_enketo_id_view', routerUtils.encryptedEnketoIdView );
+router.param( 'encrypted_enketo_id_view_dn', routerUtils.encryptedEnketoIdViewDn );
+router.param( 'encrypted_enketo_id_view_dnc', routerUtils.encryptedEnketoIdViewDnc );
 
 router
     .post( '*', function( req, res, next ) {
@@ -35,6 +37,8 @@ router
     .post( '/xform/:enketo_id', getSurveyParts )
     .post( '/xform/:encrypted_enketo_id_single', getSurveyParts )
     .post( '/xform/:encrypted_enketo_id_view', getSurveyParts )
+    .post( '/xform/:encrypted_enketo_id_view_dn', getSurveyParts )
+    .post( '/xform/:encrypted_enketo_id_view_dnc', getSurveyParts )
     .post( '/xform', getSurveyParts )
     .post( '/xform/hash/:enketo_id', getSurveyHash );
 

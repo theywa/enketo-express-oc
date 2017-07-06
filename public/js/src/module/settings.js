@@ -47,9 +47,6 @@ var settingsMap = [ {
     q: 'completeButton',
     s: 'completeButton'
 }, {
-    q: 'dnCloseButton',
-    s: 'dnCloseButton'
-}, {
     q: 'reasonForChange',
     s: 'reasonForChange'
 } ];
@@ -109,6 +106,9 @@ if ( window.location.pathname.indexOf( '/preview' ) === 0 ) {
 } else {
     settings.type = 'other';
 }
+
+// determine whether DN close button should be shown
+settings.dnCloseButton = window.location.pathname.indexOf( '/fs/dn/' ) === -1;
 
 // Provide easy way to change online-only prefix if we wanted to in the future
 settings.enketoIdPrefix = '::';

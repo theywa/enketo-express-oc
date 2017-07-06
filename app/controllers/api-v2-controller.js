@@ -64,6 +64,14 @@ router
         req.webformType = 'view-instance';
         next();
     } )
+    .all( '/instance/fieldsubmission/view/dn/iframe', function( req, res, next ) {
+        req.webformType = 'view-instance-dn';
+        next();
+    } )
+    .all( '/instance/fieldsubmission/view/dnc/iframe', function( req, res, next ) {
+        req.webformType = 'view-instance-dnc';
+        next();
+    } )
     .all( '/survey/offline*', function( req, res, next ) {
         var error;
         if ( req.app.get( 'offline enabled' ) ) {
@@ -112,17 +120,11 @@ router
     .post( '/instance/view', cacheInstance )
     .post( '/instance/view/iframe', cacheInstance )
     .delete( '/instance', removeInstance )
-    .get( '/survey/single/fieldsubmission*', _setDnCloseButtonParam )
-    .post( '/survey/single/fieldsubmission*', _setDnCloseButtonParam )
-    .get( '/survey/single/fieldsubmission', getExistingSurvey )
-    .get( '/survey/single/fieldsubmission/iframe', getExistingSurvey )
-    .post( '/survey/single/fieldsubmission', getNewOrExistingSurvey )
     .post( '/survey/single/fieldsubmission/iframe', getNewOrExistingSurvey )
     .post( '/instance/fieldsubmission*', _setCompleteButtonParam )
-    .post( '/instance/fieldsubmission*', _setDnCloseButtonParam )
-    .post( '/instance/fieldsubmission*', _setReasonForChangeParam )
-    .post( '/instance/fieldsubmission', cacheInstance )
     .post( '/instance/fieldsubmission/iframe', cacheInstance )
+    .post( '/instance/fieldsubmission/view/dn/iframe', cacheInstance )
+    .post( '/instance/fieldsubmission/view/dnc/iframe', cacheInstance )
     .all( '*', function( req, res, next ) {
         var error = new Error( 'Not allowed.' );
         error.status = 405;
@@ -398,24 +400,6 @@ function _setCompleteButtonParam( req, res, next ) {
     next();
 }
 
-function _setDnCloseButtonParam( req, res, next ) {
-    var dnCloseButton = req.body.dn_close_button;
-
-    if ( dnCloseButton ) {
-        req.dnCloseButtonParam = 'dnCloseButton=' + dnCloseButton;
-    }
-    next();
-}
-
-function _setReasonForChangeParam( req, res, next ) {
-    var reasonForChange = req.body.reason_for_change;
-
-    if ( reasonForChange ) {
-        req.reasonForChangeParam = 'reasonForChange=' + reasonForChange;
-    }
-    next();
-}
-
 function _generateQueryString( params ) {
     var paramsJoined;
 
@@ -443,6 +427,8 @@ function _generateWebformUrls( id, req ) {
     var idPartOffline = '#' + id;
     var idPartOnce = '::' + utils.insecureAes192Encrypt( id, keys.singleOnce );
     var idPartView = '::' + utils.insecureAes192Encrypt( id, keys.view );
+    var idPartViewDn = '::' + utils.insecureAes192Encrypt( id, keys.viewDn );
+    var idPartViewDnc = '::' + utils.insecureAes192Encrypt( id, keys.viewDnc );
     var queryParts;
 
     req.webformType = req.webformType || 'default';
@@ -479,6 +465,25 @@ function _generateWebformUrls( id, req ) {
             queryString = _generateQueryString( queryParts );
             obj[ 'view' + ( iframePart ? '_iframe' : '' ) + '_url' ] = baseUrl + 'view/' + iframePart + idPartView + queryString + hash;
             break;
+        case 'view-instance-dn':
+        case 'view-instance-dnc':
+            var viewId;
+            var viewPath = 'edit/' + FSPATH;
+            queryParts = [ 'instance_id=' + req.body.instance_id, req.completeButtonParam ];
+            if ( /view-instance-dnc$/.test( req.webformType ) ) {
+                viewId = idPartViewDnc;
+                viewPath += 'dnc/';
+            } else {
+                viewId = idPartViewDn;
+                viewPath += 'dn/';
+            }
+            if ( iframePart ) {
+                queryParts.push( req.parentWindowOriginParam );
+            }
+            queryParts.push( req.returnQueryParam );
+            queryString = _generateQueryString( queryParts );
+            obj[ 'edit' + ( iframePart ? '_iframe' : '' ) + '_url' ] = baseUrl + viewPath + iframePart + viewId + queryString + hash;
+            break;
         case 'all':
             // non-iframe views
             queryString = _generateQueryString( [ req.defaultsQueryParam ] );
@@ -487,7 +492,6 @@ function _generateWebformUrls( id, req ) {
             obj.single_once_url = baseUrl + idPartOnce + queryString;
             obj.single_url = baseUrl + 'single/' + idPartOnline + queryString;
             obj.single_once_url = baseUrl + 'single/' + idPartOnce + queryString;
-            obj.single_fieldsubmission_url = baseUrl + 'single/' + FSPATH + idPartOnline + queryString;
             obj.offline_url = baseUrl + OFFLINEPATH + idPartOffline;
             obj.preview_url = baseUrl + 'preview/' + idPartOnline + queryString;
             // iframe views
@@ -497,7 +501,6 @@ function _generateWebformUrls( id, req ) {
             obj.single_once_iframe_url = baseUrl + IFRAMEPATH + idPartOnce + queryString;
             obj.single_iframe_url = baseUrl + 'single/' + IFRAMEPATH + idPartOnline + queryString;
             obj.single_once_iframe_url = baseUrl + 'single/' + IFRAMEPATH + idPartOnce + queryString;
-            obj.single_fieldsubmission_iframe_url = baseUrl + 'single/' + FSPATH + IFRAMEPATH + idPartOnline + queryString;
             obj.preview_iframe_url = baseUrl + 'preview/' + IFRAMEPATH + idPartOnline + queryString;
             // rest
             obj.enketo_id = id;

@@ -1067,13 +1067,11 @@ describe( 'api', function() {
                         "url": "http://127.0.0.1/::YYYp",
                         "single_url": "http://127.0.0.1/single/::YYYp",
                         "single_once_url": "http://127.0.0.1/single/::8fc769a601c9f283e8149e68ba4f5d09",
-                        "single_fieldsubmission_url": "http://127.0.0.1/single/fs/::YYYp",
                         "offline_url": "http://127.0.0.1/x/#YYYp",
                         "preview_url": "http://127.0.0.1/preview/::YYYp",
                         "iframe_url": "http://127.0.0.1/i/::YYYp",
                         "single_iframe_url": "http://127.0.0.1/single/i/::YYYp",
                         "single_once_iframe_url": "http://127.0.0.1/single/i/::8fc769a601c9f283e8149e68ba4f5d09",
-                        "single_fieldsubmission_iframe_url": "http://127.0.0.1/single/fs/i/::YYYp",
                         "preview_iframe_url": "http://127.0.0.1/preview/i/::YYYp",
                         "enketo_id": "YYYp",
                         "code": 200

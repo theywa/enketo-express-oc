@@ -19,6 +19,8 @@ module.exports = function( app ) {
 router.param( 'enketo_id', routerUtils.enketoId );
 router.param( 'encrypted_enketo_id_single', routerUtils.encryptedEnketoIdSingle );
 router.param( 'encrypted_enketo_id_view', routerUtils.encryptedEnketoIdView );
+router.param( 'encrypted_enketo_id_view_dn', routerUtils.encryptedEnketoIdViewDn );
+router.param( 'encrypted_enketo_id_view_dnc', routerUtils.encryptedEnketoIdViewDnc );
 
 router
     .all( '*', function( req, res, next ) {
@@ -27,8 +29,12 @@ router
     } )
     .get( '/max-size/:enketo_id', maxSize )
     .get( '/max-size/:encrypted_enketo_id_single', maxSize )
+    .get( '/max-size/:encrypted_enketo_id_view_dn', maxSize )
+    .get( '/max-size/:encrypted_enketo_id_view_dnc', maxSize )
     .get( '/:enketo_id', getInstance )
     .get( '/:encrypted_enketo_id_view', getInstance )
+    .get( '/:encrypted_enketo_id_view_dn', getInstance )
+    .get( '/:encrypted_enketo_id_view_dnc', getInstance )
     .post( '/:enketo_id', submit )
     .post( '/:encrypted_enketo_id_single', submit )
     .all( '/*', function( req, res, next ) {

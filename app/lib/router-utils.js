@@ -5,6 +5,8 @@ var config = require( '../models/config-model' ).server;
 var keys = {
     singleOnce: config[ 'less secure encryption key' ],
     view: config[ 'less secure encryption key' ] + 'view',
+    viewDn: config[ 'less secure encryption key' ] + 'view-dn',
+    viewDnc: config[ 'less secure encryption key' ] + 'view-dnc',
 };
 
 function enketoIdParam( req, res, next, id ) {
@@ -22,6 +24,14 @@ function encryptedEnketoIdParamSingle( req, res, next, id ) {
 
 function encryptedEnketoIdParamView( req, res, next, id ) {
     _encryptedEnketoIdParam( req, res, next, id, keys.view );
+}
+
+function encryptedEnketoIdParamViewDn( req, res, next, id ) {
+    _encryptedEnketoIdParam( req, res, next, id, keys.viewDn );
+}
+
+function encryptedEnketoIdParamViewDnc( req, res, next, id ) {
+    _encryptedEnketoIdParam( req, res, next, id, keys.viewDnc );
 }
 
 function _encryptedEnketoIdParam( req, res, next, id, key ) {
@@ -49,5 +59,7 @@ module.exports = {
     enketoId: enketoIdParam,
     idEncryptionKeys: keys,
     encryptedEnketoIdSingle: encryptedEnketoIdParamSingle,
-    encryptedEnketoIdView: encryptedEnketoIdParamView
+    encryptedEnketoIdView: encryptedEnketoIdParamView,
+    encryptedEnketoIdViewDn: encryptedEnketoIdParamViewDn,
+    encryptedEnketoIdViewDnc: encryptedEnketoIdParamViewDnc
 };

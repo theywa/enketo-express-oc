@@ -93,9 +93,9 @@ describe( 'api', function() {
         var version = test.version;
         var server = ( typeof test.server !== 'undefined' ) ? test.server : validServer;
         var id = typeof test.id !== 'undefined' ? ( test.id !== '{{random}}' ? test.id : Math.floor( Math.random() * 10000 ).toString() ) : validFormId;
-        var ret = typeof test.ret !== 'undefined' ? test.ret : 'http://example.com';
-        var instance = typeof test.instance !== 'undefined' ? test.instance : '<data></data>';
-        var instanceId = typeof test.instanceId !== 'undefined' ? test.instanceId : 'someUUID:' + Math.random();
+        var ret = test.ret === true ? 'http://example.com' : test.ret;
+        var instance = test.instance === true ? '<data/>' : test.instance;
+        var instanceId = test.instanceId === true ? 'UUID:' + Math.random() : test.instanceId;
         var endpoint = test.endpoint;
         var resProp = ( test.res && test.res.property ) ? test.res.property : 'url';
         var offlineEnabled = !!test.offline;
@@ -134,64 +134,37 @@ describe( 'api', function() {
         var version = '2';
 
         describe( '', function() {
-            // GET /survey/single/fieldsubmission
-            testResponse( {
-                version: version,
-                endpoint: '/survey/single/fieldsubmission',
-                method: 'get',
-                // test whether completeButton is ignored as it should be
-                completeButton: true,
-                auth: true,
-                status: 200,
-                res: {
-                    property: 'single_fieldsubmission_url',
-                    expected: /\/single\/fs\/::[A-z0-9]{4}/
-                },
-                offline: false
-            } );
-
-            // POST /survey/single/fieldsubmission
-            testResponse( {
-                version: version,
-                endpoint: '/survey/single/fieldsubmission',
-                method: 'post',
-                auth: true,
-                status: 200,
-                res: {
-                    property: 'single_fieldsubmission_url',
-                    expected: /\/single\/fs\/::[A-z0-9]{4}/
-                },
-                offline: false
-            } );
-
-            // GET /survey/single/fieldsubmission/iframe
-            testResponse( {
-                version: version,
-                endpoint: '/survey/single/fieldsubmission/iframe',
-                method: 'get',
-                auth: true,
-                status: 200,
-                res: {
-                    property: 'single_fieldsubmission_iframe_url',
-                    expected: /\/single\/fs\/i\/::[A-z0-9]{4}/
-                },
-                offline: false
-            } );
-
             // POST /survey/single/fieldsubmission/iframe
             testResponse( {
                 version: version,
                 endpoint: '/survey/single/fieldsubmission/iframe',
                 method: 'post',
+                // test whether completeButton is ignored as it should be
+                completeButton: true,
+                ret: false,
                 auth: true,
                 status: 200,
                 res: {
                     property: 'single_fieldsubmission_iframe_url',
-                    expected: /\/single\/fs\/i\/::[A-z0-9]{4}/
+                    expected: /\/single\/fs\/i\/::[A-z0-9]{4}$/
                 },
                 offline: false
             } );
-
+            // with parent_window_origin
+            testResponse( {
+                version: version,
+                endpoint: '/survey/single/fieldsubmission/iframe',
+                method: 'post',
+                parentWindowOrigin: 'http://example.com',
+                ret: false,
+                auth: true,
+                status: 200,
+                res: {
+                    property: 'single_fieldsubmission_iframe_url',
+                    expected: /\/single\/fs\/i\/::[A-z0-9]{4}\?parentWindowOrigin=http%3A%2F%2Fexample\.com$/
+                },
+                offline: false
+            } );
         } );
 
         describe( '', function() {
@@ -201,6 +174,7 @@ describe( 'api', function() {
                     method: 'post',
                     auth: true,
                     instanceId: 'AAA',
+                    instance: true,
                     status: 201,
                     res: {
                         property: 'edit_url',
@@ -213,6 +187,8 @@ describe( 'api', function() {
                     method: 'post',
                     auth: true,
                     id: '{{random}}',
+                    instanceId: true,
+                    instance: true,
                     status: 201,
                     res: {
                         property: 'edit_url',
@@ -225,6 +201,7 @@ describe( 'api', function() {
                     method: 'post',
                     auth: true,
                     instanceId: beingEdited,
+                    instance: true,
                     status: 405
                 },
                 // test return url in response
@@ -232,6 +209,8 @@ describe( 'api', function() {
                     method: 'post',
                     auth: true,
                     ret: 'http://enke.to',
+                    instanceId: true,
+                    instance: true,
                     status: 201,
                     res: {
                         property: 'edit_url',
@@ -243,6 +222,8 @@ describe( 'api', function() {
                     method: 'post',
                     auth: true,
                     ret: 'http://enke.to',
+                    instanceId: true,
+                    instance: true,
                     completeButton: 'true',
                     status: 201,
                     res: {
@@ -256,6 +237,8 @@ describe( 'api', function() {
                     auth: true,
                     ret: 'http://enke.to',
                     completeButton: 'false',
+                    instanceId: true,
+                    instance: true,
                     status: 201,
                     res: {
                         property: 'edit_url',
@@ -267,26 +250,153 @@ describe( 'api', function() {
                     method: 'post',
                     auth: true,
                     id: '',
+                    instanceId: true,
+                    instance: true,
                     status: 400
                 }, {
                     method: 'post',
                     auth: true,
                     instance: '',
+                    instanceId: true,
                     status: 400
                 }, {
                     method: 'post',
                     auth: true,
                     instanceId: '',
+                    instance: true,
                     status: 400
                 }, {
                     method: 'post',
                     auth: true,
+                    instanceId: true,
+                    instance: true,
                     server: '',
                     status: 400
                 }
             ].map( function( obj ) {
                 obj.version = version;
-                obj.endpoint = '/instance/fieldsubmission';
+                obj.endpoint = '/instance/fieldsubmission/iframe';
+                return obj;
+            } ).forEach( testResponse );
+
+            var readonlyInstanceTests =
+                [
+                    // valid token
+                    {
+                        method: 'post',
+                        auth: true,
+                        instanceId: 'AAA',
+                        instance: true,
+                        status: 201,
+                        res: {
+                            property: 'edit_iframe_url',
+                            // includes proper enketoID and not e.g. ::null 
+                            expected: /\/edit\/fs\/dnc?\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
+                        }
+                    },
+                    // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
+                    {
+                        method: 'post',
+                        auth: true,
+                        id: '{{random}}',
+                        instanceId: true,
+                        instance: true,
+                        status: 201,
+                        res: {
+                            property: 'edit_iframe_url',
+                            // includes proper enketoID and not e.g. ::null 
+                            expected: /\/edit\/fs\/dnc?\/i\/::[A-z0-9]{32}\?instance_id/
+                        }
+                    },
+                    // already being edited
+                    {
+                        method: 'post',
+                        auth: true,
+                        instanceId: beingEdited,
+                        instance: true,
+                        status: 405
+                    },
+                    // test return url in response
+                    {
+                        method: 'post',
+                        auth: true,
+                        ret: 'http://enke.to',
+                        instanceId: true,
+                        instance: true,
+                        status: 201,
+                        res: {
+                            property: 'edit_iframe_url',
+                            expected: /.+\?.*returnUrl=http%3A%2F%2Fenke.to/
+                        }
+                    },
+                    // test parentWindowOrigin
+                    {
+                        method: 'post',
+                        auth: true,
+                        parentWindowOrigin: 'http://example.com',
+                        ret: false,
+                        instanceId: true,
+                        instance: true,
+                        status: 201,
+                        res: {
+                            property: 'edit_iframe_url',
+                            expected: /.+\?.*parentWindowOrigin=http%3A%2F%2Fexample\.com$/
+                        },
+                        offline: false
+                    },
+                    // test completeButton in response
+                    {
+                        method: 'post',
+                        auth: true,
+                        ret: 'http://enke.to',
+                        completeButton: true,
+                        instanceId: true,
+                        instance: true,
+                        status: 201,
+                        res: {
+                            property: 'edit_iframe_url',
+                            expected: /.+\?.*completeButton=true/
+                        }
+                    },
+                    // invalid parameters
+                    {
+                        method: 'post',
+                        auth: true,
+                        id: '',
+                        instanceId: true,
+                        instance: true,
+                        status: 400
+                    }, {
+                        method: 'post',
+                        auth: true,
+                        instance: '',
+                        instanceId: true,
+                        status: 400
+                    }, {
+                        method: 'post',
+                        auth: true,
+                        instanceId: '',
+                        instance: true,
+                        status: 400
+                    }, {
+                        method: 'post',
+                        auth: true,
+                        instanceId: true,
+                        instance: true,
+                        server: '',
+                        status: 400
+                    }
+                ];
+
+            readonlyInstanceTests.map( function( obj ) {
+                obj.version = version;
+                obj.endpoint = '/instance/fieldsubmission/view/dn/iframe';
+                return obj;
+            } ).forEach( testResponse );
+
+            readonlyInstanceTests.map( function( obj ) {
+                obj.version = version;
+                obj.endpoint = '/instance/fieldsubmission/view/dnc/iframe';
                 return obj;
             } ).forEach( testResponse );
         } );

@@ -18,6 +18,8 @@ module.exports = function( app ) {
 router.param( 'enketo_id', routerUtils.enketoId );
 router.param( 'encrypted_enketo_id_single', routerUtils.encryptedEnketoIdSingle );
 router.param( 'encrypted_enketo_id_view', routerUtils.encryptedEnketoIdView );
+router.param( 'encrypted_enketo_id_view_dn', routerUtils.encryptedEnketoIdViewDn );
+router.param( 'encrypted_enketo_id_view_dnc', routerUtils.encryptedEnketoIdViewDnc );
 
 router.param( 'mod', function( req, rex, next, mod ) {
     if ( mod === 'i' ) {
@@ -35,7 +37,6 @@ router
     .get( '/_/', offlineWebform )
     .get( '/:enketo_id', webform )
     .get( '/:mod/:enketo_id', webform )
-    .get( '/single/fs/:enketo_id', fieldSubmission )
     .get( '/single/fs/:mod/:enketo_id', fieldSubmission )
     .get( '/preview/:enketo_id', preview )
     .get( '/preview/:mod/:enketo_id', preview )
@@ -49,8 +50,9 @@ router
     .get( '/view/:mod/:encrypted_enketo_id_view', view )
     .get( '/edit/:enketo_id', edit )
     .get( '/edit/:mod/:enketo_id', edit )
-    .get( '/edit/fs/:enketo_id', fieldSubmission )
     .get( '/edit/fs/:mod/:enketo_id', fieldSubmission )
+    .get( '/edit/fs/dn/:mod/:encrypted_enketo_id_view_dn', fieldSubmission )
+    .get( '/edit/fs/dnc/:mod/:encrypted_enketo_id_view_dnc', fieldSubmission )
     .get( '/xform/:enketo_id', xform )
     .get( '/connection', function( req, res ) {
         res.status = 200;
