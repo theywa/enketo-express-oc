@@ -21,3 +21,4 @@ logs/submissions*
 logs/logrotate
 public/temp-client-config.json
 app/views/styles/component/_system_variables.scss
+test/client/forms/forms.json

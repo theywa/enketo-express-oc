@@ -220,11 +220,43 @@ module.exports = function( grunt ) {
         grunt.log.writeln( 'File ' + systemSassVariablesPath + ' created' );
     } );
 
+    grunt.registerTask( 'transforms', 'Creating forms.json', function( task ) {
+        var forms = {};
+        var done = this.async();
+        var jsonStringify = require( 'json-pretty' );
+        var formsJsonPath = 'test/client/forms/forms.json';
+        var xformsPaths = grunt.file.expand( {}, 'test/client/forms/*.xml' );
+        var transformer = require( 'enketo-transformer' );
+
+        xformsPaths.reduce( function( prevPromise, filePath ) {
+                return prevPromise.then( function() {
+                    var xformStr = grunt.file.read( filePath );
+                    grunt.log.writeln( 'Transforming ' + filePath + '...' );
+                    return transformer.transform( {
+                            xform: xformStr,
+                            includeRelevantMsg: true
+                        } )
+                        .then( function( result ) {
+                            forms[ filePath.substring( filePath.lastIndexOf( '/' ) + 1 ) ] = {
+                                html_form: result.form,
+                                xml_model: result.model
+                            };
+                        } );
+                } );
+
+            }, Promise.resolve() )
+            .then( function() {
+                grunt.file.write( formsJsonPath, jsonStringify( forms ) );
+                done();
+            } );
+    } );
+
+
     grunt.registerTask( 'default', [ 'i18next', 'css', 'js', 'uglify' ] );
     grunt.registerTask( 'js', [ 'client-config-file:create', 'browserify:production' ] );
     grunt.registerTask( 'js-dev', [ 'client-config-file:create', 'browserify:development' ] );
     grunt.registerTask( 'css', [ 'system-sass-variables:create', 'sass' ] );
-    grunt.registerTask( 'test', [ 'env:test', 'js', 'css', 'mochaTest:all', 'karma:headless', 'jsbeautifier:test', 'jshint' ] );
+    grunt.registerTask( 'test', [ 'env:test', 'transforms', 'js', 'css', 'mochaTest:all', 'karma:headless', 'jsbeautifier:test', 'jshint' ] );
     grunt.registerTask( 'test-browser', [ 'env:test', 'css', 'client-config-file:create', 'karma:browsers' ] );
     grunt.registerTask( 'develop', [ 'env:develop', 'i18next', 'js-dev', 'concurrent:develop' ] );
     grunt.registerTask( 'test-and-build', [ 'env:test', 'mochaTest:all', 'karma:headless', 'env:production', 'default' ] );

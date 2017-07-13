@@ -110,7 +110,13 @@ function getSurveyHash( req, res, next ) {
 function _getFormDirectly( survey ) {
     return communicator.getXForm( survey )
         .then( _addMediaMap )
+        .then( _addSettings )
         .then( transformer.transform );
+}
+
+function _addSettings( survey ) {
+    survey.includeRelevantMsg = true;
+    return survey;
 }
 
 function _authenticate( survey ) {

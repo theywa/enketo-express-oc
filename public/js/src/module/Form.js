@@ -5,6 +5,9 @@
 var Form = require( 'enketo-core/src/js/Form' );
 var $ = require( 'jquery' );
 
+require( './Form-model' );
+require( './branch' );
+
 /**
  * This function doesn't actually evaluate constraints. It triggers
  * an event on nodes that have constraint dependency on the changed node(s).
@@ -14,7 +17,6 @@ var $ = require( 'jquery' );
  */
 var constraintUpdate = function( updated ) {
     var $nodes;
-    var that = this;
     updated = updated || {};
     // If the update object is a repeat node (cloned=true), do nothing
     if ( !updated.cloned ) {
@@ -45,9 +47,31 @@ var constraintUpdate = function( updated ) {
     }
 };
 
+/**
+ * OC does not empty irrelevant nodes. Instead non-empty irrelevant nodes get an error until the user clears the value.
+ * This function takes care of re-evaluating the branch when the value is cleared.
+ *
+ * @param  {[type]} updated [description]
+ * @return {[type]}         [description]
+ */
+var relevantErrorUpdate = function( updated ) {
+    var $nodes;
+    var that = this;
+    //updated = updated || {};
+
+    $nodes = this.getRelatedNodes( 'name', '[data-relevant]', updated )
+        .closest( '.invalid-relevant' )
+        .map( function() {
+            return $( this ).is( '[data-relevant]' ) ? this : this.querySelector( '[data-relevant]' );
+        } );
+
+    this.branch.updateNodes( $nodes );
+
+};
+
 var originalInit = Form.prototype.init;
 
-Form.prototype.evaluationCascadeAdditions = [ constraintUpdate ];
+Form.prototype.evaluationCascadeAdditions = [ constraintUpdate, relevantErrorUpdate ];
 
 /**
  * Overrides function in Enketo Core to hide asterisk if field has value.

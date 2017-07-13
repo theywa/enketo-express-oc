@@ -24,12 +24,12 @@ var formData;
 var $formprogress;
 var ignoreBeforeUnload = false;
 var formOptions = {
-    clearIrrelevantImmediately: true,
     goTo: settings.type === 'edit' || settings.type === 'preview'
 };
 
-require( './Form-model' );
+// Modify Enketo Core
 require( './Form' );
+
 
 function init( selector, data ) {
     var advice;
@@ -46,6 +46,7 @@ function init( selector, data ) {
             }
 
             form = new Form( formSelector, data, formOptions );
+            window.form = form; // DEBUG
             fieldSubmissionQueue = new FieldSubmissionQueue();
 
             // remove submit button before event handlers are set
