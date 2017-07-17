@@ -3,6 +3,9 @@
 
 var Form = require( '../../public/js/src/module/Form' );
 var forms = require( './forms/forms' );
+var chai = require( 'chai' );
+var expect = chai.expect;
+var chaiAsPromised = require( 'chai-as-promised' );
 
 var loadForm = function( filename ) {
     var strings = forms[ filename ];
@@ -87,5 +90,36 @@ describe( 'Customized Branching Logic', function() {
             expect( form.view.$.find( c ).closest( '.question' ).hasClass( 'invalid-relevant' ) ).to.equal( false );
         } );
     } );
+
+
+    describe( 'with relevant error interacting with constraint error', function() {
+        var form;
+
+        beforeEach( function( done ) {
+            form = loadForm( 'relevant_constraint_required.xml' );
+            form.init();
+            form.view.$.find( a ).val( 'afdgsgsfafdfadssf' ).trigger( 'change' );
+            form.view.$.find( b ).val( 'diarrhea' ).trigger( 'change' );
+            // add value to c that fails constraint
+            form.view.$.find( c ).val( 5 ).trigger( 'change' );
+            // make c irrelevant (and still failing constraint validation too)
+            form.view.$.find( b ).val( 'diarrheadafsdsfdasd' ).trigger( 'change' );
+            setTimeout( function() {
+                done();
+            }, 500 );
+        } );
+
+        it( 'shows relevant error but not constraint error when form.validate() is called', function() {
+            return form.validate()
+                .then( function( result ) {
+                    return Promise.all( [
+                        expect( result ).to.equal( false ),
+                        expect( form.view.$.find( c ).closest( '.question' ).hasClass( 'invalid-relevant' ) ).to.equal( true ),
+                        expect( form.view.$.find( c ).closest( '.question' ).hasClass( 'invalid-constraint' ) ).to.equal( false ),
+                    ] );
+                } );
+        } );
+
+    } )
 
 } );

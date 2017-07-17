@@ -70,6 +70,7 @@ var relevantErrorUpdate = function( updated ) {
 };
 
 var originalInit = Form.prototype.init;
+var originalValidateInput = Form.prototype.validateInput;
 
 Form.prototype.evaluationCascadeAdditions = [ constraintUpdate, relevantErrorUpdate ];
 
@@ -110,6 +111,26 @@ Form.prototype.init = function() {
         loadErrors.push( e.name + ': ' + e.message );
     }
     return loadErrors;
+};
+
+/**
+ * Skip constraint (and required) validation if question is currently marked with "invalid-relevant" error.
+ * 
+ * @param  {[type]} $input [description]
+ * @return {[type]}        [description]
+ */
+Form.prototype.validateInput = function( $input ) {
+    if ( $input.closest( '.question' ).hasClass( 'invalid-relevant' ) ) {
+        // There is a condition where a valuechange result in both a invalid-relevant and invalid-constraint,
+        // where the invalid constraint is added *after* the invalid-relevant. I can reproduce in automated test (not manually).
+        // It is probably related due to the asynchronousity of contraint evaluation.
+        // 
+        // To crudely resolve this, we remove any constraint (and required) error here.
+        this.setValid( $input, 'constraint' );
+        this.setValid( $input, 'required' );
+        return Promise.resolve();
+    }
+    return originalValidateInput.call( this, $input );
 };
 
 module.exports = Form;
