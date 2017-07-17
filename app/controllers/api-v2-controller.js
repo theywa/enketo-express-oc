@@ -56,6 +56,10 @@ router
         req.fieldSubmission = true;
         next();
     } )
+    .all( '*/c/*', function( req, res, next ) {
+        req.dnClose = true;
+        next();
+    } )
     .all( '/survey/view*', function( req, res, next ) {
         req.webformType = 'view';
         next();
@@ -64,12 +68,8 @@ router
         req.webformType = 'view-instance';
         next();
     } )
-    .all( '/instance/fieldsubmission/view/dn/iframe', function( req, res, next ) {
+    .all( '/instance/fieldsubmission/note/*', function( req, res, next ) {
         req.webformType = 'view-instance-dn';
-        next();
-    } )
-    .all( '/instance/fieldsubmission/view/dnc/iframe', function( req, res, next ) {
-        req.webformType = 'view-instance-dnc';
         next();
     } )
     .all( '/survey/offline*', function( req, res, next ) {
@@ -121,10 +121,12 @@ router
     .post( '/instance/view/iframe', cacheInstance )
     .delete( '/instance', removeInstance )
     .post( '/survey/single/fieldsubmission/iframe', getNewOrExistingSurvey )
+    .post( '/survey/single/fieldsubmission/c/iframe', getNewOrExistingSurvey )
     .post( '/instance/fieldsubmission*', _setCompleteButtonParam )
     .post( '/instance/fieldsubmission/iframe', cacheInstance )
-    .post( '/instance/fieldsubmission/view/dn/iframe', cacheInstance )
-    .post( '/instance/fieldsubmission/view/dnc/iframe', cacheInstance )
+    .post( '/instance/fieldsubmission/c/iframe', cacheInstance )
+    .post( '/instance/fieldsubmission/note/iframe', cacheInstance )
+    .post( '/instance/fieldsubmission/note/c/iframe', cacheInstance )
     .all( '*', function( req, res, next ) {
         var error = new Error( 'Not allowed.' );
         error.status = 405;
@@ -419,6 +421,7 @@ function _generateWebformUrls( id, req ) {
     var OFFLINEPATH = 'x/';
     var FSPATH = 'fs/';
     var fsPart = ( req.fieldSubmission ) ? FSPATH : '';
+    var dnClosePart = ( req.dnClose ) ? 'c/' : '';
     var hash = req.goTo;
     var iframePart = ( req.iframe ) ? IFRAMEPATH : '';
     var protocol = req.headers[ 'x-forwarded-proto' ] || req.protocol;
@@ -429,6 +432,7 @@ function _generateWebformUrls( id, req ) {
     var idPartView = '::' + utils.insecureAes192Encrypt( id, keys.view );
     var idPartViewDn = '::' + utils.insecureAes192Encrypt( id, keys.viewDn );
     var idPartViewDnc = '::' + utils.insecureAes192Encrypt( id, keys.viewDnc );
+    var idPartFsC = '::' + utils.insecureAes192Encrypt( id, keys.fsC );
     var queryParts;
 
     req.webformType = req.webformType || 'default';
@@ -440,17 +444,22 @@ function _generateWebformUrls( id, req ) {
             break;
         case 'edit':
             // no defaults query parameter in edit view
-            queryString = _generateQueryString( [ 'instance_id=' + req.body.instance_id, req.parentWindowOriginParam, req.returnQueryParam, req.completeButtonParam, req.dnCloseButtonParam, req.reasonForChangeParam ] );
-            obj.edit_url = baseUrl + 'edit/' + fsPart + iframePart + idPartOnline + queryString + hash;
+            queryString = _generateQueryString( [ 'instance_id=' + req.body.instance_id, req.parentWindowOriginParam, req.returnQueryParam, req.completeButtonParam, req.reasonForChangeParam ] );
+            obj.edit_url = baseUrl + 'edit/' + fsPart + dnClosePart + iframePart + ( dnClosePart ? idPartFsC : idPartOnline ) + queryString + hash;
             break;
         case 'single':
-            queryParts = [ req.defaultsQueryParam, req.returnQueryParam, req.dnCloseButtonParam ];
+            queryParts = [ req.defaultsQueryParam, req.returnQueryParam ];
             if ( iframePart ) {
                 queryParts.push( req.parentWindowOriginParam );
             }
             queryString = _generateQueryString( queryParts );
-            obj[ 'single' + ( fsPart ? '_fieldsubmission' : '' ) + ( req.multipleAllowed === false ? '_once' : '' ) + ( iframePart ? '_iframe' : '' ) + '_url' ] = baseUrl +
-                'single/' + fsPart + iframePart + ( req.multipleAllowed === false ? idPartOnce : idPartOnline ) + queryString;
+            if ( !req.fieldSubmission ) {
+                obj[ 'single' + ( req.multipleAllowed === false ? '_once' : '' ) + ( iframePart ? '_iframe' : '' ) + '_url' ] = baseUrl +
+                    'single/' + iframePart + ( req.multipleAllowed === false ? idPartOnce : idPartOnline ) + queryString;
+            } else {
+                obj[ 'single_fieldsubmission' + ( iframePart ? '_iframe' : '' ) + '_url' ] = baseUrl +
+                    'single/' + fsPart + dnClosePart + iframePart + ( dnClosePart ? idPartFsC : idPartOnline ) + queryString;
+            }
             break;
         case 'view':
         case 'view-instance':
@@ -466,23 +475,15 @@ function _generateWebformUrls( id, req ) {
             obj[ 'view' + ( iframePart ? '_iframe' : '' ) + '_url' ] = baseUrl + 'view/' + iframePart + idPartView + queryString + hash;
             break;
         case 'view-instance-dn':
-        case 'view-instance-dnc':
-            var viewId;
-            var viewPath = 'edit/' + FSPATH;
+            var viewId = dnClosePart ? idPartViewDnc : idPartViewDn;
+            var viewPath = 'edit/' + FSPATH + 'dn/';
             queryParts = [ 'instance_id=' + req.body.instance_id, req.completeButtonParam ];
-            if ( /view-instance-dnc$/.test( req.webformType ) ) {
-                viewId = idPartViewDnc;
-                viewPath += 'dnc/';
-            } else {
-                viewId = idPartViewDn;
-                viewPath += 'dn/';
-            }
             if ( iframePart ) {
                 queryParts.push( req.parentWindowOriginParam );
             }
             queryParts.push( req.returnQueryParam );
             queryString = _generateQueryString( queryParts );
-            obj[ 'edit' + ( iframePart ? '_iframe' : '' ) + '_url' ] = baseUrl + viewPath + iframePart + viewId + queryString + hash;
+            obj[ 'edit' + ( iframePart ? '_iframe' : '' ) + '_url' ] = baseUrl + viewPath + dnClosePart + iframePart + viewId + queryString + hash;
             break;
         case 'all':
             // non-iframe views

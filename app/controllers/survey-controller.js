@@ -20,6 +20,7 @@ router.param( 'encrypted_enketo_id_single', routerUtils.encryptedEnketoIdSingle 
 router.param( 'encrypted_enketo_id_view', routerUtils.encryptedEnketoIdView );
 router.param( 'encrypted_enketo_id_view_dn', routerUtils.encryptedEnketoIdViewDn );
 router.param( 'encrypted_enketo_id_view_dnc', routerUtils.encryptedEnketoIdViewDnc );
+router.param( 'encrypted_enketo_id_fs_c', routerUtils.encryptedEnketoIdFsC );
 
 router.param( 'mod', function( req, rex, next, mod ) {
     if ( mod === 'i' ) {
@@ -38,6 +39,7 @@ router
     .get( '/:enketo_id', webform )
     .get( '/:mod/:enketo_id', webform )
     .get( '/single/fs/:mod/:enketo_id', fieldSubmission )
+    .get( '/single/fs/c/:mod/:encrypted_enketo_id_fs_c', fieldSubmission )
     .get( '/preview/:enketo_id', preview )
     .get( '/preview/:mod/:enketo_id', preview )
     .get( '/preview', preview )
@@ -51,8 +53,9 @@ router
     .get( '/edit/:enketo_id', edit )
     .get( '/edit/:mod/:enketo_id', edit )
     .get( '/edit/fs/:mod/:enketo_id', fieldSubmission )
+    .get( '/edit/fs/c/:mod/:encrypted_enketo_id_fs_c', fieldSubmission )
     .get( '/edit/fs/dn/:mod/:encrypted_enketo_id_view_dn', fieldSubmission )
-    .get( '/edit/fs/dnc/:mod/:encrypted_enketo_id_view_dnc', fieldSubmission )
+    .get( '/edit/fs/dn/c/:mod/:encrypted_enketo_id_view_dnc', fieldSubmission )
     .get( '/xform/:enketo_id', xform )
     .get( '/connection', function( req, res ) {
         res.status = 200;

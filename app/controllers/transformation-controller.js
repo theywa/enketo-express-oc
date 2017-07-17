@@ -27,6 +27,7 @@ router.param( 'encrypted_enketo_id_single', routerUtils.encryptedEnketoIdSingle 
 router.param( 'encrypted_enketo_id_view', routerUtils.encryptedEnketoIdView );
 router.param( 'encrypted_enketo_id_view_dn', routerUtils.encryptedEnketoIdViewDn );
 router.param( 'encrypted_enketo_id_view_dnc', routerUtils.encryptedEnketoIdViewDnc );
+router.param( 'encrypted_enketo_id_fs_c', routerUtils.encryptedEnketoIdFsC );
 
 router
     .post( '*', function( req, res, next ) {
@@ -39,6 +40,7 @@ router
     .post( '/xform/:encrypted_enketo_id_view', getSurveyParts )
     .post( '/xform/:encrypted_enketo_id_view_dn', getSurveyParts )
     .post( '/xform/:encrypted_enketo_id_view_dnc', getSurveyParts )
+    .post( '/xform/:encrypted_enketo_id_fs_c', getSurveyParts )
     .post( '/xform', getSurveyParts )
     .post( '/xform/hash/:enketo_id', getSurveyHash );
 

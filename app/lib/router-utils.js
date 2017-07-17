@@ -7,6 +7,7 @@ var keys = {
     view: config[ 'less secure encryption key' ] + 'view',
     viewDn: config[ 'less secure encryption key' ] + 'view-dn',
     viewDnc: config[ 'less secure encryption key' ] + 'view-dnc',
+    fsC: config[ 'less secure encryption key' ] + 'fs-c',
 };
 
 function enketoIdParam( req, res, next, id ) {
@@ -34,6 +35,10 @@ function encryptedEnketoIdParamViewDnc( req, res, next, id ) {
     _encryptedEnketoIdParam( req, res, next, id, keys.viewDnc );
 }
 
+function encryptedEnketoIdParamFsC( req, res, next, id ) {
+    _encryptedEnketoIdParam( req, res, next, id, keys.fsC );
+}
+
 function _encryptedEnketoIdParam( req, res, next, id, key ) {
     // either 32 or 64 hexadecimal characters
     if ( /^::([0-9a-fA-F]{32}$|[0-9a-fA-F]{64})$/.test( id ) ) {
@@ -53,13 +58,12 @@ function _encryptedEnketoIdParam( req, res, next, id, key ) {
     }
 }
 
-
-
 module.exports = {
     enketoId: enketoIdParam,
     idEncryptionKeys: keys,
     encryptedEnketoIdSingle: encryptedEnketoIdParamSingle,
     encryptedEnketoIdView: encryptedEnketoIdParamView,
     encryptedEnketoIdViewDn: encryptedEnketoIdParamViewDn,
-    encryptedEnketoIdViewDnc: encryptedEnketoIdParamViewDnc
+    encryptedEnketoIdViewDnc: encryptedEnketoIdParamViewDnc,
+    encryptedEnketoIdFsC: encryptedEnketoIdParamFsC,
 };

@@ -17,6 +17,7 @@ module.exports = function( app ) {
 router.param( 'enketo_id', routerUtils.enketoId );
 router.param( 'encrypted_enketo_id_view_dn', routerUtils.encryptedEnketoIdViewDn );
 router.param( 'encrypted_enketo_id_view_dnc', routerUtils.encryptedEnketoIdViewDnc );
+router.param( 'encrypted_enketo_id_fs_c', routerUtils.encryptedEnketoIdFsC );
 
 router
     .all( '*', function( req, res, next ) {
@@ -24,14 +25,19 @@ router
         next();
     } )
     .post( '/:enketo_id', submit )
+    .post( '/:encrypted_enketo_id_fs_c', submit )
     .post( '/complete/:enketo_id', complete )
+    .post( '/complete/:encrypted_enketo_id_fs_c', complete )
     .put( '/:enketo_id', submit )
+    .put( '/:encrypted_enketo_id_fs_c', submit )
     .put( '/:encrypted_enketo_id_view_dn', submit )
     .put( '/:encrypted_enketo_id_view_dnc', submit )
     .put( '/complete/:enketo_id', complete )
+    .put( '/complete/:encrypted_enketo_id_fs_c', complete )
     .put( '/complete/:encrypted_enketo_id_view_dn', complete )
     .put( '/complete/:encrypted_enketo_id_view_dnc', complete )
     .delete( '/:enketo_id', submit )
+    .delete( '/:encrypted_enketo_id_fs_c', submit )
     .put( '/reason/:enketo_id', reason )
     .all( '/*', function( req, res, next ) {
         var error = new Error( 'Not allowed' );

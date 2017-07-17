@@ -165,6 +165,20 @@ describe( 'api', function() {
                 },
                 offline: false
             } );
+            // POST /survey/single/fieldsubmission/c/iframe
+            testResponse( {
+                version: version,
+                endpoint: '/survey/single/fieldsubmission/c/iframe',
+                method: 'post',
+                ret: false,
+                auth: true,
+                status: 200,
+                res: {
+                    property: 'single_fieldsubmission_iframe_url',
+                    expected: /\/single\/fs\/c\/i\/::[A-z0-9]{32}$/
+                },
+                offline: false
+            } );
         } );
 
         describe( '', function() {
@@ -279,6 +293,27 @@ describe( 'api', function() {
                 return obj;
             } ).forEach( testResponse );
 
+            [
+                // valid token
+                {
+                    method: 'post',
+                    auth: true,
+                    instanceId: 'AAA',
+                    instance: true,
+                    status: 201,
+                    res: {
+                        property: 'edit_url',
+                        // includes proper enketoID and not e.g. ::null 
+                        expected: /\/edit\/fs\/c?\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
+                    }
+                },
+            ].map( function( obj ) {
+                obj.version = version;
+                obj.endpoint = '/instance/fieldsubmission/c/iframe';
+                return obj;
+            } ).forEach( testResponse );
+
+
             var readonlyInstanceTests =
                 [
                     // valid token
@@ -291,7 +326,7 @@ describe( 'api', function() {
                         res: {
                             property: 'edit_iframe_url',
                             // includes proper enketoID and not e.g. ::null 
-                            expected: /\/edit\/fs\/dnc?\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
+                            expected: /\/edit\/fs\/dn(\/c)?\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
                         }
                     },
                     // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
@@ -305,7 +340,7 @@ describe( 'api', function() {
                         res: {
                             property: 'edit_iframe_url',
                             // includes proper enketoID and not e.g. ::null 
-                            expected: /\/edit\/fs\/dnc?\/i\/::[A-z0-9]{32}\?instance_id/
+                            expected: /\/edit\/fs\/dn(\/c)?\/i\/::[A-z0-9]{32}\?instance_id/
                         }
                     },
                     // already being edited
@@ -390,13 +425,13 @@ describe( 'api', function() {
 
             readonlyInstanceTests.map( function( obj ) {
                 obj.version = version;
-                obj.endpoint = '/instance/fieldsubmission/view/dn/iframe';
+                obj.endpoint = '/instance/fieldsubmission/note/iframe';
                 return obj;
             } ).forEach( testResponse );
 
             readonlyInstanceTests.map( function( obj ) {
                 obj.version = version;
-                obj.endpoint = '/instance/fieldsubmission/view/dnc/iframe';
+                obj.endpoint = '/instance/fieldsubmission/note/c/iframe';
                 return obj;
             } ).forEach( testResponse );
         } );
