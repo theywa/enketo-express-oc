@@ -11,7 +11,8 @@
             "autoclosed": "Query closed by system because this item was hidden",
             "valuechange": "Value changed from __previous__ to __new__",
             "autoconstraint": "Automatic query for: __constraintMsg__",
-            "closedmodified": "Data changed after query was closed"
+            "closedmodified": "Data changed after query was closed",
+            "zerominutes": "Just now"
         }
     },
     "fieldsubmission": {

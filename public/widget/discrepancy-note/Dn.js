@@ -482,6 +482,9 @@ Comment.prototype._parseElapsedTime = function( elapsedMilliseconds ) {
     }
     minutes = elapsedMilliseconds / ( 1000 * 60 );
     // TODO: translateable strings with plural?
+    if ( minutes < 0.5 ) {
+        return t( 'widget.dn.zerominutes' ) || 'Just now';
+    }
     if ( minutes < 59.5 ) {
         return Math.round( minutes ) + ' minute(s)';
     }

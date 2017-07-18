@@ -93,8 +93,8 @@ describe( 'DN object', function() {
         } );
 
         [
-            [ 0, '0 minute(s)' ],
-            [ 29999, '0 minute(s)' ],
+            [ 0, 'widget.dn.zerominutes' ],
+            [ 29999, 'widget.dn.zerominutes' ],
             [ 30000, '1 minute(s)' ],
             [ 59.5 * 60 * 1000 - 1, '59 minute(s)' ],
             [ 59.5 * 60 * 1000, '1 hour(s)' ],
