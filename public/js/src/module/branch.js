@@ -44,10 +44,12 @@ branchModule.deactivate = function( $branchNode ) {
         } else {
             this.setDisabledProperty( $branchNode, true );
             this.form.setValid( $control, 'relevant' );
+            $branchNode.trigger( 'hiding.oc' );
         }
 
     } else {
         //TODO: if group descendent has a value, add the relevantError class and remove other errors
         this.setDisabledProperty( $branchNode, true );
+        $branchNode.trigger( 'hiding.oc' );
     }
 };
