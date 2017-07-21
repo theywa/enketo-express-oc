@@ -449,6 +449,7 @@ Comment.prototype._datetimeDesc = function( a, b ) {
 Comment.prototype._getParsedElapsedTime = function( datetimeStr ) {
     var dt = new Date( this._getIsoDatetimeStr( datetimeStr ) );
     if ( typeof datetimeStr !== 'string' || dt.toString() === 'Invalid Date' ) {
+        console.error( 'Could not convert datetime string "' + datetimeStr + '" to a Date object.' );
         return 'error';
     }
     return this._parseElapsedTime( new Date() - dt );
@@ -461,6 +462,7 @@ Comment.prototype._parseElapsedTime = function( elapsedMilliseconds ) {
     var minutes;
 
     if ( isNaN( elapsedMilliseconds ) || elapsedMilliseconds < 0 ) {
+        console.error( 'Could not parse elapsed time for elapsed milliseconds: "' + elapsedMilliseconds + '"' );
         return 'error';
     }
     minutes = elapsedMilliseconds / ( 1000 * 60 );
