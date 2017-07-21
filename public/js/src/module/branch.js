@@ -21,6 +21,8 @@ branchModule.activate = function( $branchNode ) {
     }
 };
 
+branchModule.originalDeactivate = branchModule.deactivate;
+
 // Overwrite deactivate function
 branchModule.deactivate = function( $branchNode ) {
     var name;
@@ -36,20 +38,20 @@ branchModule.deactivate = function( $branchNode ) {
         value = this.form.model.node( name, index ).getVal()[ 0 ];
 
         if ( value !== '' ) {
-            $branchNode.removeClass( 'disabled' );
+            //$branchNode.removeClass( 'disabled' );
             this.form.setInvalid( $control, 'relevant' );
             // After setting invalid-relevant remove any previous errors.
             this.form.setValid( $control, 'constraint' );
             this.form.setValid( $control, 'required' );
         } else {
-            this.setDisabledProperty( $branchNode, true );
             this.form.setValid( $control, 'relevant' );
+            this.originalDeactivate( $branchNode );
             $branchNode.trigger( 'hiding.oc' );
         }
 
     } else {
         //TODO: if group descendent has a value, add the relevantError class and remove other errors
-        this.setDisabledProperty( $branchNode, true );
+        this.originalDeactivate( $branchNode );
         $branchNode.trigger( 'hiding.oc' );
     }
 };
