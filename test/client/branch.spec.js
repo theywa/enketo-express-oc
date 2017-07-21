@@ -120,6 +120,29 @@ describe( 'Customized Branching Logic', function() {
                 } );
         } );
 
-    } )
+    } );
+
+    describe( 'resets relevantError', function() {
+        var form;
+
+        beforeEach( function( done ) {
+            form = loadForm( 'relevant_constraint_required.xml' );
+            form.init();
+            form.view.$.find( a ).val( 'a' ).trigger( 'change' );
+            form.view.$.find( b ).val( 'd' ).trigger( 'change' );
+            // make b irrelevant
+            form.view.$.find( a ).val( 'nothing' ).trigger( 'change' );
+            setTimeout( function() {
+                done();
+            }, 500 );
+        } );
+
+        it( 'when question becomes relevant again', function() {
+            expect( form.view.$.find( b ).closest( '.question' ).hasClass( 'invalid-relevant' ) ).to.equal( true );
+            // make b relevant again
+            form.view.$.find( a ).val( 'a' ).trigger( 'change' );
+            expect( form.view.$.find( c ).closest( '.question' ).hasClass( 'invalid-relevant' ) ).to.equal( false );
+        } );
+    } );
 
 } );

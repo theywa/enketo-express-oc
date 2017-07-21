@@ -5,6 +5,16 @@
 var branchModule = require( 'enketo-core/src/js/branch' );
 var $ = require( 'jquery' );
 
+/**
+ * Overwrite core functionality by removing isSelfRelevant check
+ */
+branchModule.enable = function( $branchNode ) {
+    $branchNode.removeClass( 'disabled pre-init' );
+    this.form.widgets.enable( $branchNode );
+    this.activate( $branchNode );
+    return true;
+};
+
 
 // Overwrite clear function
 branchModule.clear = function( $branchNode ) {
