@@ -146,7 +146,6 @@ Comment.prototype._setFocusHandler = function() {
  * Observes the disabled state of the linked question, and automatically generates
  * an audit log if:
  * 1. The question gets disabled and the query is currently 'open'.
- * 2. The form was loaded with a value for the linked question, but the question was disabled (upon load).
  */
 Comment.prototype._setDisabledHandler = function() {
     var comment;
@@ -163,13 +162,8 @@ Comment.prototype._setDisabledHandler = function() {
             currentStatus = that._getCurrentStatus( that.notes );
             open = currentStatus === 'updated' || currentStatus === 'new';
             linkedVal = that.options.helpers.input.getVal( $target );
-            // If clearIrrelevantImmediately is true, this condition can only occur upon form loading if a form is loaded
-            // with a value for an irrelevant question and no open queries.
             // Note that getVal() can return an empty array.
-            if ( !open && linkedVal.length > 0 ) {
-                comment = t( 'widget.dn.containsdatahidden' );
-                status = 'updated'; //TODO: properly determine status of added audit log
-            } else if ( open && linkedVal.length === 0 ) {
+            if ( open && linkedVal.length === 0 ) {
                 // This will not be triggered if a form is loaded with a value for an irrelevant question and an open query.
                 comment = t( 'widget.dn.autoclosed' );
                 status = 'closed';
