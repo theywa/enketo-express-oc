@@ -47,6 +47,10 @@
             "complete": {
                 "msg": "Would you like to complete this record and exit?",
                 "heading": "Confirm Completion"
+            },
+            "leaveanyway": {
+                "msg": "Would you like to discard the changes and leave anyway?",
+                "button": "Leave Anyway"
             }
         },
         "prompt": {

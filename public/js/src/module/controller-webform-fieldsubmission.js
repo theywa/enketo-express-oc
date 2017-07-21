@@ -184,25 +184,43 @@ function _close( bypassAutoQuery ) {
 
                 msg += t( 'alert.submissionsuccess.redirectmsg' );
                 gui.alert( msg, t( 'alert.submissionsuccess.heading' ), 'success' );
-                ignoreBeforeUnload = true;
-                setTimeout( function() {
-                    location.href = decodeURIComponent( settings.returnUrl || DEFAULT_THANKS_URL );
-                }, 1200 );
+                _redirect();
             }
         } )
         .catch( function( error ) {
+            var errorMsg;
             error = error || {};
 
             console.error( 'close error', error );
             if ( error.status === 401 ) {
-                msg = t( 'alert.submissionerror.authrequiredmsg', {
+                errorMsg = t( 'alert.submissionerror.authrequiredmsg', {
                     here: authLink
                 } );
+                gui.alert( errorMsg, t( 'alert.submissionerror.heading' ) );
             } else {
-                msg = error.message || gui.getErrorResponseMsg( error.status );
+                errorMsg = error.message || gui.getErrorResponseMsg( error.status );
+                gui.confirm( {
+                    heading: t( 'alert.default.heading' ),
+                    errorMsg: errorMsg,
+                    msg: t( 'fieldsubmission.confirm.leaveanyway.msg' )
+                }, {
+                    posButton: t( 'confirm.default.negButton' ),
+                    negButton: t( 'fieldsubmission.confirm.leaveanyway.button' ),
+                    posAction: function() {},
+                    negAction: function() {
+                        _redirect( 100 );
+                    }
+                } );
             }
-            gui.alert( msg, t( 'alert.submissionerror.heading' ) );
+
         } );
+}
+
+function _redirect( msec ) {
+    ignoreBeforeUnload = true;
+    setTimeout( function() {
+        location.href = decodeURIComponent( settings.returnUrl || DEFAULT_THANKS_URL );
+    }, msec || 1200 );
 }
 
 /**
@@ -260,10 +278,7 @@ function _complete( bypassConfirmation ) {
 
             msg += t( 'alert.submissionsuccess.redirectmsg' );
             gui.alert( msg, t( 'alert.submissionsuccess.heading' ), 'success' );
-            ignoreBeforeUnload = true;
-            setTimeout( function() {
-                location.href = decodeURIComponent( settings.returnUrl || DEFAULT_THANKS_URL );
-            }, 1200 );
+            _redirect();
         } )
         .catch( function( result ) {
             result = result || {};
