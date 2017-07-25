@@ -1,6 +1,5 @@
 'use strict';
 
-var sniffer = require( './sniffer' );
 var config = require( 'enketo-config' );
 var queryParams = _getAllQueryParams();
 var settings = {};
@@ -123,6 +122,12 @@ settings.enketoId = ( settings.offline ) ? _getEnketoId( '#', window.location.ha
 if ( settings.type === 'single' && settings.enketoId.length !== 32 && settings.enketoId.length !== 64 ) {
     settings.multipleAllowed = true;
 }
+
+// Determine whether "go to" functionality should be enabled.
+settings.goTo = settings.type === 'edit' || settings.type === 'preview' || settings.type === 'view';
+
+// A bit crude and hackable by users, but this way also type=view with a record will be caught.
+settings.printRelevantOnly = !!settings.instanceId;
 
 function _getEnketoId( prefix, haystack ) {
     var id = new RegExp( prefix ).test( haystack ) ? haystack.substring( haystack.lastIndexOf( prefix ) + prefix.length ) : null;

@@ -24,7 +24,8 @@ var formData;
 var $formprogress;
 var ignoreBeforeUnload = false;
 var formOptions = {
-    goTo: settings.type === 'edit' || settings.type === 'preview'
+    goTo: settings.goTo,
+    printRelevantOnly: settings.printRelevantOnly
 };
 
 // Modify Enketo Core
