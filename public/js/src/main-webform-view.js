@@ -95,6 +95,10 @@ function _init( formParts ) {
             external: formParts.externalData,
             instanceAttachments: formParts.instanceAttachments
         } ).then( function() {
+            // Add OC readonly message
+            $( '<div class="fieldsubmission-status readonly"/>' ).prependTo( '.form-header' )
+                .add( $( '<div class="form-footer__feedback fieldsubmission-status readonly"/>' ).prependTo( '.form-footer' ) )
+                .text( t( 'fieldsubmission.readonly.msg' ) );
             $form.add( $buttons ).removeClass( 'hide' );
             $( 'head>title' ).text( utils.getTitleFromFormStr( formParts.form ) );
         } );

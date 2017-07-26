@@ -63,6 +63,9 @@
             "ongoing": "Saving...",
             "success": "All changes saved.",
             "fail": "Failed to save changes."
+        },
+        "readonly": {
+            "msg": "You are in read-only mode."
         }
     }
 }

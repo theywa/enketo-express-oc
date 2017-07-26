@@ -308,6 +308,9 @@ FieldSubmissionQueue.prototype._uploadStatus = {
         this._getBox().removeClass( 'ongoing success error fail' ).addClass( status ).text( this._getText( status ) );
     },
     update: function( status ) {
+        if ( /\/fs\/dnc?\//.test( window.location.pathname ) ) {
+            return;
+        }
         this._updateClass( status );
     }
 };
