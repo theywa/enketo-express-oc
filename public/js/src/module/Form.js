@@ -56,8 +56,6 @@ var constraintUpdate = function( updated ) {
  */
 var relevantErrorUpdate = function( updated ) {
     var $nodes;
-    var that = this;
-    //updated = updated || {};
 
     $nodes = this.getRelatedNodes( 'name', '[data-relevant]', updated )
         .closest( '.invalid-relevant' )
@@ -66,7 +64,6 @@ var relevantErrorUpdate = function( updated ) {
         } );
 
     this.branch.updateNodes( $nodes );
-
 };
 
 var originalInit = Form.prototype.init;
@@ -89,7 +86,6 @@ Form.prototype.updateRequiredVisibility = function( n ) {
 
 
 Form.prototype.init = function() {
-    var $nodes;
     var that = this;
     var loadErrors = originalInit.call( this );
     // Add custom functionality

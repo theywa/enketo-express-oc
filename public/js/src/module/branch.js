@@ -17,17 +17,30 @@ branchModule.enable = function( $branchNode ) {
 
 
 // Overwrite clear function
-branchModule.clear = function( $branchNode ) {
+branchModule.clear = function() {
     // Only user can clear values in OC.
 };
 
 branchModule.activate = function( $branchNode ) {
     var $control;
+    var required;
 
     this.setDisabledProperty( $branchNode, false );
     if ( $branchNode.is( '.question' ) ) {
         $control = $( $branchNode[ 0 ].querySelector( 'input, select, textarea' ) );
         this.form.setValid( $control, 'relevant' );
+        // Re-show any constraint error message when the relevant error has been removed.
+        // Since validateInput looks at both required and constraint, and we don't want required
+        // validation, we use a very dirty trick to bypass it.
+        required = $control.data( 'required' );
+        if ( required ) {
+            $control.removeAttr( 'data-required' );
+        }
+        this.form.validateInput( $control );
+        if ( required ) {
+            $control.attr( 'data-required', required );
+
+        }
     }
 };
 
