@@ -100,7 +100,7 @@ function _init( formParts ) {
                 .add( $( '<div class="form-footer__feedback fieldsubmission-status readonly"/>' ).prependTo( '.form-footer' ) )
                 .text( t( 'fieldsubmission.readonly.msg' ) );
             $form.add( $buttons ).removeClass( 'hide' );
-            $( 'head>title' ).text( utils.getTitleFromFormStr( formParts.form ) );
+            $( 'head>title' ).text( $( '#form-title' ).text() );
         } );
     } );
 }
