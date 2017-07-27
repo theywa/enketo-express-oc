@@ -127,7 +127,7 @@ if ( settings.type === 'single' && settings.enketoId.length !== 32 && settings.e
 settings.goTo = settings.type === 'edit' || settings.type === 'preview' || settings.type === 'view';
 
 // A bit crude and hackable by users, but this way also type=view with a record will be caught.
-settings.printRelevantOnly = !!settings.instanceId;
+settings.printRelevantOnly = !( ( settings.type === 'view' && !settings.instanceId ) || settings.type === 'preview' );
 
 function _getEnketoId( prefix, haystack ) {
     var id = new RegExp( prefix ).test( haystack ) ? haystack.substring( haystack.lastIndexOf( prefix ) + prefix.length ) : null;
