@@ -116,17 +116,23 @@ Form.prototype.init = function() {
  * @return {[type]}        [description]
  */
 Form.prototype.validateInput = function( $input ) {
-    if ( $input.closest( '.question' ).hasClass( 'invalid-relevant' ) ) {
-        // There is a condition where a valuechange result in both a invalid-relevant and invalid-constraint,
-        // where the invalid constraint is added *after* the invalid-relevant. I can reproduce in automated test (not manually).
-        // It is probably related due to the asynchronousity of contraint evaluation.
-        // 
-        // To crudely resolve this, we remove any constraint (and required) error here.
-        this.setValid( $input, 'constraint' );
-        this.setValid( $input, 'required' );
-        return Promise.resolve();
-    }
-    return originalValidateInput.call( this, $input );
+    var that = this;
+    // There is a condition where a valuechange result in both an invalid-relevant and invalid-constraint,
+    // where the invalid constraint is added *after* the invalid-relevant. I can reproduce in automated test (not manually).
+    // It is probably related due to the asynchronousity of contraint evaluation.
+    // 
+    // To crudely resolve this, we remove any constraint error here.
+    // However we do want some of the other things that validateInput does (ie. updating the required "*" visibility), so 
+    // we will still run it but then remove any invalid classes.
+    // 
+    // This is very unfortunate, but these are the kind of acrobatics that are necessary to "fight" the built-in behavior of Enketo's form engine.
+    return originalValidateInput.call( this, $input )
+        .then( function( passed ) {
+            if ( !passed && $input.closest( '.question' ).hasClass( 'invalid-relevant' ) ) {
+                that.setValid( $input, 'constraint' );
+            }
+            return passed;
+        } );
 };
 
 module.exports = Form;
