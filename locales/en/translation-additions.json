@@ -65,7 +65,10 @@
             "fail": "Failed to save changes."
         },
         "readonly": {
-            "msg": "You are in read-only mode."
+            "msg": "You're in read-only mode."
+        },
+        "noteonly": {
+            "msg": "You're in review-only mode."
         }
     }
 }

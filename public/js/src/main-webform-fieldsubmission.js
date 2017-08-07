@@ -103,7 +103,7 @@ function _readonlify( formParts ) {
     // change status message
     $( '<div class="fieldsubmission-status readonly"/>' ).prependTo( '.form-header' )
         .add( $( '<div class="form-footer__feedback fieldsubmission-status readonly"/>' ).prependTo( '.form-footer' ) )
-        .text( t( 'fieldsubmission.readonly.msg' ) );
+        .text( t( 'fieldsubmission.noteonly.msg' ) );
 
     formParts.form = $( formParts.form );
     // Note: Enketo made a syntax error by adding the readonly attribute on a <select>
