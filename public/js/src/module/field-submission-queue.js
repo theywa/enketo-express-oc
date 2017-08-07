@@ -135,7 +135,6 @@ FieldSubmissionQueue.prototype.submitAll = function() {
 };
 
 FieldSubmissionQueue.prototype._submitAll = function() {
-    var submission;
     var _queue;
     var method;
     var url;

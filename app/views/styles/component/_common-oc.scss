@@ -1,3 +1,34 @@
 .or .or-repeat .repeat-number {
     display: none;
 }
+
+// readonly and note-only views
+.oc-view, 
+.touch .oc-view{
+    .form-progress {
+        display: none;
+    }
+    // hover style of radiobuttons and checkboxes
+     .option-wrapper:not(.or-comment-widget__content__user__dn-notify) > label:hover {
+        background: inherit !important;
+    }
+    // suppress focus style, for most form controls except for discrepancy note controls
+    select:not([name=dn-assignee]), textarea:not([name=dn-comment]), input:not([name=dn-notify], [name=dn-comment]),
+    .draw-widget__body__canvas {    
+        &:focus {
+            box-shadow: inherit !important;
+            &:not(:checked) {
+                border-color: $input-border !important;
+            }
+        }
+    }
+    // suppress focus style for pulldown widgets
+    a:focus {
+        outline: 0 !important;
+    }
+    // suppress image grid focus style
+    input:focus ~ .active {
+        box-shadow: inherit !important;
+        border: none !important;
+    }
+}

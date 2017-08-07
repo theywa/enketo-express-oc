@@ -364,7 +364,6 @@ function _setEventHandlers( selector ) {
         .on( 'dataupdate.enketo', selector, function( event, updated ) {
             var instanceId = form.instanceID;
             var file;
-            var update;
 
             if ( updated.cloned ) {
                 // This event is fired when a repeat is cloned. It does not trigger

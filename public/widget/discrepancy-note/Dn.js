@@ -280,7 +280,6 @@ Comment.prototype._showCommentModal = function( linkedQuestionErrorMsg ) {
         updateText + '</button>' );
     var $closeQueryButton = ( noClose ) ? $() : $( '<button name="closed" class="btn btn-default or-comment-widget__content__btn-submit" type="button">' +
         closeText + '</button>' );
-    var $flag = this.$linkedQuestion.find( '.btn-dn' ).clone( false );
     var status = this._getCurrentStatus( this.notes );
     var readOnlyAttr = this.readOnly ? 'readonly ' : '';
 
@@ -298,6 +297,7 @@ Comment.prototype._showCommentModal = function( linkedQuestionErrorMsg ) {
         .find( 'input, textarea' )
         .addClass( 'ignore' )
         .removeAttr( 'name data-for data-type-xml' )
+        .attr( 'name', 'dn-comment' )
         .removeData()
         .val( linkedQuestionErrorMsg );
 

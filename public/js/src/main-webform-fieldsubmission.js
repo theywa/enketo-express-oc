@@ -89,6 +89,9 @@ function _showErrorOrAuthenticate( error ) {
  * @return {[type]}           [description]
  */
 function _readonlify( formParts ) {
+    // Styling changes
+    $( 'body' ).addClass( 'oc-view' );
+
     // Completely disable calculations in Enketo Core
     require( 'enketo-core/src/js/calculation' ).update = function() {
         console.log( 'Calculations disabled.' );

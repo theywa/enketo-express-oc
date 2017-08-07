@@ -21,6 +21,9 @@ var survey = {
     noHashes: true
 };
 
+// OC style customizations for "views"
+$( 'body' ).addClass( 'oc-view' );
+
 // Completely disable calculations in Enketo Core
 require( 'enketo-core/src/js/calculation' ).update = function() {
     console.log( 'Calculations disabled.' );
