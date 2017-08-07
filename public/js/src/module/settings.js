@@ -46,8 +46,8 @@ var settingsMap = [ {
     q: 'completeButton',
     s: 'completeButton'
 }, {
-    q: 'reasonForChange',
-    s: 'reasonForChange'
+    q: 'PID',
+    s: 'pid'
 } ];
 
 // rename query string parameters to settings, but only if they do not exist already

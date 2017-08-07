@@ -129,8 +129,11 @@ function _init( formParts ) {
             external: formParts.externalData,
             instanceAttachments: formParts.instanceAttachments
         } ).then( function() {
+            var $title = $( '#form-title' );
+            var title = ( settings.pid ) ? settings.pid + ': ' + $title.text() : title.text();
             $form.add( $buttons ).removeClass( 'hide' );
-            $( 'head>title' ).text( $( '#form-title' ).text() );
+            $title.text( title );
+            $( 'head>title' ).text( title );
         } );
     } );
 }
