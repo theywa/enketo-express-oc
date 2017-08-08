@@ -70,5 +70,8 @@
         "noteonly": {
             "msg": "You're in review-only mode."
         }
+    },
+    "constraint": {
+        "relevant": "Response(s) in related field(s) make this invalid. This must be corrected to mark the form complete."
     }
 }

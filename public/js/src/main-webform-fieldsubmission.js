@@ -14,7 +14,6 @@ var translator = require( './module/translator' );
 var t = translator.t;
 var utils = require( './module/utils' );
 var $loader = $( '.form__loader' );
-var $form = $( 'form.or' );
 var $buttons = $( '.form-header__button--print, button#close-form, button#finish-form' );
 var survey = {
     enketoId: settings.enketoId,
@@ -123,15 +122,16 @@ function _readonlify( formParts ) {
 function _init( formParts ) {
     $loader.replaceWith( formParts.form );
     $( document ).ready( function() {
+        translator.localize( document.querySelector( 'form.or' ) );
         controller.init( 'form.or:eq(0)', {
             modelStr: formParts.model,
             instanceStr: formParts.instance,
             external: formParts.externalData,
             instanceAttachments: formParts.instanceAttachments
-        } ).then( function() {
+        } ).then( function( form ) {
             var $title = $( '#form-title' );
             var title = ( settings.pid ) ? settings.pid + ': ' + $title.text() : title.text();
-            $form.add( $buttons ).removeClass( 'hide' );
+            form.view.$.add( $buttons ).removeClass( 'hide' );
             $title.text( title );
             $( 'head>title' ).text( title );
         } );
