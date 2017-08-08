@@ -91,20 +91,21 @@ function _convertToReadonly( formParts ) {
 
 function _init( formParts ) {
     $loader.replaceWith( formParts.form );
+    translator.localize( document.querySelector( 'form.or' ) );
     $( document ).ready( function() {
         controller.init( 'form.or:eq(0)', {
             modelStr: formParts.model,
             instanceStr: formParts.instance,
             external: formParts.externalData,
             instanceAttachments: formParts.instanceAttachments
-        } ).then( function() {
+        } ).then( function( form ) {
             var $title = $( '#form-title' );
             var title = ( settings.pid ) ? settings.pid + ': ' + $title.text() : title.text();
             // Add OC readonly message
             $( '<div class="fieldsubmission-status readonly"/>' ).prependTo( '.form-header' )
                 .add( $( '<div class="form-footer__feedback fieldsubmission-status readonly"/>' ).prependTo( '.form-footer' ) )
                 .text( t( 'fieldsubmission.readonly.msg' ) );
-            $form.add( $buttons ).removeClass( 'hide' );
+            form.view.$.add( $buttons ).removeClass( 'hide' );
             // Updated OC-amended title and copy to head>title
             $title.text( title );
             $( 'head>title' ).text( title );
