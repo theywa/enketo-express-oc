@@ -100,7 +100,7 @@ function _init( formParts ) {
             instanceAttachments: formParts.instanceAttachments
         } ).then( function( form ) {
             var $title = $( '#form-title' );
-            var title = ( settings.pid ) ? settings.pid + ': ' + $title.text() : title.text();
+            var title = ( settings.pid ) ? settings.pid + ': ' + $title.text() : $title.text();
             // Add OC readonly message
             $( '<div class="fieldsubmission-status readonly"/>' ).prependTo( '.form-header' )
                 .add( $( '<div class="form-footer__feedback fieldsubmission-status readonly"/>' ).prependTo( '.form-footer' ) )
