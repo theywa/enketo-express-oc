@@ -130,7 +130,7 @@ function _init( formParts ) {
             instanceAttachments: formParts.instanceAttachments
         } ).then( function( form ) {
             var $title = $( '#form-title' );
-            var title = ( settings.pid ) ? settings.pid + ': ' + $title.text() : title.text();
+            var title = ( settings.pid ) ? settings.pid + ': ' + $title.text() : $title.text();
             form.view.$.add( $buttons ).removeClass( 'hide' );
             $title.text( title );
             $( 'head>title' ).text( title );
