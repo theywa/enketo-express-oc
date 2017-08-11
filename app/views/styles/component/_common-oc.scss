@@ -3,32 +3,72 @@
 }
 
 // readonly and note-only views
-.oc-view, 
-.touch .oc-view{
+.oc-view,
+.touch .oc-view {
     .form-progress {
         display: none;
     }
+
     // hover style of radiobuttons and checkboxes
-     .option-wrapper:not(.or-comment-widget__content__user__dn-notify) > label:hover {
+    .option-wrapper:not(.or-comment-widget__content__user__dn-notify) > label:hover {
         background: inherit !important;
     }
+
     // suppress focus style, for most form controls except for discrepancy note controls
     select:not([name=dn-assignee]), textarea:not([name=dn-comment]), input:not([name=dn-notify], [name=dn-comment]),
-    .draw-widget__body__canvas {    
+    .draw-widget__body__canvas {
         &:focus {
             box-shadow: inherit !important;
+
             &:not(:checked) {
                 border-color: $input-border !important;
             }
         }
     }
+
     // suppress focus style for pulldown widgets
     a:focus {
         outline: 0 !important;
     }
+
     // suppress image grid focus style
     input:focus ~ .active {
         box-shadow: inherit !important;
         border: none !important;
+    }
+}
+
+// Error messages on groups (which is a feature that doesn't exist in Enketo Express and Enketo Core)
+.or-group, .or-group-data {
+    &.invalid-relevant {
+        border: 2px solid $state-danger-text;
+
+        .or-repeat {
+            background: transparent;
+        }
+
+        .or-relevant-msg {
+            padding: 4px 8px;
+        }
+
+        // only show relevant error message that belong to groups (not questions)
+        > .or-relevant-msg {
+            display: block;
+        }
+
+        .or-repeat,
+        .or-group,
+        .or-group-data {
+            > .or-relevant-msg {
+                display: block;
+            }
+        }
+
+        // hide constraint and required messages that are descendants of an 
+        // irrelevant group
+        .or-constraint-msg.active,
+        .or-required-msg.active {
+            display: none;
+        }
     }
 }

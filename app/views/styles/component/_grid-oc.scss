@@ -2,6 +2,16 @@
     margin: 0 14px;
     top: -2px;
 }
+
 .question legend .btn-dn {
     top: -4px;
+}
+
+// Error messages on groups (which is a feature that doesn't exist in Enketo Express and Enketo Core)
+.or-group, .or-group-data {
+    &.invalid-relevant {
+        margin: 0;
+        padding: 0;
+        border-radius: 0;
+    }
 }
