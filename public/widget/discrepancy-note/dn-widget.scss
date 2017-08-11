@@ -181,15 +181,8 @@ $padding: 30px;
     }
 }
 
-// legend hack
-legend .btn-dn .icon {
-    position: absolute;
-    top: -2px;
-}
-
 .btn-comment.btn-dn {
     cursor: pointer;
-
     .icon {
         opacity: 0.9;
 
