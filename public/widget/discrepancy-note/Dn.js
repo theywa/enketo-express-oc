@@ -329,7 +329,7 @@ Comment.prototype._showCommentModal = function( linkedQuestionErrorMsg ) {
 
     $input
         .on( 'input', function() {
-            $queryButtons.find( '.btn' ).prop( 'disabled', !$input.val() );
+            $queryButtons.find( '.btn' ).prop( 'disabled', !$input.val().trim() );
         } )
         .trigger( 'input' )
         .focus();
