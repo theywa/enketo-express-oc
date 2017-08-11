@@ -47,7 +47,6 @@ function init( selector, data ) {
             }
 
             form = new Form( formSelector, data, formOptions );
-            window.form = form; // DEBUG
             fieldSubmissionQueue = new FieldSubmissionQueue();
 
             // remove submit button before event handlers are set
