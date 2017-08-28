@@ -310,7 +310,6 @@ function _setReasonForChangeUi() {
 function _removeCompleteButtonIfNeccessary() {
     if ( settings.type === 'edit' && !settings.completeButton ) {
         $( 'button#finish-form' ).remove();
-        console.log( 'MAGIC!' );
         // Now, let the Close button function as a Complete button...
         // Yes, this is a mess. It is supposed to be only temporary.
         $( 'button#close-form' ).attr( 'id', 'finish-form' );
