@@ -85,7 +85,8 @@ Comment.prototype._getLinkedQuestion = function( element ) {
 Comment.prototype._setCommentButtonState = function( value, error, state ) {
     this.$commentButton
         .toggleClass( 'new', state === 'new' )
-        .toggleClass( 'closed', state === 'closed' || state === 'closed-modified' )
+        .toggleClass( 'closed', state === 'closed' )
+        .toggleClass( 'closed-modified', state === 'closed-modified' )
         .toggleClass( 'updated', state === 'updated' )
         .toggleClass( 'invalid', !!error );
 };
