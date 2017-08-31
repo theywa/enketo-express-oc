@@ -73,5 +73,10 @@
     },
     "constraint": {
         "relevant": "Response(s) in related field(s) make this data invalid. This must be corrected to mark the form complete."
+    },
+    "alert": {
+        "gotohidden": {
+            "msg": "Failed to go to question \"__path__\" because it is hidden."
+        }
     }
 }
