@@ -308,11 +308,13 @@ function _setReasonForChangeUi() {
 }*/
 
 function _removeCompleteButtonIfNeccessary() {
+    // In the future we can use a more robust way to do this by inspecting the record.
     if ( settings.type === 'edit' && !settings.completeButton ) {
         $( 'button#finish-form' ).remove();
-        // Now, let the Close button function as a Complete button...
-        // Yes, this is a mess. It is supposed to be only temporary.
-        $( 'button#close-form' ).attr( 'id', 'finish-form' );
+        // Change the behavior of the Close button in edit views except in note-only views
+        if ( !/\/fs\/dnc?\//.test( window.location.pathname ) ) {
+            $( 'button#close-form' ).addClass( 'act-as-finish' );
+        }
     }
 }
 
@@ -395,7 +397,7 @@ function _setEventHandlers( selector ) {
 
         } );
 
-    $( 'button#close-form' ).click( function() {
+    $( 'button#close-form:not(.act-as-submit)' ).click( function() {
         var $button = $( this ).btnBusyState( true );
 
         _close()
@@ -414,7 +416,7 @@ function _setEventHandlers( selector ) {
         return false;
     } );
 
-    $( 'button#finish-form' ).click( function() {
+    $( 'button#finish-form, button#close-form.act-as-finish' ).click( function() {
         var $button = $( this ).btnBusyState( true );
 
         // form.validate() will trigger fieldsubmissions for timeEnd before it resolves
