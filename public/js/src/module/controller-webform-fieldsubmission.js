@@ -399,7 +399,7 @@ function _setEventHandlers( selector ) {
 
         } );
 
-    $( 'button#close-form:not(.act-as-submit)' ).click( function() {
+    $( 'button#close-form:not(.act-as-finish)' ).click( function() {
         var $button = $( this ).btnBusyState( true );
 
         _close()
