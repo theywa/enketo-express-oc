@@ -125,6 +125,9 @@ function _resetForm( confirmed ) {
 
 /**
  * Closes the form after checking that the queue is empty.
+ *
+ * TODO: I think this can probably be reorganized to avoid the bypassAutoQuery parameter. 
+ * See the _closeCompleteRecord for example.
  * 
  * @return {Promise} [description]
  */
@@ -218,6 +221,45 @@ function _close( bypassAutoQuery ) {
         } );
 }
 
+// This is conceptually a Complete function that has some pre-processing.
+function _closeCompletedRecord() {
+    var $violated;
+
+    return form.validate()
+        .then( function( valid ) {
+            if ( valid ) {
+                return _complete()
+                    .then( function( again ) {
+                        if ( again ) {
+                            return _complete( again );
+                        }
+                    } );
+            } else if ( form.view.$.find( '.invalid-relevant' ).length ) {
+                gui.alert( t( 'fieldsubmission.alert.relevantvalidationerror.msg' ) );
+
+                return false;
+            } else {
+                $violated = form.view.$.find( '.invalid-constraint, .invalid-required' );
+                // Note that unlike _close this also looks at .invalid-required.
+                gui.confirm( {
+                    heading: t( 'alert.default.heading' ),
+                    errorMsg: t( 'fieldsubmission.confirm.autoquery.msg1' ),
+                    msg: t( 'fieldsubmission.confirm.autoquery.msg2' )
+                }, {
+                    posButton: t( 'fieldsubmission.confirm.autoquery.automatic' ),
+                    negButton: t( 'fieldsubmission.confirm.autoquery.manual' ),
+                    posAction: function() {
+                        _autoAddQueries( $violated );
+                        return _closeCompletedRecord();
+                    },
+                    negAction: function() {
+                        return false;
+                    }
+                } );
+            }
+        } );
+}
+
 function _redirect( msec ) {
     ignoreBeforeUnload = true;
     setTimeout( function() {
@@ -227,6 +269,10 @@ function _redirect( msec ) {
 
 /**
  * Finishes a submission
+ *
+ * TODO: I think this can probably be reorganized to avoid the bypassConfirmation parameter. 
+ * See the _closeCompleteRecord for example.
+ * 
  */
 function _complete( bypassConfirmation ) {
     var beforeMsg;
@@ -251,8 +297,6 @@ function _complete( bypassConfirmation ) {
             } );
         } );
     }
-
-
 
     form.view.$.trigger( 'beforesave' );
 
@@ -315,7 +359,7 @@ function _removeCompleteButtonIfNeccessary() {
         $( 'button#finish-form' ).remove();
         // Change the behavior of the Close button in edit views except in note-only views
         if ( !/\/fs\/dnc?\//.test( window.location.pathname ) ) {
-            $( 'button#close-form' ).addClass( 'act-as-finish' );
+            $( 'button#close-form' ).addClass( 'completed-record' );
         }
     }
 }
@@ -399,7 +443,7 @@ function _setEventHandlers( selector ) {
 
         } );
 
-    $( 'button#close-form:not(.act-as-finish)' ).click( function() {
+    $( 'button#close-form:not(.completed-record)' ).click( function() {
         var $button = $( this ).btnBusyState( true );
 
         _close()
@@ -418,7 +462,7 @@ function _setEventHandlers( selector ) {
         return false;
     } );
 
-    $( 'button#finish-form, button#close-form.act-as-finish' ).click( function() {
+    $( 'button#finish-form' ).click( function() {
         var $button = $( this ).btnBusyState( true );
 
         // form.validate() will trigger fieldsubmissions for timeEnd before it resolves
@@ -435,6 +479,23 @@ function _setEventHandlers( selector ) {
                     gui.alert( t( 'fieldsubmission.alert.validationerror.msg' ) );
                 }
             } )
+            .catch( function( e ) {
+                gui.alert( e.message );
+            } )
+            .then( function() {
+                $button.btnBusyState( false );
+            } );
+
+        return false;
+    } );
+
+    // This is for closing a record that was marked as final. It's quite different
+    // from Complete or the regular Close.
+    $( 'button#close-form.completed-record' ).click( function() {
+        var $button = $( this ).btnBusyState( true );
+
+        // form.validate() will trigger fieldsubmissions for timeEnd before it resolves
+        _closeCompletedRecord()
             .catch( function( e ) {
                 gui.alert( e.message );
             } )

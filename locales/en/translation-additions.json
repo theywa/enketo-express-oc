@@ -9,7 +9,7 @@
             "me": "Me",
             "autoclosed": "Query closed by system because this item was hidden",
             "valuechange": "Value changed from __previous__ to __new__",
-            "autoconstraint": "Automatic query for: __constraintMsg__",
+            "autoconstraint": "Automatic query for: __errorMsg__",
             "closedmodified": "Data changed after query was closed",
             "zerominutes": "Just now"
         }
@@ -32,6 +32,9 @@
             },
             "validationerror": {
                 "msg": "You must address all errors on this form before it can be marked complete. Please update the value or add a query for each field marked in red."
+            },
+            "relevantvalidationerror": {
+                "msg": "Response(s) in some field(s) make this data invalid. This must be corrected to mark the form complete."
             }
         },
         "confirm": {
