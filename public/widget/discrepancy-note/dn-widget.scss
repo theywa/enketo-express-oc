@@ -239,6 +239,10 @@ $padding: 30px;
 
     &.closed-modified {
         opacity: 1;
+
+        .icon {
+            opacity: 0.5;
+        }
     }
 }
 
