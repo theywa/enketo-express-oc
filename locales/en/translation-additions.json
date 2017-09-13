@@ -75,7 +75,7 @@
         }
     },
     "constraint": {
-        "relevant": "Response(s) in related field(s) make this data invalid. This must be corrected to mark the form complete."
+        "relevant": "Response(s) in some field(s) make some data on this form invalid. This must be corrected to retain the form's complete status."
     },
     "alert": {
         "gotohidden": {

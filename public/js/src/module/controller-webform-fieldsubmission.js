@@ -228,12 +228,8 @@ function _closeCompletedRecord() {
     return form.validate()
         .then( function( valid ) {
             if ( valid ) {
-                return _complete()
-                    .then( function( again ) {
-                        if ( again ) {
-                            return _complete( again );
-                        }
-                    } );
+                // do not show confirmation dialog
+                return _complete( true );
             } else if ( form.view.$.find( '.invalid-relevant' ).length ) {
                 gui.alert( t( 'fieldsubmission.alert.relevantvalidationerror.msg' ) );
 
