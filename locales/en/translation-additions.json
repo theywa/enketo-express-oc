@@ -79,7 +79,20 @@
     },
     "alert": {
         "gotohidden": {
-            "msg": "Failed to go to question \"__path__\" because it is hidden."
+            "msg": "The item you are trying to access is currently hidden. Please use the View Query Only icon instead of the View Query Within Record icon to see it."
+        },
+        "gotonotfound": {
+            "msg": "The item you are trying to access has been removed from this form. Please use the View Query Only icon instead of the View Query Within Record icon to see it."
+        },
+        "loaderror": {
+            "editadvice": "",
+            "entryadvice": "",
+            "heading": "Hold on a second...",
+            "msg1": "Please contact your support team with the link to this page and the error message below if you need further help.",
+            "msg2": "",
+            "heading_plural": "Hold on a second...",
+            "msg1_plural": "Please contact your support team with the link to this page and the error messages below if you need further help.",
+            "msg2_plural": ""
         }
     }
 }
