@@ -27,8 +27,12 @@ branchModule.update = function( updated, forceClearIrrelevant ) {
 /**
  * Overwrite core functionality by removing isSelfRelevant check
  */
-branchModule.enable = function( $branchNode ) {
+branchModule.enable = function( $branchNode, path ) {
     $branchNode.removeClass( 'disabled pre-init' );
+    // Update calculated items, both individual question or descendants of group
+    this.form.calc.update( {
+        relevantPath: path
+    } );
     this.form.widgets.enable( $branchNode );
     this.activate( $branchNode );
     return true;
@@ -38,8 +42,21 @@ branchModule.enable = function( $branchNode ) {
 /**
  * Overwrite clear function
  */
-branchModule.clear = function() {
-    // Only user can clear values in OC.
+branchModule.clear = function( $branchNode, path ) {
+    // Only user can clear values from user-input fields in OC.
+    // TODO: when readonly becomes dynamic, we'll have to fix this.
+    // Only for readonly items in OC fork:
+    $branchNode
+        .find( 'input[readonly]:not(.ignore), select[readonly]:not(.ignore), textarea[readonly]:not(.ignore)' )
+        .closest( '.question' )
+        .clearInputs( 'change', 'inputupdate.enketo' );
+
+    // Unchanged from Enketo Core:
+    if ( $branchNode.is( '.or-group, .or-group-data' ) ) {
+        this.form.calc.update( {
+            relevantPath: path
+        } );
+    }
 };
 
 branchModule.activate = function( $branchNode ) {
@@ -99,8 +116,8 @@ branchModule.deactivate = function( $branchNode ) {
         name = this.form.input.getName( $branchNode );
         index = this.form.input.getIndex( $branchNode );
         /*
-         * We need to check if any of the _regular_ fields with a form control 
-         * (ie. excl calculations and discrepancy note questions) has a value.
+         * We need to check if any of the fields with a form control or calculations
+         * (ie. excl discrepancy note questions) has a value.
          * The best way is to do this in the model.
          * 
          * First get all the leafnodes (nodes without children) and then check if there is a calculation 
