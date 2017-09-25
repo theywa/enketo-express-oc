@@ -89,6 +89,10 @@ function init( selector, data ) {
 
             advice = ( data.instanceStr ) ? t( 'alert.loaderror.editadvice' ) : t( 'alert.loaderror.entryadvice' );
             gui.alertLoadErrors( loadErrors, advice );
+        } )
+        .then( function( form ) {
+            // OC will return even if there were errors.
+            return form;
         } );
 }
 
