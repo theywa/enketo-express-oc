@@ -139,7 +139,7 @@ Comment.prototype._setFocusHandler = function() {
         if ( that.$commentButton.is( ':visible' ) ) {
             that.$commentButton.click();
         } else {
-            throw new Error( 'Linked question for "' + location.hash.substring( 1 ) + '" is not visible.' );
+            throw new Error( t( 'alert.gotohidden.msg' ) );
         }
     } );
 };
