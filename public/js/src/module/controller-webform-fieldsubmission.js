@@ -225,6 +225,58 @@ function _close( bypassAutoQuery ) {
         } );
 }
 
+function _closeSimple() {
+    var msg = '';
+    var tAlertCloseMsg = t( 'fieldsubmission.alert.close.msg1' );
+    var tAlertCloseHeading = t( 'fieldsubmission.alert.close.heading1' );
+    var authLink = '<a href="/login" target="_blank">' + t( 'here' ) + '</a>';
+
+    // Start with actually closing, but only proceed once the queue is emptied.
+    gui.alert( tAlertCloseMsg + '<br/>' +
+        '<div class="loader-animation-small" style="margin: 40px auto 0 auto;"/>', tAlertCloseHeading, 'bare' );
+
+    return fieldSubmissionQueue.submitAll()
+        .then( function() {
+            if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
+                throw new Error( t( 'fieldsubmission.alert.close.msg2' ) );
+            } else {
+                // this event is used in communicating back to iframe parent window
+                $( document ).trigger( 'close' );
+
+                msg += t( 'alert.submissionsuccess.redirectmsg' );
+                gui.alert( msg, t( 'alert.submissionsuccess.heading' ), 'success' );
+                _redirect();
+            }
+        } )
+        .catch( function( error ) {
+            var errorMsg;
+            error = error || {};
+
+            console.error( 'close error', error );
+            if ( error.status === 401 ) {
+                errorMsg = t( 'alert.submissionerror.authrequiredmsg', {
+                    here: authLink
+                } );
+                gui.alert( errorMsg, t( 'alert.submissionerror.heading' ) );
+            } else {
+                errorMsg = error.message || gui.getErrorResponseMsg( error.status );
+                gui.confirm( {
+                    heading: t( 'alert.default.heading' ),
+                    errorMsg: errorMsg,
+                    msg: t( 'fieldsubmission.confirm.leaveanyway.msg' )
+                }, {
+                    posButton: t( 'confirm.default.negButton' ),
+                    negButton: t( 'fieldsubmission.confirm.leaveanyway.button' ),
+                    posAction: function() {},
+                    negAction: function() {
+                        _redirect( 100 );
+                    }
+                } );
+            }
+
+        } );
+}
+
 // This is conceptually a Complete function that has some pre-processing.
 function _closeCompletedRecord() {
     var $violated;
@@ -354,13 +406,15 @@ function _setReasonForChangeUi() {
 }*/
 
 function _removeCompleteButtonIfNeccessary() {
-    // In the future we can use a more robust way to do this by inspecting the record.
-    if ( settings.type === 'edit' && !settings.completeButton ) {
+    // for readonly and note-only views
+    if ( settings.type === 'view' || /\/fs\/dnc?\//.test( window.location.pathname ) ) {
+        $( 'button#finish-form' ).remove();
+        $( 'button#close-form' ).addClass( 'simple' );
+    } else if ( settings.type === 'edit' && !settings.completeButton ) {
+        // In the future we can use a more robust way to do this by inspecting the record.
         $( 'button#finish-form' ).remove();
         // Change the behavior of the Close button in edit views except in note-only views
-        if ( !/\/fs\/dnc?\//.test( window.location.pathname ) ) {
-            $( 'button#close-form' ).addClass( 'completed-record' );
-        }
+        $( 'button#close-form' ).addClass( 'completed-record' );
     }
 }
 
@@ -443,7 +497,7 @@ function _setEventHandlers( selector ) {
 
         } );
 
-    $( 'button#close-form:not(.completed-record)' ).click( function() {
+    $( 'button#close-form:not(.completed-record, .simple)' ).click( function() {
         var $button = $( this ).btnBusyState( true );
 
         _close()
@@ -496,6 +550,21 @@ function _setEventHandlers( selector ) {
 
         // form.validate() will trigger fieldsubmissions for timeEnd before it resolves
         _closeCompletedRecord()
+            .catch( function( e ) {
+                gui.alert( e.message );
+            } )
+            .then( function() {
+                $button.btnBusyState( false );
+            } );
+
+        return false;
+    } );
+
+    // This is for closing a record in a readonly or note-only view.
+    $( 'button#close-form.simple' ).click( function() {
+        var $button = $( this ).btnBusyState( true );
+
+        _closeSimple()
             .catch( function( e ) {
                 gui.alert( e.message );
             } )
