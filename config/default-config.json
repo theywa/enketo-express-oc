@@ -29,7 +29,8 @@
     "widgets": [
         "note", "select-desktop", "select-mobile", "autocomplete", "geo", "textarea",
         "table", "radio", "date", "time", "datetime", "compact", "file", "draw",
-        "likert", "distress", "horizontal", "image-view", "comment", "image-map", "date-mobile"
+        "likert", "distress", "horizontal", "image-view", "comment", "image-map", "date-mobile",
+        "analog-scale", "../../widget/discrepancy-note/dn-widget"
     ],
     "analytics": "google",
     "google": {

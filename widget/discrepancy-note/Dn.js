@@ -1,9 +1,9 @@
 'use strict';
 
-var Widget = require( '../../../node_modules/enketo-core/src/js/Widget' );
+var Widget = require( 'enketo-core/src/js/Widget' );
 var $ = require( 'jquery' );
 var t = require( 'translator' ).t;
-var settings = require( '../../js/src/module/settings' );
+var settings = require( '../../public/js/src/module/settings' );
 var usersOptionsHtml;
 var SYSTEM_USER = 'root';
 
