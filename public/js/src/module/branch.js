@@ -142,7 +142,8 @@ branchModule.deactivate = function( $branchNode ) {
         } else {
             this.form.setValid( $branchNode, 'relevant' );
             this.originalDeactivate( $branchNode );
-            $branchNode.trigger( 'hiding.oc' );
+            // trigger on all questions inside this group that possibly have a discrepancy note attached to them.
+            $branchNode.find( '.question' ).trigger( 'hiding.oc' );
         }
     }
 };

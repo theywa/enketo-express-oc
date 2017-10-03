@@ -159,22 +159,23 @@ Comment.prototype._setDisabledHandler = function() {
     var target = this.$linkedQuestion.get( 0 ).querySelector( 'input, select, textarea' );
     var $target = $( target );
 
-    if ( this.options.helpers.input.getRelevant( $target ) ) {
-        this.$linkedQuestion.on( 'hiding.oc', function() {
-            currentStatus = that._getCurrentStatus( that.notes );
-            open = currentStatus === 'updated' || currentStatus === 'new';
-            linkedVal = that.options.helpers.input.getVal( $target );
-            // Note that getVal() can return an empty array.
-            if ( open && linkedVal.length === 0 ) {
-                // This will not be triggered if a form is loaded with a value for an irrelevant question and an open query.
-                comment = t( 'widget.dn.autoclosed' );
-                status = 'closed';
-            }
-            if ( comment ) {
-                that._addQuery( comment, status, '', false, SYSTEM_USER );
-            }
-        } );
-    }
+    this.$linkedQuestion.on( 'hiding.oc', function() {
+        // For now there is no need to doublecheck if this question has a relevant attribute 
+        // or has an ancestor group with a relevant attribute. This is because we trust that
+        // the "hiding.oc" event is sent only for branches or its children when being closed (by the branch module).
+        currentStatus = that._getCurrentStatus( that.notes );
+        open = currentStatus === 'updated' || currentStatus === 'new';
+        linkedVal = that.options.helpers.input.getVal( $target );
+        // Note that getVal() can return an empty array.
+        if ( open && linkedVal.length === 0 ) {
+            // This will not be triggered if a form is loaded with a value for an irrelevant question and an open query.
+            comment = t( 'widget.dn.autoclosed' );
+            status = 'closed';
+        }
+        if ( comment ) {
+            that._addQuery( comment, status, '', false, SYSTEM_USER );
+        }
+    } );
 };
 
 /**
