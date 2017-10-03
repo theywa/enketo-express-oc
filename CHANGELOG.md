@@ -2,14 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased]
+[1.53.0]
 ----------------------
 ##### Added
-- Ability to [add custom widgets](https://github.com/kobotoolbox/enketo-express/blob/master/doc/custom-widgets.md) or [remove default widgets](https://github.com/kobotoolbox/enketo-express/tree/master/config#widgets) in config.json.
+- Ability to [add custom widgets](https://github.com/kobotoolbox/enketo-express/blob/master/doc/custom-widgets.md) or [remove default widgets](https://github.com/kobotoolbox/enketo-express/tree/master/config#widgets) in config.json. **Have an issue? Check whether your config.json contains an old "widgets" property. If so, you'll probably want to just remove it.**
 
 ##### Fixed
 - With validateContinuously=true, a new repeat instance is immediately validated.
 - Pesky "error" message that sourcemap for bootstrap-datepicker.css is not found (when dev tools are open in browser).
+- Incorrect Content-type of error responses.
 
 [1.52.0] - 2017-09-26
 ---------------------
