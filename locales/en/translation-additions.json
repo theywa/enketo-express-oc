@@ -34,7 +34,7 @@
                 "msg": "You must address all errors on this form before it can be marked complete. Please update the value or add a query for each field marked in red."
             },
             "relevantvalidationerror": {
-                "msg": "Response(s) in some field(s) make some data on this form invalid. This must be corrected to retain the form's complete status."
+                "msg": "Response(s) in some field(s) make some data on this form invalid. This must be corrected to mark the form complete.",
             }
         },
         "confirm": {
