@@ -530,7 +530,11 @@ function _setEventHandlers( selector ) {
                             }
                         } );
                 } else {
-                    gui.alert( t( 'fieldsubmission.alert.validationerror.msg' ) );
+                    if ( form.view.$.find( '.invalid-relevant' ).length ) {
+                        gui.alert( t( 'fieldsubmission.alert.relevantvalidationerror.msg' ) );
+                    } else {
+                        gui.alert( t( 'fieldsubmission.alert.validationerror.msg' ) );
+                    }
                 }
             } )
             .catch( function( e ) {
