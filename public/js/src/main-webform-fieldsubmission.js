@@ -15,6 +15,7 @@ var t = translator.t;
 var utils = require( './module/utils' );
 var $loader = $( '.form__loader' );
 var $buttons = $( '.form-header__button--print, button#close-form, button#finish-form' );
+var oc = require( './module/custom' );
 var survey = {
     enketoId: settings.enketoId,
     serverUrl: settings.serverUrl,
@@ -128,13 +129,16 @@ function _init( formParts ) {
             instanceStr: formParts.instance,
             external: formParts.externalData,
             instanceAttachments: formParts.instanceAttachments
-        } ).then( function() {
+        } ).then( function( form ) {
             // Note: be careful, "form" param returned by controller.init is undefined if there were loadErrors (in fs view).
             var $title = $( '#form-title' );
             var title = ( settings.pid ) ? settings.pid + ': ' + $title.text() : $title.text();
             $buttons.removeClass( 'hide' );
             $title.text( title );
             $( 'head>title' ).text( title );
+            if ( formParts.instance ) {
+                oc.addSignedStatus( form );
+            }
         } );
     } );
 }

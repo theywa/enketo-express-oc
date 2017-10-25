@@ -14,6 +14,7 @@ var t = translator.t;
 var utils = require( './module/utils' );
 var $loader = $( '.form__loader' );
 var $buttons = $( '.form-header__button--print, button#close-form' );
+var oc = require( './module/custom' );
 var survey = {
     enketoId: settings.enketoId,
     instanceId: settings.instanceId,
@@ -108,6 +109,9 @@ function _init( formParts ) {
             // Updated OC-amended title and copy to head>title
             $title.text( title );
             $( 'head>title' ).text( title );
+            if ( formParts.instance ) {
+                oc.addSignedStatus( form );
+            }
         } );
     } );
 }
