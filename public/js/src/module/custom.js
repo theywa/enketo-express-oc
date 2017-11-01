@@ -15,7 +15,7 @@ function addSignedStatus( form ) {
     if ( signedBy && signedOn ) {
         $status = $( '<div class="record-signed-status">' + t( 'signed.msg', {
                 name: signedBy,
-                date: _parseDateTime( signedOn )
+                date: signedOn
             } ) +
             '</div>' );
         $( '#form-title' )
@@ -26,10 +26,6 @@ function addSignedStatus( form ) {
     }
 }
 
-function _parseDateTime( dt ) {
-    var parts = ( dt ) ? dt.substr( 0, dt.indexOf( ' ' ) ).split( '-' ) : [];
-    return parts.length === 3 ? parts[ 1 ] + '/' + parts[ 2 ] + ', ' + parts[ 0 ] : 'error';
-}
 
 module.exports = {
     addSignedStatus: addSignedStatus
