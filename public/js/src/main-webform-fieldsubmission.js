@@ -16,6 +16,7 @@ var utils = require( './module/utils' );
 var $loader = $( '.form__loader' );
 var $buttons = $( '.form-header__button--print, button#close-form, button#finish-form' );
 var oc = require( './module/custom' );
+var $footer = $( '.form-footer' );
 var survey = {
     enketoId: settings.enketoId,
     serverUrl: settings.serverUrl,
@@ -102,7 +103,7 @@ function _readonlify( formParts ) {
     };
     // change status message
     $( '<div class="fieldsubmission-status readonly"/>' ).prependTo( '.form-header' )
-        .add( $( '<div class="form-footer__feedback fieldsubmission-status readonly"/>' ).prependTo( '.form-footer' ) )
+        .add( $( '<div class="form-footer__feedback fieldsubmission-status readonly"/>' ).prependTo( $footer ) )
         .text( t( 'fieldsubmission.noteonly.msg' ) );
 
     formParts.form = $( formParts.form );

@@ -1,5 +1,10 @@
 $padding: 30px;
 
+.icon-delta:before {
+    content: "Δ";
+    font-size: 19px;
+}
+
 .or-comment-widget {
     &__content {
         @include display-flex;
@@ -250,6 +255,7 @@ $padding: 30px;
         }
     }
 }
+
 
 // small screens
 @media screen and (max-width: 500px) {

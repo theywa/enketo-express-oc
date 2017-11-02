@@ -22,8 +22,7 @@
                 "heading1": "Closing",
                 "heading2": "Warning",
                 "msg1": "Submitting unsaved data...",
-                "msg2": "Not all data has been submitted. If you exit this page, it will be lost.",
-                "msg3": "A Reason for Change is required. Please try again."
+                "msg2": "Not all data has been submitted. If you exit this page, it will be lost."
             },
             "locked": {
                 "heading": "Locked",
@@ -37,6 +36,9 @@
             },
             "relevantvalidationerror": {
                 "msg": "Response(s) in some field(s) make some data on this form invalid. This must be corrected to mark the form complete."
+            },
+            "reasonforchangevalidationerror": {
+                "msg": "For each changed field a reason for change has to be provided. Please add any missing reasons."
             }
         },
         "confirm": {
@@ -59,9 +61,9 @@
             }
         },
         "prompt": {
-            "rfc": {
-                "heading": "Reason for Change",
-                "label": "Reason for changes to this record"
+            "reason": {
+                "heading": "Enter reason",
+                "msg": "Please enter a reason for removing this group."
             }
         },
         "feedback": {
@@ -74,6 +76,10 @@
         },
         "noteonly": {
             "msg": "You're in review-only mode."
+        },
+        "reason": {
+            "heading": "Looks like you've made some updates. Please tell us why:",
+            "placeholder": "Enter a reason for changing this value"
         }
     },
     "constraint": {

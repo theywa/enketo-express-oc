@@ -7,6 +7,7 @@ var $ = require( 'jquery' );
 
 require( './Form-model' );
 require( './branch' );
+require( './page' );
 
 /**
  * This function doesn't actually evaluate constraints. It triggers

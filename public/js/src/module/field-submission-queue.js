@@ -10,8 +10,6 @@ var FIELDSUBMISSION_URL = ( settings.enketoId ) ? settings.basePath + '/fieldsub
     utils.getQueryString( settings.submissionParameter ) : null;
 var FIELDSUBMISSION_COMPLETE_URL = ( settings.enketoId ) ? settings.basePath + '/fieldsubmission/complete/' + settings.enketoIdPrefix + settings.enketoId +
     utils.getQueryString( settings.submissionParameter ) : null;
-var FIELDSUBMISSION_REASON_URL = ( settings.enketoId ) ? settings.basePath + '/fieldsubmission/reason/' + settings.enketoIdPrefix + settings.enketoId +
-    utils.getQueryString( settings.submissionParameter ) : null;
 
 function FieldSubmissionQueue() {
     this.submissionQueue = {};
@@ -54,20 +52,6 @@ FieldSubmissionQueue.prototype.addFieldSubmission = function( fieldPath, xmlFrag
 
     } else {
         console.error( 'Attempt to add field submission without path, XML fragment or instanceID' );
-    }
-};
-
-FieldSubmissionQueue.prototype.addReasonForChange = function( reason, instanceId, deprecatedId ) {
-    var fd = new FormData();
-
-    // empty string is allowed
-    if ( typeof reason === 'string' && instanceId && deprecatedId ) {
-        fd.append( 'instance_id', instanceId );
-        fd.append( 'deprecated_id', deprecatedId );
-        fd.append( 'reason_for_change', reason );
-        this.submissionQueue[ 'PUT_reason' ] = fd;
-    } else {
-        console.error( 'Attempt to add reason for change submission without reaons, instanceId or deprecatedId' );
     }
 };
 
@@ -166,7 +150,7 @@ FieldSubmissionQueue.prototype._submitAll = function() {
                 return prevPromise.then( function() {
                     keyParts = fieldSubmission.key.split( '_' );
                     method = keyParts[ 0 ];
-                    url = keyParts[ 1 ] === 'reason' ? FIELDSUBMISSION_REASON_URL : FIELDSUBMISSION_URL;
+                    url = FIELDSUBMISSION_URL;
                     return that._submitOne( url, fieldSubmission.fd, method )
                         .catch( function( error ) {
                             console.debug( 'failed to submit ', fieldSubmission.key, 'adding it back to the queue, error:', error );

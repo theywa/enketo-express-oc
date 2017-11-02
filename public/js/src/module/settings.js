@@ -129,6 +129,9 @@ settings.goTo = settings.type === 'edit' || settings.type === 'preview' || setti
 // A bit crude and hackable by users, but this way also type=view with a record will be caught.
 settings.printRelevantOnly = !( ( settings.type === 'view' && !settings.instanceId ) || settings.type === 'preview' );
 
+// Reason for change functionality
+settings.reasonForChange = settings.type === 'edit' && !settings.completeButton && !( /\/fs\/dnc?\//.test( window.location.pathname ) );
+
 function _getEnketoId( prefix, haystack ) {
     var id = new RegExp( prefix ).test( haystack ) ? haystack.substring( haystack.lastIndexOf( prefix ) + prefix.length ) : null;
     return id;

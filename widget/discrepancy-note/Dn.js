@@ -8,6 +8,7 @@ var usersOptionsHtml;
 var currentUser;
 var users;
 var SYSTEM_USER = 'root';
+var reasons = require( '../../public/js/src/module/reasons' );
 
 /**
  * Visually transforms a question into a comment modal that can be shown on its linked question.
@@ -31,6 +32,8 @@ Comment.prototype._init = function() {
     this.$commentQuestion = $( this.element ).closest( '.question' );
     this.ordinal = 0;
     this.readOnly = this.element.readOnly;
+    this.linkedQuestionReadonly = this.$linkedQuestion[ 0 ]
+        .querySelector( 'input:not(.ignore), textarea:not(.ignore), select:not(.ignore)' ).readOnly;
 
     if ( this.$linkedQuestion.length === 1 ) {
         this.notes = this._parseModelFromString( this.element.value );
@@ -48,6 +51,7 @@ Comment.prototype._init = function() {
         this._setCloseHandler();
         this._setFocusHandler();
         this._setConstraintEvaluationHandler();
+        this._setRepeatRemovalReasonChangeHandler();
     }
 };
 
@@ -207,6 +211,22 @@ Comment.prototype._setValueChangeHandler = function() {
         }
 
         that._addAudit( comment, '', false );
+
+        if ( settings.reasonForChange && !that.linkedQuestionReadonly ) {
+            reasons.addField( that.$linkedQuestion[ 0 ] )
+                .on( 'change', function( evt ) {
+                    if ( evt.target.value && evt.target.value.trim() ) {
+                        that._addReason( evt.target.value );
+                        reasons.setValid( evt.target );
+                    }
+                } )
+                .on( 'input', function( evt ) {
+                    if ( evt.target.value && evt.target.value.trim() ) {
+                        reasons.setPending( evt.target );
+                    }
+                } );
+        }
+
         previousValue = currentValue;
 
         if ( currentStatus === 'closed' ) {
@@ -214,6 +234,20 @@ Comment.prototype._setValueChangeHandler = function() {
             that._addQuery( comment, 'closed-modified', '', false, SYSTEM_USER );
         }
     } );
+};
+
+Comment.prototype._setRepeatRemovalReasonChangeHandler = function() {
+    var that = this;
+    if ( settings.reasonForChange && !that.linkedQuestionReadonly ) {
+        this.$linkedQuestion.on( 'reasonchange.enketo', function( evt, data ) {
+            if ( data.reason ) {
+                that._addReason( data.reason );
+                reasons.removeField( this );
+            } else {
+                console.error( 'no reason provided' );
+            }
+        } );
+    }
 };
 
 /**
@@ -266,7 +300,6 @@ Comment.prototype._getFullWidthStyleCorrection = function() {
         left: ( ( mostLeft - linkedQuestionLeft ) * 100 / linkedQuestionWidth ) + '%'
     };
 };
-
 
 Comment.prototype._showCommentModal = function( linkedQuestionErrorMsg ) {
     var $widget;
@@ -545,6 +578,27 @@ Comment.prototype._addAudit = function( comment, assignee, notify ) {
     } );
 };
 
+Comment.prototype._addReason = function( reason ) {
+    var modelDataStr;
+    var that = this;
+    var q = {
+        type: 'reason',
+        id: ( ++this.ordinal ).toString(),
+        date_time: this._getFormattedCurrentDatetimeStr(),
+        comment: reason
+    };
+
+    this.notes.queries.unshift( q );
+
+    // strip logs from model
+    modelDataStr = JSON.stringify( {
+        queries: that.notes.queries
+    } );
+
+    // update XML Model
+    $( this.element ).val( modelDataStr ).trigger( 'change' );
+};
+
 Comment.prototype._getCurrentStatus = function( notes ) {
     var status = '';
 
@@ -624,7 +678,8 @@ Comment.prototype._getRows = function( item ) {
     var fullName;
     var types = {
         comment: '<span class="icon tooltip fa-comment-o" data-title="Query/Comment"> </span>',
-        audit: '<span class="icon tooltip fa-edit" data-title="Audit Event"> </span>'
+        audit: '<span class="icon tooltip fa-edit" data-title="Audit Event"> </span>',
+        reason: '<span class="icon tooltip icon-delta" data-title="Reason for Change"> </span>'
     };
     if ( typeof item.user === 'undefined' ) {
         item.user = currentUser;

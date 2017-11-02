@@ -15,14 +15,14 @@ var $ = require( 'jquery' );
 var FieldSubmissionQueue = require( './field-submission-queue' );
 var fieldSubmissionQueue;
 var rc = require( './controller-webform' );
+var reasons = require( './reasons' );
 var DEFAULT_THANKS_URL = '/thanks';
-var reasonForChangeFeature = false;
-var reasonForChange = '';
 var form;
 var formSelector;
 var formData;
 var $formprogress;
 var ignoreBeforeUnload = false;
+
 var formOptions = {
     goTo: settings.goTo,
     printRelevantOnly: settings.printRelevantOnly
@@ -72,7 +72,6 @@ function init( selector, data ) {
                 loadErrors.unshift( '<strong>' + t( 'error.encryptionnotsupported' ) + '</strong>' );
             }
 
-            //_setReasonForChangeUi();
             rc.setLogoutLinkVisibility();
 
             if ( loadErrors.length > 0 ) {
@@ -100,7 +99,7 @@ function init( selector, data ) {
  * Controller function to reset to a blank form. Checks whether all changes have been saved first
  * @param  {boolean=} confirmed Whether unsaved changes can be discarded and lost forever
  */
-function _resetForm( confirmed ) {
+/*function _resetForm( confirmed ) {
     var message;
     var choices;
 
@@ -120,12 +119,11 @@ function _resetForm( confirmed ) {
             modelStr: formData.modelStr,
             external: formData.external
         }, formOptions );
-        reasonForChange = '';
         form.init();
         form.view.$
             .trigger( 'formreset' );
     }
-}
+}*/
 
 /**
  * Closes the form after checking that the queue is empty.
@@ -168,22 +166,6 @@ function _close( bypassAutoQuery ) {
         '<div class="loader-animation-small" style="margin: 40px auto 0 auto;"/>', tAlertCloseHeading, 'bare' );
 
     return fieldSubmissionQueue.submitAll()
-        .then( function() {
-            if ( reasonForChangeFeature && !reasonForChange ) {
-                return new Promise( function( resolve, reject ) {
-                    _showReasonForChangeDialog( function( reason ) {
-                        if ( reasonForChange ) {
-                            resolve();
-                        } else {
-                            reject( new Error( t( 'fieldsubmission.alert.close.msg3' ) ) );
-                        }
-                    } );
-                } );
-            }
-        } )
-        .then( function() {
-            return fieldSubmissionQueue.submitAll();
-        } )
         .then( function() {
             if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
                 throw new Error( t( 'fieldsubmission.alert.close.msg2' ) );
@@ -283,13 +265,15 @@ function _closeCompletedRecord() {
 
     return form.validate()
         .then( function( valid ) {
-            if ( valid ) {
+            if ( reasons.validate() && valid ) {
                 // do not show confirmation dialog
                 return _complete( true );
             } else if ( form.view.$.find( '.invalid-relevant' ).length ) {
                 gui.alert( t( 'fieldsubmission.alert.relevantvalidationerror.msg' ) );
 
                 return false;
+            } else if ( $( '.reason-for-change .invalid' ).length ) {
+                gui.alert( t( 'fieldsubmission.alert.reasonforchangevalidationerror.msg' ) );
             } else {
                 $violated = form.view.$.find( '.invalid-constraint, .invalid-required' );
                 // Note that unlike _close this also looks at .invalid-required.
@@ -392,19 +376,6 @@ function _complete( bypassConfirmation ) {
         } );
 }
 
-/*
-function _setReasonForChangeUi() {
-    var $rfcButton;
-    reasonForChangeFeature = settings.type === 'edit' && settings.reasonForChange === true;
-
-    if ( reasonForChangeFeature ) {
-        $rfcButton = $( '<button class="form-header__button--reason btn-icon-only">' +
-                '<i class="icon icon-pencil"></i></button>' )
-            .on( 'click', _showReasonForChangeDialog );
-        $( '.form-header__button--print' ).before( $rfcButton );
-    }
-}*/
-
 function _removeCompleteButtonIfNeccessary() {
     // for readonly and note-only views
     if ( settings.type === 'view' || /\/fs\/dnc?\//.test( window.location.pathname ) ) {
@@ -416,26 +387,6 @@ function _removeCompleteButtonIfNeccessary() {
         // Change the behavior of the Close button in edit views except in note-only views
         $( 'button#close-form' ).addClass( 'completed-record' );
     }
-}
-
-function _showReasonForChangeDialog( postAction ) {
-    var inputs = '<label><span>' + t( 'fieldsubmission.prompt.rfc.label' ) + '</span>' +
-        '<textarea style="min-height: 120px;" name="reason" type="text">' + reasonForChange + '</textarea>' + '</label>';
-    var content = {
-        msg: '',
-        heading: t( 'fieldsubmission.prompt.rfc.heading' ),
-    };
-    var choices = {
-        posAction: function( data ) {
-            reasonForChange = data.reason;
-            fieldSubmissionQueue.addReasonForChange( reasonForChange, form.instanceID, form.deprecatedID );
-            fieldSubmissionQueue.submitAll();
-            if ( typeof postAction === 'function' ) {
-                postAction.call();
-            }
-        }
-    };
-    gui.prompt( content, choices, inputs );
 }
 
 function _autoAddQueries( $questions ) {
@@ -450,7 +401,7 @@ function _setEventHandlers( selector ) {
                 $formprogress.css( 'width', status + '%' );
             }
         } )
-        // Repeat removal
+        // After repeat removal from view (before removal from model)
         .on( 'removed.enketo', function( event, updated ) {
             var instanceId = form.instanceID;
             if ( !updated.xmlFragment ) {
@@ -476,7 +427,7 @@ function _setEventHandlers( selector ) {
             }
 
             if ( !updated.xmlFragment ) {
-                console.error( 'Could not submit field. XML fragment missing.' );
+                console.error( 'Could not submit field. XML fragment missing. (If repeat was deleted, this is okay.)' );
                 return;
             }
             if ( !instanceId ) {
@@ -496,6 +447,53 @@ function _setEventHandlers( selector ) {
             fieldSubmissionQueue.submitAll();
 
         } );
+
+    // Before repeat removal from view and model
+    if ( settings.reasonForChange ) {
+        // We need to catch the click before repeat.js does. So 
+        // we attach the handler to a lower level DOM element and make sure it's only attached once.
+        $( '.or-repeat-info' ).parent( '.or-group, .or-group-data' ).on( 'click.propagate', 'button.remove:enabled', function( evt, data ) {
+            if ( data && data.propagate ) {
+                return true;
+            }
+            // Any form controls inside the repeat need a Reason for Change
+            // TODO: exclude controls that have no value?
+            var $questions = $( evt.currentTarget ).closest( '.or-repeat' ).find( '.question:not(.disabled)' );
+            var texts = {
+                heading: t( 'fieldsubmission.prompt.reason.heading' ),
+                msg: t( 'fieldsubmission.prompt.reason.msg' )
+            };
+            var inputs = '<p><label><input name="reason" type="text"/></label></p>';
+            var options = {
+                posAction: function( values ) {
+                    if ( !values.reason || !values.reason.trim() ) {
+                        // TODO: something
+                    } else {
+                        $questions.trigger( 'reasonchange.enketo', values );
+                        // Propagate to repeat.js
+                        $( evt.currentTarget ).trigger( 'click', {
+                            propagate: true
+                        } );
+                        reasons.updateNumbering();
+                    }
+                }
+            };
+            gui.prompt( texts, options, inputs );
+
+            return false;
+        } );
+
+        $( '.form-footer' ).find( '.next-page, .last-page, .previous-page, .first-page' ).on( 'click', function( evt ) {
+            var valid = reasons.validate();
+            if ( !valid ) {
+                evt.stopImmediatePropagation();
+
+                return false;
+            }
+            reasons.clearAll();
+            return true;
+        } );
+    }
 
     $( 'button#close-form:not(.completed-record, .simple)' ).click( function() {
         var $button = $( this ).btnBusyState( true );
