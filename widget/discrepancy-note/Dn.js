@@ -637,14 +637,21 @@ Comment.prototype._getRows = function( item ) {
 };
 
 Comment.prototype._parseFullName = function( user ) {
-    var matches;
+    var fullName;
 
     if ( !user ) {
         return '';
     }
 
-    matches = user.match( /^(.+)\((.+)\)$/ );
-    return ( matches && matches.length > 0 ) ? matches[ 1 ] : user;
+    users.some( function( u ) {
+        if ( u.userName === user ) {
+            fullName = u.firstName + ' ' + u.lastName;
+            return true;
+        }
+    } );
+
+    // use unchanged user as fallback if no match is found
+    return fullName || user;
 };
 
 module.exports = Comment;
