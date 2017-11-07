@@ -2,11 +2,37 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased]
+[1.55.1] - 2017-10-27
+----------------------
+##### Changed
+- Track fragment identifier (#abcd) if Google Analytics is enabled, and no longer track querystrings.
+
+##### Fixed
+- If repeat = page in Pages mode, the second+ repeat is now shown.
+
+[1.55.0] - 2017-10-19
+----------------------
+##### Changed
+- Time format according to ODK XForms Specification (10:12 -> 10:12.00.000-06:00). **WARNING: Make sure your backend is ready for this.**
+
+[1.54.0] - 2017-10-16
+----------------------
+##### Added
+- Make all label groups collapsible.
+- Let appearance "compact" on a group collapse this group by default.
+- Make first repeat removable with button if repeat-count is not used.
+- Let appearance "minimal" on a repeat prevent automatic creation of the first repeat instance.
+
+#### Fixed
+- Data type conversion issues for integers and dates.
+
+[1.53.1] - 2017-10-09
 ----------------------
 ##### Fixed
 - Max() and min() fail if nodeset is empty (0 repeats).
 - If first page is not relevant it is still displayed upon load.
+- Datepicker not available on iOS browsers.
+- In nested repeats a user-entered repeat count is always taken from the first repeat if current repeat instances in the series are zero.
 
 [1.53.0] - 2017-10-03
 ----------------------
