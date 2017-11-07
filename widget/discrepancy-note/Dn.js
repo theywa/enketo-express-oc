@@ -192,12 +192,19 @@ Comment.prototype._setValueChangeHandler = function() {
         var currentValue = that.options.helpers.input.getVal( $( evt.target ) );
         var currentStatus = that._getCurrentStatus( that.notes );
 
+        // Note obtaining the values like this does not work for file input types, but since have a different
+        // change comment for those that doesn't mention the filename, we don't need to fix that.
         previousValue = ( Array.isArray( previousValue ) ) ? previousValue.join( ', ' ) : previousValue;
         currentValue = ( Array.isArray( currentValue ) ) ? currentValue.join( ', ' ) : currentValue;
-        comment = t( 'widget.dn.valuechange', {
-            'new': '"' + currentValue + '"',
-            'previous': '"' + previousValue + '"'
-        } );
+
+        if ( evt.target.type !== 'file' ) {
+            comment = t( 'widget.dn.valuechange', {
+                'new': '"' + currentValue + '"',
+                'previous': '"' + previousValue + '"'
+            } );
+        } else {
+            comment = ( currentValue ) ? t( 'widget.dn.newfile' ) : t( 'widget.dn.fileremoved' );
+        }
 
         that._addAudit( comment, '', false );
         previousValue = currentValue;

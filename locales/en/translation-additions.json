@@ -11,7 +11,9 @@
             "valuechange": "Value changed from __previous__ to __new__",
             "autoconstraint": "Automatic query for: __errorMsg__",
             "closedmodified": "Data changed after query was closed",
-            "zerominutes": "Just now"
+            "zerominutes": "Just now",
+            "newfile": "New file uploaded",
+            "fileremoved": "File removed"
         }
     },
     "fieldsubmission": {
