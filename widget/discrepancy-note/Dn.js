@@ -5,6 +5,8 @@ var $ = require( 'jquery' );
 var t = require( 'translator' ).t;
 var settings = require( '../../public/js/src/module/settings' );
 var usersOptionsHtml;
+var currentUser;
+var users;
 var SYSTEM_USER = 'root';
 
 /**
@@ -371,13 +373,14 @@ Comment.prototype._hideCommentModal = function( $linkedQuestion ) {
 
 Comment.prototype._getUserOptions = function( readOnly ) {
     var userNodes;
-    var users;
+    var currentUsernameNode;
     var defaultAssignee = this.defaultAssignee;
     var disabled = readOnly ? 'disabled' : '';
 
     if ( !usersOptionsHtml ) {
         try {
             userNodes = this.options.helpers.evaluate( 'instance("_users")/root/item', 'nodes', null, null, true );
+
             // doing this in 2 steps as it is likely useful later on to store the users array separately.
             users = userNodes.map( function( item ) {
                 return {
@@ -392,6 +395,9 @@ Comment.prototype._getUserOptions = function( readOnly ) {
                     var selected = user.userName === defaultAssignee ? ' selected ' : '';
                     return '<option value="' + user.userName + '"' + selected + disabled + '>' + readableName + '</option>';
                 } );
+
+            currentUsernameNode = this.options.helpers.evaluate( 'instance("_users")/root/item[@current]/user_name', 'node', null, null, true );
+            currentUser = currentUsernameNode ? currentUsernameNode.textContent : null;
         } catch ( e ) {
             //users = [];
             console.error( e );
@@ -609,15 +615,17 @@ Comment.prototype._getRows = function( item ) {
     var msg;
     var elapsed;
     var fullName;
-    var me;
     var types = {
         comment: '<span class="icon tooltip fa-comment-o" data-title="Query/Comment"> </span>',
         audit: '<span class="icon tooltip fa-edit" data-title="Audit Event"> </span>'
     };
-    me = typeof item.user === 'undefined' ? t( 'widget.dn.me' ) : '';
+    if ( typeof item.user === 'undefined' ) {
+        item.user = currentUser;
+    }
     msg = item.comment || item.message;
     elapsed = this._getParsedElapsedTime( item.date_time );
-    fullName = this._parseFullName( item.user ) || me;
+    fullName = this._parseFullName( item.user ) || t( 'widget.dn.me' );
+
     return '<tr><td>' + ( types[ item.type ] || '' ) + '</td><td>' + msg + '</td><td>' + fullName + '</td><td>' + elapsed + '</td></tr>';
 };
 

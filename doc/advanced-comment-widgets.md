@@ -102,8 +102,7 @@ In addition there is `comment-status` function that can be used to check the sta
 
 #### Users list
 
-Add a secondary instance with id "_users" to the XForm, with the following (preferred) structure as *\_users.xml*:
-
+Add a secondary instance with id "_users" to the XForm, with the following structure as *\_users.xml*:
 
 ```xml
 <root>
@@ -112,7 +111,7 @@ Add a secondary instance with id "_users" to the XForm, with the following (pref
         <first_name>Esther</first_name>
         <last_name>Summerson</last_name>
     </item>
-    <item>
+    <item current>
         <user_name>honoria</user_name>
         <first_name>Honoria</first_name>
         <last_name>Dedlock</last_name>
@@ -120,13 +119,7 @@ Add a secondary instance with id "_users" to the XForm, with the following (pref
 </root>
 ```
 
-Or alternatively, with the following structure as *\_users.csv*:
-
-| user_name | first_name | last_name |
-|-----------|------------|-----------|
-| esummer   | Esther     | Summerson |
-| honoria   | Honoria    | Dedlock   |
-
+Use the current attribute to pass information to Enketo on the current user. The value of this attribute is ignored.
 
 
 #### XForm sample
