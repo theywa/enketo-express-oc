@@ -173,20 +173,24 @@ $padding: 30px;
             outline: 0;
         }
 
-        .tooltip[data-title]:hover:after {
-            @include font-normal;
-
-            content: attr(data-title);
-            padding: 2px 8px;
-            color: $state-info-text;
-            position: absolute;
-            margin-top: -20px;
-            margin-left: -10px;
-            white-space: nowrap;
-            z-index: 20;
-            border-radius: 3px;
-            border: 1px solid $state-info-border;
-            background-color: $state-info-bg;
+        .tooltip{
+            &[data-title]:hover:after {
+                @include font-normal;
+                content: attr(data-title);
+                padding: 2px 8px;
+                color: $state-info-text;
+                position: absolute;
+                margin-top: -20px;
+                margin-left: -10px;
+                white-space: nowrap;
+                z-index: 20;
+                border-radius: 3px;
+                border: 1px solid $state-info-border;
+                background-color: $state-info-bg;
+            }
+            &.username[data-title]:hover:after{
+                margin-left: -200px;
+            }
         }
     }
 }

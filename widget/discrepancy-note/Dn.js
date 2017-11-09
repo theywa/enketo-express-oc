@@ -688,7 +688,8 @@ Comment.prototype._getRows = function( item ) {
     elapsed = this._getParsedElapsedTime( item.date_time );
     fullName = this._parseFullName( item.user ) || t( 'widget.dn.me' );
 
-    return '<tr><td>' + ( types[ item.type ] || '' ) + '</td><td>' + msg + '</td><td>' + fullName + '</td><td>' + elapsed + '</td></tr>';
+    return '<tr><td>' + ( types[ item.type ] || '' ) + '</td><td>' + msg + '</td><td>' +
+        '<span class="username tooltip" data-title="' + fullName + ' (' + item.user + ')">' + fullName + '</span></td><td>' + elapsed + '</td></tr>';
 };
 
 Comment.prototype._parseFullName = function( user ) {
