@@ -79,7 +79,8 @@
         },
         "reason": {
             "heading": "Looks like you've made some updates. Please tell us why:",
-            "placeholder": "Enter a reason for changing this value"
+            "placeholder": "Enter a reason for changing this value",
+            "applytoall": "apply to all"
         }
     },
     "constraint": {

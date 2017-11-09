@@ -5,8 +5,12 @@ var t = require( 'translator' ).t;
 
 module.exports = {
     get $section() {
-        this._$section = this._$section || $( '<section class="reason-for-change"><h5 class="reason-for-change__heading">' +
-            t( 'fieldsubmission.reason.heading' ) + '</h5></section>' ).insertBefore( '.form-footer' );
+        this._$section = this._$section || $( '<section class="reason-for-change"><header class="reason-for-change__header"><h5>' +
+            t( 'fieldsubmission.reason.heading' ) + '</h5><div class="question reason-for-change__header__apply-to-all">' +
+            '<input class="ignore" type="text" name="common-rfc" placeholder="' + t( 'fieldsubmission.reason.placeholder' ) + '"/>' +
+            '<div class="option-wrapper"><label class=""><input class="ignore" type="checkbox" name="apply-to-all"/>' +
+            '<span lang="" class="option-label active">' + t( 'fieldsubmission.reason.applytoall' ) + '</span></label></div></div>' +
+            '</header></section>' ).insertBefore( '.form-footer' );
         return this._$section;
     },
     fields: [],
@@ -16,7 +20,10 @@ module.exports = {
         var $repeatNumber;
         var repeatNumber;
         var index;
-        console.log( 'adding to reason for change section', this.fields );
+
+        if ( this.fields.length === 0 ) {
+            this.setApplyToAllHandler();
+        }
         if ( this.fields.indexOf( question ) === -1 ) {
             // No need to worry about nested repeats as OC doesn't use them.
             $repeatNumber = $( question ).closest( '.or-repeat' ).find( '.repeat-number' );
@@ -48,6 +55,8 @@ module.exports = {
     },
     clearAll: function() {
         this.$section.find( '.reason-for-change__item' ).remove();
+        this.$section.find( 'input[name="apply-to-all"]' ).prop( 'checked', false );
+        this.$section.find( 'input[name="common-rfc"]' ).val( '' );
         this.fields = [];
     },
     setInvalid: function( inputEl ) {
@@ -81,11 +90,30 @@ module.exports = {
         var that = this;
         var valid = true;
 
-        this.$section.find( 'input:not(.added)' ).each( function() {
+        this.$section.find( '.reason-for-change__item input:not(.added)' ).each( function() {
             that.setInvalid( this );
             valid = false;
         } );
 
         return valid;
+    },
+    setValue: function( el, newVal ) {
+        if ( el.value.trim() !== newVal.trim() ) {
+            $( el ).val( newVal ).trigger( 'change' );
+        }
+    },
+    applyToAll: function() {
+        var that = this;
+        var $checkbox = this.$section.find( 'input[name="apply-to-all"]' );
+        var $input = this.$section.find( 'input[name="common-rfc"]' );
+        if ( $checkbox.is( ':checked' ) ) {
+            that.$section.find( '.reason-for-change__item input[type="text"]' ).each( function() {
+                that.setValue( this, $input.val() );
+            } );
+        }
+    },
+    setApplyToAllHandler: function() {
+        this.$section.find( '.reason-for-change__header' )
+            .on( 'change', this.applyToAll.bind( this ) );
     }
 };

@@ -225,6 +225,8 @@ Comment.prototype._setValueChangeHandler = function() {
                         reasons.setPending( evt.target );
                     }
                 } );
+
+            reasons.applyToAll();
         }
 
         previousValue = currentValue;

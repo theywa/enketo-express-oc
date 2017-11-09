@@ -54,7 +54,7 @@
             padding: 0 5px;
         }
         input[type=text] {
-            @inlude form-control;
+            @include form-control;
             background-color: $question-bg;
             padding-left: 5px;
             padding-right: 5px;
@@ -72,8 +72,32 @@
         }
     }
 
-    &__heading{
-        margin-bottom: 10px;
+    &__header {
+        h5 {
+            margin-bottom: 5px;
+        }
+        &__apply-to-all.question{
+            display: flex;
+            flex-direction: row;
+            border: none;
+            padding-bottom: 6px;
+            &.question:not(.note):not(.focus):hover {
+                background: none;
+            }
+            .option-wrapper{
+                flex-direction: row;
+                align-items: center;
+            }
+            input[type=text]{
+                @include form-control;
+                flex: 1;
+                width: auto;
+                background-color: $question-bg;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+            
+        }
         // do not show heading if there is no following sibling
         &:last-child {
             display: none
