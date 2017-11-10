@@ -53,22 +53,33 @@
         &__repeat-number{
             padding: 0 5px;
         }
-        input[type=text] {
-            @include form-control;
-            background-color: $question-bg;
-            padding-left: 5px;
-            padding-right: 5px;
-            width: 100%;
-            &.added {
+        &.added {
+            input[type=text]{
                 opacity: 0.5;
             }
-            &.invalid {
+        }
+        &.invalid {
+            input[type=text]{
                 @extend .invalid-required; 
                 border: 1px solid $state-danger-border;
                 margin: inherit !important;
                 padding: inherit !important;
                 border-radius: 0;
             }
+        }
+        &:not(.added){
+            .reason-for-change__item__label::after{
+                content: '*';
+                color: $brand-primary-color;
+                padding: 0 3px;
+            }
+        }
+        input[type=text] {
+            @include form-control;
+            background-color: $question-bg;
+            padding-left: 5px;
+            padding-right: 5px;
+            width: 100%;
         }
     }
 

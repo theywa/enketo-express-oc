@@ -59,6 +59,10 @@ module.exports = {
         this.$section.find( 'input[name="common-rfc"]' ).val( '' );
         this.fields = [];
     },
+    getInvalidFields: function() {
+        this.validate();
+        return this.$section.find( '.reason-for-change__item.invalid input' );
+    },
     setInvalid: function( inputEl ) {
         this.changeFieldStatus( inputEl, 'invalid' );
     },
@@ -72,9 +76,9 @@ module.exports = {
         el.textContent = '(' + number + ')';
     },
     changeFieldStatus: function( inputEl, status ) {
-        inputEl.classList.remove( 'added', 'invalid' );
+        inputEl.parentNode.classList.remove( 'added', 'invalid' );
         if ( status ) {
-            inputEl.classList.add( status );
+            inputEl.parentNode.classList.add( status );
         }
     },
     updateNumbering: function() {
@@ -90,7 +94,7 @@ module.exports = {
         var that = this;
         var valid = true;
 
-        this.$section.find( '.reason-for-change__item input:not(.added)' ).each( function() {
+        this.$section.find( '.reason-for-change__item:not(.added) input' ).each( function() {
             that.setInvalid( this );
             valid = false;
         } );

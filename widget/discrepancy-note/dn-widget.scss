@@ -174,7 +174,7 @@ $padding: 30px;
         }
 
         .tooltip{
-            &[data-title]:hover:after {
+            &[data-title]:hover::after {
                 @include font-normal;
                 content: attr(data-title);
                 padding: 2px 8px;
@@ -188,7 +188,7 @@ $padding: 30px;
                 border: 1px solid $state-info-border;
                 background-color: $state-info-bg;
             }
-            &.username[data-title]:hover:after{
+            &.username[data-title]:hover::after{
                 margin-left: -200px;
             }
         }

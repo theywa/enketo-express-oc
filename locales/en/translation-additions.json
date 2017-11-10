@@ -10,6 +10,7 @@
             "autoclosed": "Query closed by system because this item was hidden",
             "valuechange": "Value changed from __previous__ to __new__",
             "autoconstraint": "Automatic query for: __errorMsg__",
+            "autonoreason": "Automatic query for: Value changed and no reason for change provided",
             "closedmodified": "Data changed after query was closed",
             "zerominutes": "Just now",
             "newfile": "New file uploaded",

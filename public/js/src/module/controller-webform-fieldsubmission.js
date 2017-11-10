@@ -393,6 +393,10 @@ function _autoAddQueries( $questions ) {
     $questions.trigger( 'addquery.oc' );
 }
 
+function _autoAddReasonQueries( $rfcInputs ) {
+    $rfcInputs.val( t( 'widget.dn.autonoreason' ) ).trigger( 'change' );
+}
+
 function _setEventHandlers( selector ) {
     var $doc = $( document );
     $doc
@@ -584,6 +588,7 @@ function _setEventHandlers( selector ) {
     window.onbeforeunload = function() {
         if ( !ignoreBeforeUnload ) {
             _autoAddQueries( form.view.$.find( '.invalid-constraint' ) );
+            _autoAddReasonQueries( reasons.getInvalidFields() );
             if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
                 return 'Any unsaved data will be lost';
             }

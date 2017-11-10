@@ -215,10 +215,10 @@ Comment.prototype._setValueChangeHandler = function() {
         if ( settings.reasonForChange && !that.linkedQuestionReadonly ) {
             reasons.addField( that.$linkedQuestion[ 0 ] )
                 .on( 'change', function( evt ) {
-                    if ( evt.target.value && evt.target.value.trim() ) {
-                        that._addReason( evt.target.value );
-                        reasons.setValid( evt.target );
-                    }
+                    // Also for empty onchange values
+                    // TODO: exclude empty values if RFC field never had a value?
+                    that._addReason( evt.target.value );
+                    reasons.setValid( evt.target );
                 } )
                 .on( 'input', function( evt ) {
                     if ( evt.target.value && evt.target.value.trim() ) {
@@ -583,7 +583,13 @@ Comment.prototype._addAudit = function( comment, assignee, notify ) {
 Comment.prototype._addReason = function( reason ) {
     var modelDataStr;
     var that = this;
-    var q = {
+    var q;
+
+    if ( !reason ) {
+        return;
+    }
+
+    q = {
         type: 'reason',
         id: ( ++this.ordinal ).toString(),
         date_time: this._getFormattedCurrentDatetimeStr(),
