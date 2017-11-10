@@ -14,7 +14,7 @@ function addSignedStatus( form ) {
             signature.replace( /\\n/g, '<br/>' ).replace( /\n/g, '<br/>' ) + '</div>' );
         $( '#form-title' )
             .before( $status )
-            .closest( 'form.or' ).on( 'valuechange.enketo inputupdate.enketo', function() {
+            .closest( 'form.or' ).one( 'valuechange.enketo', '.question:not(.or-appearance-dn)', function() {
                 $status.remove();
             } );
     }
