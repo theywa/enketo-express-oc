@@ -35,7 +35,7 @@
 }
 
 .reason-for-change {
-    $b: 2px solid $gray-light;
+    $b: 1px solid $gray-light;
     margin-bottom: 10px;
     &__item {
         margin: 0;
@@ -90,7 +90,8 @@
         &__apply-to-all.question{
             display: flex;
             flex-direction: row;
-            border: none;
+            border: $b;
+            border-bottom: none;
             padding-bottom: 6px;
             &.question:not(.note):not(.focus):hover {
                 background: none;
