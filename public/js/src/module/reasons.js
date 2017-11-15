@@ -7,7 +7,7 @@ module.exports = {
     get $section() {
         this._$section = this._$section || $( '<section class="reason-for-change"><header class="reason-for-change__header"><h5>' +
             t( 'fieldsubmission.reason.heading' ) + '</h5><div class="question reason-for-change__header__apply-to-all">' +
-            '<input class="ignore" type="text" name="common-rfc" placeholder="' + t( 'fieldsubmission.reason.placeholder' ) + '"/>' +
+            '<input class="ignore" type="text" name="common-rfc" placeholder="' + t( 'fieldsubmission.reason.placeholder1' ) + '"/>' +
             '<div class="option-wrapper"><label class=""><input class="ignore" type="checkbox" name="apply-to-all"/>' +
             '<span lang="" class="option-label active">' + t( 'fieldsubmission.reason.applytoall' ) + '</span></label></div></div>' +
             '</header></section>' ).insertBefore( '.form-footer' );
@@ -39,7 +39,7 @@ module.exports = {
                 '<span class="reason-for-change__item__label">' +
                 $( question ).find( '.question-label.active' ).text() + '</span>' +
                 ( repeatNumber ? '<span class="reason-for-change__item__repeat-number" data-index="' + index + '">(' + repeatNumber + ')</span>' : '' ) +
-                '<input class="ignore" type="text" placeholder="' + t( 'fieldsubmission.reason.placeholder' ) + '"/></div>' );
+                '<input class="ignore" type="text" placeholder="' + t( 'fieldsubmission.reason.placeholder2' ) + '"/></div>' );
             this.fields.push( question );
             return $field.appendTo( this.$section );
         }

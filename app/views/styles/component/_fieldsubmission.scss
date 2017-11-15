@@ -68,10 +68,13 @@
             }
         }
         &:not(.added){
-            .reason-for-change__item__label::after{
-                content: '*';
-                color: $brand-primary-color;
-                padding: 0 3px;
+            .reason-for-change__item__label,
+            .reason-for-change__item__repeat-number{
+                &:last-of-type::after{
+                    content: '*';
+                    color: $brand-primary-color;
+                    padding: 0 3px;
+                }
             }
         }
         input[type=text] {

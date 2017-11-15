@@ -80,8 +80,9 @@
         },
         "reason": {
             "heading": "Looks like you've made some updates. Please tell us why:",
-            "placeholder": "Enter a reason for changing this value",
-            "applytoall": "apply to all"
+            "placeholder1": "Enter a reason for your changes",
+            "placeholder2": "Enter a reason for changing this value",
+            "applytoall": "Apply to all"
         }
     },
     "constraint": {
