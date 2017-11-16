@@ -218,11 +218,11 @@ Comment.prototype._setValueChangeHandler = function() {
                     // Also for empty onchange values
                     // TODO: exclude empty values if RFC field never had a value?
                     that._addReason( evt.target.value );
-                    reasons.setValid( evt.target );
+                    reasons.setSubmitted( evt.target );
                 } )
                 .on( 'input', function( evt ) {
                     if ( evt.target.value && evt.target.value.trim() ) {
-                        reasons.setPending( evt.target );
+                        reasons.setEdited( evt.target );
                     }
                 } );
 

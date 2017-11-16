@@ -13,6 +13,10 @@ module.exports = {
             '</header></section>' ).insertBefore( '.form-footer' );
         return this._$section;
     },
+    get questionMsg() {
+        this._questionMsg = this._questionMsg || '<span class="oc-reason-msg active">' + t( 'fieldsubmission.reason.questionmsg' ) + '</span>';
+        return this._questionMsg;
+    },
     fields: [],
     numbers: [],
     addField: function( question ) {
@@ -41,6 +45,7 @@ module.exports = {
                 ( repeatNumber ? '<span class="reason-for-change__item__repeat-number" data-index="' + index + '">(' + repeatNumber + ')</span>' : '' ) +
                 '<input class="ignore" type="text" placeholder="' + t( 'fieldsubmission.reason.placeholder2' ) + '"/></div>' );
             this.fields.push( question );
+            $( question ).append( this.questionMsg );
             return $field.appendTo( this.$section );
         }
         return $();
@@ -66,19 +71,47 @@ module.exports = {
     setInvalid: function( inputEl ) {
         this.changeFieldStatus( inputEl, 'invalid' );
     },
-    setValid: function( inputEl ) {
+    setSubmitted: function( inputEl ) {
         this.changeFieldStatus( inputEl, 'added' );
+        inputEl.dataset.previousValue = inputEl.value;
     },
-    setPending: function( inputEl ) {
-        this.changeFieldStatus( inputEl );
+    setEdited: function( inputEl ) {
+        // only set edited status if the field has been submitted previously
+        if ( this.hasSubmitted( inputEl ) ) {
+            if ( inputEl.value === inputEl.dataset.previousValue ) {
+                // remove statuses to go back to 'added' status only
+                this.changeFieldStatus( inputEl, 'added' );
+            } else {
+                this.changeFieldStatus( inputEl, 'edited' );
+            }
+        }
     },
     setNumber: function( el, number ) {
         el.textContent = '(' + number + ')';
     },
+    getIndex: function( inputEl ) {
+        return this.$section.find( '.reason-for-change__item' ).index( $( inputEl ).closest( '.reason-for-change__item' ) );
+    },
+    hasSubmitted: function( inputEl ) {
+        return inputEl.parentNode.classList.contains( 'added' );
+    },
     changeFieldStatus: function( inputEl, status ) {
-        inputEl.parentNode.classList.remove( 'added', 'invalid' );
+        // we never remove the "added" class
+        inputEl.parentNode.classList.remove( 'edited', 'invalid' );
         if ( status ) {
             inputEl.parentNode.classList.add( status );
+        }
+        this.updateQuestionMessage( inputEl, status );
+    },
+    updateQuestionMessage: function( inputEl, status ) {
+        var question = this.fields[ this.getIndex( inputEl ) ];
+        var existingMsg = question.querySelector( '.oc-reason-msg' );
+        if ( status === 'edited' || status === 'added' ) {
+            if ( existingMsg ) {
+                existingMsg.remove();
+            }
+        } else if ( !existingMsg ) {
+            $( question ).append( this.questionMsg );
         }
     },
     updateNumbering: function() {

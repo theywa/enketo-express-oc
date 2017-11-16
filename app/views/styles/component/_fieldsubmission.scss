@@ -53,7 +53,7 @@
         &__repeat-number{
             padding: 0 5px;
         }
-        &.added {
+        &.added:not(.edited) {
             input[type=text]{
                 opacity: 0.5;
             }
@@ -118,6 +118,11 @@
             display: none
         }
     }
+}
+
+.oc-reason-msg{
+    @extend .or-required-msg;
+    display: block !important;
 }
 
 .pages ~ .form-footer {
