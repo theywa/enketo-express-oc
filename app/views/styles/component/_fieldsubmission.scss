@@ -125,6 +125,10 @@
     }
 }
 
+.bootstrap-select .btn-default.dropdown-toggle {
+    background: white;
+}
+
 .oc-reason-msg{
     @extend .or-required-msg;
     color: #4f89bd !important;
