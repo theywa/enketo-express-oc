@@ -83,7 +83,7 @@
             "placeholder1": "Enter a reason for your changes",
             "placeholder2": "Enter a reason for changing this value",
             "applytoall": "Apply to all",
-            "questionmsg": "Please enter a reason for change at bottom of page"
+            "questionmsg": "Please enter a reason for change at bottom of page."
         }
     },
     "constraint": {
