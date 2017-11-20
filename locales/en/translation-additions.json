@@ -65,6 +65,9 @@
             "reason": {
                 "heading": "Enter reason",
                 "msg": "Please enter a reason for removing this group."
+            },
+            "repeatdelete": {
+                "msg": "Are you sure you want to proceed? This action is irreversible."
             }
         },
         "feedback": {

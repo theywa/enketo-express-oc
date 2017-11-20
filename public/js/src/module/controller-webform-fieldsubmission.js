@@ -255,7 +255,6 @@ function _closeSimple() {
                     }
                 } );
             }
-
         } );
 }
 
@@ -501,6 +500,29 @@ function _setEventHandlers( selector ) {
             }
             reasons.clearAll();
             return true;
+        } );
+    } else {
+        // We need to catch the click before repeat.js does. So 
+        // we attach the handler to a lower level DOM element and make sure it's only attached once.
+        $( '.or-repeat-info' ).parent( '.or-group, .or-group-data' ).on( 'click.propagate', 'button.remove:enabled', function( evt, data ) {
+            if ( data && data.propagate ) {
+                return true;
+            }
+            var texts = {
+                //heading: t( 'fieldsubmission.prompt.repeatdelete.heading' ),
+                msg: t( 'fieldsubmission.prompt.repeatdelete.msg' )
+            };
+            var options = {
+                posAction: function() {
+                    // Propagate to repeat.js
+                    $( evt.currentTarget ).trigger( 'click', {
+                        propagate: true
+                    } );
+                }
+            };
+            gui.confirm( texts, options );
+
+            return false;
         } );
     }
 
