@@ -42,6 +42,7 @@
         padding: 10px 10px 0 10px;
         border-left: $b;
         border-right: $b;
+        border-bottom: 1px solid transparent; 
         background-color: #f1f1f1;
         &:first-of-type{
             border-top: $b;
@@ -95,13 +96,15 @@
             flex-direction: row;
             border: $b;
             border-bottom: none;
-            padding-bottom: 6px;
+            margin-bottom: 0;
+            padding: 10px;
             &.question:not(.note):not(.focus):hover {
                 background: none;
             }
             .option-wrapper{
                 flex-direction: row;
                 align-items: center;
+                margin-left: 10px;
             }
             input[type=text]{
                 @include form-control;
@@ -110,6 +113,8 @@
                 background-color: $question-bg;
                 padding-left: 5px;
                 padding-right: 5px;
+                border: 1px solid #ccc;
+                margin: 0;
             }
             
         }
