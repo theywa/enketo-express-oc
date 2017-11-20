@@ -263,17 +263,22 @@ function _closeSimple() {
 function _closeCompletedRecord() {
     var $violated;
 
+    if ( !reasons.validate() ) {
+        var firstInvalidInput = reasons.getFirstInvalidField();
+        gui.alert( t( 'fieldsubmission.alert.reasonforchangevalidationerror.msg' ) );
+        firstInvalidInput.scrollIntoView();
+        firstInvalidInput.focus();
+        return Promise.resolve( false );
+    }
+
     return form.validate()
         .then( function( valid ) {
-            if ( reasons.validate() && valid ) {
+            if ( valid ) {
                 // do not show confirmation dialog
                 return _complete( true );
             } else if ( form.view.$.find( '.invalid-relevant' ).length ) {
                 gui.alert( t( 'fieldsubmission.alert.relevantvalidationerror.msg' ) );
-
                 return false;
-            } else if ( $( '.reason-for-change .invalid' ).length ) {
-                gui.alert( t( 'fieldsubmission.alert.reasonforchangevalidationerror.msg' ) );
             } else {
                 $violated = form.view.$.find( '.invalid-constraint, .invalid-required' );
                 // Note that unlike _close this also looks at .invalid-required.

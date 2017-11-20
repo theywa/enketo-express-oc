@@ -134,6 +134,9 @@ module.exports = {
 
         return valid;
     },
+    getFirstInvalidField: function() {
+        return this.$section[ 0 ].querySelector( '.invalid input' );
+    },
     setValue: function( el, newVal ) {
         if ( el.value.trim() !== newVal.trim() ) {
             $( el ).val( newVal ).trigger( 'change' );
