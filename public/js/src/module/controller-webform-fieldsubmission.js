@@ -268,6 +268,8 @@ function _closeCompletedRecord() {
         firstInvalidInput.scrollIntoView();
         firstInvalidInput.focus();
         return Promise.resolve( false );
+    } else {
+        reasons.clearAll();
     }
 
     return form.validate()
