@@ -512,10 +512,18 @@ Comment.prototype._parseElapsedTime = function( elapsedMilliseconds ) {
     var hours;
     var minutes;
 
-    if ( isNaN( elapsedMilliseconds ) || elapsedMilliseconds < 0 ) {
+    if ( isNaN( elapsedMilliseconds ) || elapsedMilliseconds < -120000 ) {
         console.error( 'Could not parse elapsed time for elapsed milliseconds: "' + elapsedMilliseconds + '"' );
         return 'error';
     }
+
+    // To work around negative values due to incorrect times on OC server or client device,
+    // we tolerate up to -2 minutes.
+    if ( elapsedMilliseconds < 0 ) {
+        console.error( 'Negative time difference of less than 2 minutes. Setting to "Just Now"' );
+        elapsedMilliseconds = 1;
+    }
+
     minutes = elapsedMilliseconds / ( 1000 * 60 );
     // TODO: translateable strings with plural?
     if ( minutes < 0.5 ) {
