@@ -63,11 +63,11 @@
         },
         "prompt": {
             "reason": {
-                "heading": "Enter reason",
-                "msg": "Please enter a reason for removing this group."
+                "msg": "If so, please enter a reason for deleting the group."
             },
             "repeatdelete": {
-                "msg": "Are you sure you want to proceed? This action is irreversible."
+                "heading": "Delete this group of responses?",
+                "msg": "This action is irreversible (it will be recorded in the audit trail). Are you sure you want to proceed?"
             }
         },
         "feedback": {

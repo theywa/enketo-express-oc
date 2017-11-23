@@ -470,8 +470,8 @@ function _setEventHandlers( selector ) {
             // TODO: exclude controls that have no value?
             var $questions = $( evt.currentTarget ).closest( '.or-repeat' ).find( '.question:not(.disabled)' );
             var texts = {
-                heading: t( 'fieldsubmission.prompt.reason.heading' ),
-                msg: t( 'fieldsubmission.prompt.reason.msg' )
+                heading: t( 'fieldsubmission.prompt.repeatdelete.heading' ),
+                msg: t( 'fieldsubmission.prompt.repeatdelete.msg' ) + ' ' + t( 'fieldsubmission.prompt.reason.msg' )
             };
             var inputs = '<p><label><input name="reason" type="text"/></label></p>';
             var options = {
@@ -511,7 +511,7 @@ function _setEventHandlers( selector ) {
                 return true;
             }
             var texts = {
-                //heading: t( 'fieldsubmission.prompt.repeatdelete.heading' ),
+                heading: t( 'fieldsubmission.prompt.repeatdelete.heading' ),
                 msg: t( 'fieldsubmission.prompt.repeatdelete.msg' )
             };
             var options = {
