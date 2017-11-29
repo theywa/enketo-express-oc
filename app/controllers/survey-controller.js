@@ -115,15 +115,6 @@ function fieldSubmission( req, res, next ) {
     _renderWebform( req, res, next, options );
 }
 
-function fieldSubmissionEdit( req, res, next ) {
-    var options = {
-        type: 'fs',
-        iframe: req.iframe
-    };
-
-    _renderWebform( req, res, next, options );
-}
-
 function view( req, res, next ) {
     var options = {
         type: 'view',
