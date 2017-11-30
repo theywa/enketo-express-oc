@@ -47,10 +47,7 @@ translator.init( survey )
     } )
     .then( function( formParts ) {
         if ( formParts.form && formParts.model ) {
-            return gui.swapTheme( formParts.theme || utils.getThemeFromFormStr( formParts.form ) )
-                .then( function() {
-                    return formParts;
-                } );
+            return gui.swapTheme( formParts );
         } else {
             throw new Error( t( 'error.unknown' ) );
         }
