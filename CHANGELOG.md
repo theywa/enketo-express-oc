@@ -5,9 +5,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [Unreleased]
 ---------------------
 ##### Fixed
-- When swapping to Grid Theme via API or app 'default theme' setting, the proper print dialog is not shown.
+- Printing: When swapping to Grid Theme via API or app 'default theme' setting, the proper print dialog is not shown.
+- Printing: Non-relevant non-select fields are not greyed out.
+- Printing: Geo widget without "maps" appearance is shown on screen but not on printout.
+- Printing: Geo widget map/zoom selector buttons are shown on printouts.
+- Printing: Various Analog Scale widget styling issues.
+- Grid Theme: A table-list/list-no-label question does not have a bottom border.
+- Grid Theme: Top of page sometimes does not have a border.
 
-[1.55.5] - 2017-11-30
+[1.55.5] - 2017-11-29
 --------------------
 ##### Fixed
 - When a repeat is removed any logic that depends on repeat position changes is not updated when it should be.
