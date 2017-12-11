@@ -29,13 +29,13 @@ Comment.prototype.constructor = Comment;
 
 Comment.prototype._init = function() {
     this.$linkedQuestion = this._getLinkedQuestion( this.element );
-    this.$commentQuestion = $( this.element ).closest( '.question' );
-    this.ordinal = 0;
-    this.readOnly = this.element.readOnly;
-    this.linkedQuestionReadonly = this.$linkedQuestion[ 0 ]
-        .querySelector( 'input:not(.ignore), textarea:not(.ignore), select:not(.ignore)' ).readOnly;
 
     if ( this.$linkedQuestion.length === 1 ) {
+        this.$commentQuestion = $( this.element ).closest( '.question' );
+        this.ordinal = 0;
+        this.readOnly = this.element.readOnly;
+        this.linkedQuestionReadonly = this.$linkedQuestion[ 0 ]
+            .querySelector( 'input:not(.ignore), textarea:not(.ignore), select:not(.ignore)' ).readOnly;
         this.notes = this._parseModelFromString( this.element.value );
         this.defaultAssignee = this._getDefaultAssignee( this.notes );
         this.$commentQuestion.addClass( 'hide' ).attr( 'role', 'comment' );
