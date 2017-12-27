@@ -256,6 +256,8 @@ function _getSurveyParams( req ) {
     var domain;
     var params = req.body;
     var noHashes = ( params.noHashes === 'true' );
+    var customParamName = req.app.get( 'query parameter to pass to submission' );
+    var customParam = customParamName ? req.query[ customParamName ] : null;
 
     if ( req.enketoId ) {
         return surveyModel.get( req.enketoId )
@@ -263,6 +265,7 @@ function _getSurveyParams( req ) {
             .then( _checkQuota )
             .then( function( survey ) {
                 survey.noHashes = noHashes;
+                survey.customParam = customParam;
                 return _setCookieAndCredentials( survey, req );
             } );
     } else if ( params.serverUrl && params.xformId ) {
@@ -273,6 +276,7 @@ function _getSurveyParams( req ) {
             .then( _checkQuota )
             .then( function( survey ) {
                 survey.noHashes = noHashes;
+                survey.customParam = customParam;
                 return _setCookieAndCredentials( survey, req );
             } );
     } else if ( params.xformUrl ) {
