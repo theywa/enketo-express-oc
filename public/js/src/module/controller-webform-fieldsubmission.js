@@ -403,6 +403,11 @@ function _autoAddReasonQueries( $rfcInputs ) {
     $rfcInputs.val( t( 'widget.dn.autonoreason' ) ).trigger( 'change' );
 }
 
+function _doNotSubmit( fullPath ) {
+    // no need to check on cloned radiobuttons, selects or textareas
+    return !!form.view.$.get( 0 ).querySelector( 'input[oc-external="clinicaldata"][name="' + fullPath + '"]' );
+}
+
 function _setEventHandlers( selector ) {
     var $doc = $( document );
     $doc
@@ -435,7 +440,6 @@ function _setEventHandlers( selector ) {
                 // a fieldsubmission.
                 return;
             }
-
             if ( !updated.xmlFragment ) {
                 console.error( 'Could not submit field. XML fragment missing. (If repeat was deleted, this is okay.)' );
                 return;
@@ -447,7 +451,9 @@ function _setEventHandlers( selector ) {
             if ( !updated.fullPath ) {
                 console.error( 'Could not submit field. Path missing.' );
             }
-
+            if ( _doNotSubmit( updated.fullPath ) ) {
+                return;
+            }
             if ( updated.file ) {
                 file = fileManager.getCurrentFile( updated.file );
             }
