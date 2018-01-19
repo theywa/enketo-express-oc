@@ -17,8 +17,7 @@ var $buttons = $( '.form-header__button--print, button#close-form' );
 var oc = require( './module/custom' );
 var survey = {
     enketoId: settings.enketoId,
-    instanceId: settings.instanceId,
-    noHashes: true
+    instanceId: settings.instanceId
 };
 
 // OC style customizations for "views"
