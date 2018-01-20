@@ -37,8 +37,12 @@ pageModule.setRepeatHandlers = function() {
             // note that that.$current will have length 1 even if it was removed from DOM!
             if ( that.$current.closest( 'html' ).length === 0 ) {
                 that.updateAllActive();
+                var $target = $( event.target ).prev();
+                if ( $target.length === 0 ) {
+                    $target = $( event.target );
+                }
                 // is it best to go to previous page always?
-                that.flipToPageContaining( $( event.target ) );
+                that.flipToPageContaining( $target );
             }
         } );
 };
