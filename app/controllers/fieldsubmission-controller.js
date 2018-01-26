@@ -79,8 +79,6 @@ function _request( type, req, res, next ) {
         .then( function( survey ) {
             submissionUrl = _getSubmissionUrl( survey.openRosaServer, type ) + query;
             credentials = userModel.getCredentials( req );
-
-            // first check if authentication is required and if so get the Basic or Digest Authorization header
             return communicator.getAuthHeader( submissionUrl, credentials );
         } )
         .then( function( authHeader ) {
@@ -88,7 +86,8 @@ function _request( type, req, res, next ) {
                 url: submissionUrl,
                 headers: authHeader ? {
                     'Authorization': authHeader
-                } : {}
+                } : {},
+                timeout: req.app.get( 'timeout' ) + 500
             };
 
             // pipe the request 
