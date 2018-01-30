@@ -12,7 +12,6 @@ var settings = require( './module/settings' );
 var connection = require( './module/connection' );
 var translator = require( './module/translator' );
 var t = translator.t;
-var utils = require( './module/utils' );
 var $loader = $( '.form__loader' );
 var $buttons = $( '.form-header__button--print, button#close-form, button#finish-form' );
 var oc = require( './module/custom' );
@@ -22,8 +21,7 @@ var survey = {
     serverUrl: settings.serverUrl,
     xformId: settings.xformId,
     xformUrl: settings.xformUrl,
-    instanceId: settings.instanceId,
-    noHashes: !settings.offline
+    instanceId: settings.instanceId
 };
 
 translator.init( survey )
