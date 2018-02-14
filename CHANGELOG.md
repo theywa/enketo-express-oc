@@ -2,6 +2,26 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+---------------------
+##### Added
+- File pickers can now (only) be reset by a new reset button.
+- Download functionality to file pickers.
+- Full support for annotate widget.
+
+##### Changed
+- Repeats without form controls now no longer take up any visual space in the form.
+- Show upload placeholder with max file size.
+- Error messages in geopicker are now translatable.
+- Draw/signature widget requires confirmation before reset.
+
+##### Fixed
+- Instances with special characters in instance id attributes cannot to be queried.
+- Namespaces not resolved for secondary instances.
+- Slowdown with repeat-count that was introduced in 1.58.0.
+- Printing: geo widget with appearance "maps" does not show coordinate fields.
+- Printing: Analog scale widget with Grid theme in pages mode is messed up.
+
 [1.59.0] - 2018-01-30
 ---------------------
 ##### Added 
@@ -15,7 +35,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Date strings returned by XPath evaluator for question with type 'date' are not considered valid dates and set to ''.
 - When redirecting to an external login URL, the return URL is not encoded.
 - Instance('id' )/path/to/node does not work if 'id' is surrounded by whitespace.
-- Markdown headers preceded by whitespace fail to render as header and whitespace trimming is to aggresive.
+- Markdown headers preceded by whitespace fail to render as header and whitespace trimming is too aggresive.
 - Datepicker with "month-year" and "year" appearance shows full value.
 
 [1.58.0] - 2018-01-19

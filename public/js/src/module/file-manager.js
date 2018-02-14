@@ -14,6 +14,7 @@ var settings = require( './settings' );
 var $ = require( 'jquery' );
 var utils = require( './utils' );
 var coreUtils = require( 'enketo-core/src/js/utils' );
+var t = require( 'translator' ).t;
 var instanceAttachments;
 
 /**
@@ -62,12 +63,10 @@ function getFileUrl( subject, filename ) {
                 store.record.file.get( _getInstanceId(), subject )
                     .then( function( file ) {
                         if ( file.item ) {
-                            if ( _isTooLarge( file.item ) ) {
+                            if ( isTooLarge( file.item ) ) {
                                 reject( _getMaxSizeError() );
                             } else {
-                                utils.blobToDataUri( file.item )
-                                    .then( resolve )
-                                    .catch( reject );
+                                resolve( URL.createObjectURL( file.item ) );
                             }
                         } else {
                             reject( new Error( 'File Retrieval Error' ) );
@@ -76,12 +75,10 @@ function getFileUrl( subject, filename ) {
                     .catch( reject );
             }
         } else if ( typeof subject === 'object' ) {
-            if ( _isTooLarge( subject ) ) {
+            if ( isTooLarge( subject ) ) {
                 reject( _getMaxSizeError() );
             } else {
-                utils.blobToDataUri( subject, filename )
-                    .then( resolve )
-                    .catch( reject );
+                resolve( URL.createObjectURL( subject ) );
             }
         } else {
             reject( new Error( 'Unknown error occurred' ) );
@@ -168,14 +165,14 @@ function _getInstanceId() {
  * @param  {[type]}  file the File
  * @return {Boolean}
  */
-function _isTooLarge( file ) {
+function isTooLarge( file ) {
     return file && file.size > _getMaxSize();
 }
 
 function _getMaxSizeError() {
-    return new Error( 'File too large (max ' +
-        ( Math.round( ( _getMaxSize() * 100 ) / ( 1024 * 1024 ) ) / 100 ) +
-        ' Mb)' );
+    return new Error( t( 'filepicker.toolargeerror', {
+        maxSize: getMaxSizeReadable()
+    } ) );
 }
 
 /**
@@ -186,11 +183,17 @@ function _getMaxSize() {
     return settings.maxSize || 5 * 1024 * 1024;
 }
 
+function getMaxSizeReadable() {
+    return Math.round( _getMaxSize() * 100 / ( 1024 * 1024 ) / 100 ) + 'MB';
+}
+
 module.exports = {
     isWaitingForPermissions: isWaitingForPermissions,
     init: init,
     setInstanceAttachments: setInstanceAttachments,
     getFileUrl: getFileUrl,
     getCurrentFiles: getCurrentFiles,
-    getCurrentFile: getCurrentFile
+    getCurrentFile: getCurrentFile,
+    isTooLarge: isTooLarge,
+    getMaxSizeReadable: getMaxSizeReadable
 };
