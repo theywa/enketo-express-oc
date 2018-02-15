@@ -2,7 +2,7 @@
 
 var Widget = require( 'enketo-core/src/js/Widget' );
 var $ = require( 'jquery' );
-var t = require( 'translator' ).t;
+var t = require( '../../public/js/src/module/translator' ).t;
 var settings = require( '../../public/js/src/module/settings' );
 var usersOptionsHtml;
 var currentUser;
