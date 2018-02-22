@@ -2,6 +2,46 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.61.0] - 2018-02-21
+---------------------
+##### Added
+- Download functionality to draw widgets.
+- Support for "new", "new-front", "new-rear" on media inputs.
+- Feature to undo drawing strokes in draw and annotate widgets.
+
+##### Changed
+- Show helpful error message if SVG image cannot be found with Image Map widget.
+- Native month-year datepicker used on mobile devices when available.
+
+##### Fixed
+- In annotate widget loaded file disappears when screen is resized.
+- Annotate widget not working on touchscreen devices.
+- Annotate widget stretches uploaded image.
+- Downloaded drawings have a different filename from the one stored in the record.
+- Imagemap widget does not work for a group `<g>` of `<path>`s.
+- Imagemap scaling issue when width and height defined in SVG file have units (pt).
+
+[1.60.0] - 2018-02-14
+---------------------
+##### Added
+- File pickers can now (only) be reset by a new reset button.
+- Download functionality to file pickers.
+- Full support for annotate widget.
+
+##### Changed
+- Repeats without form controls now no longer take up any visual space in the form.
+- Show upload placeholder with max file size.
+- Error messages in geopicker are now translatable.
+- Draw/signature widget requires confirmation before reset.
+- Geo widget and file widget now use consistent (app) modal dialogs instead of inconsistent native dialogs.
+
+##### Fixed
+- Instances with special characters in instance id attributes cannot to be queried.
+- Namespaces not resolved for secondary instances.
+- Slowdown with repeat-count that was introduced in 1.58.0.
+- Printing: geo widget with appearance "maps" does not show coordinate fields.
+- Printing: Analog scale widget with Grid theme in pages mode is messed up.
+
 [1.59.0] - 2018-01-30
 ---------------------
 ##### Added 
@@ -15,7 +55,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Date strings returned by XPath evaluator for question with type 'date' are not considered valid dates and set to ''.
 - When redirecting to an external login URL, the return URL is not encoded.
 - Instance('id' )/path/to/node does not work if 'id' is surrounded by whitespace.
-- Markdown headers preceded by whitespace fail to render as header and whitespace trimming is to aggresive.
+- Markdown headers preceded by whitespace fail to render as header and whitespace trimming is too aggresive.
 - Datepicker with "month-year" and "year" appearance shows full value.
 
 [1.58.0] - 2018-01-19

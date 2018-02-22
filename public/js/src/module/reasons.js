@@ -1,7 +1,7 @@
 'use strict';
 
 var $ = require( 'jquery' );
-var t = require( 'translator' ).t;
+var t = require( './translator' ).t;
 
 module.exports = {
     get $section() {
