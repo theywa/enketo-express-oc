@@ -4,7 +4,7 @@ var account = require( '../models/account-model' );
 var auth = require( 'basic-auth' );
 var express = require( 'express' );
 var router = express.Router();
-var debug = require( 'debug' )( 'account-controller' );
+//var debug = require( 'debug' )( 'account-controller' );
 
 module.exports = function( app ) {
     app.use( '/accounts/api/v1', router );
@@ -84,7 +84,7 @@ function removeAccount( req, res, next ) {
     return account.remove( {
             linkedServer: req.body.server_url || req.query.server_url,
             key: req.body.api_key || req.query.api_key
-        } ).then( function( account ) {
+        } ).then( function() {
             _render( 204, null, res );
         } )
         .catch( next );

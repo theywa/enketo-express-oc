@@ -17,11 +17,10 @@ require( './page' );
  * @param  {[type]} updated [description]
  */
 var constraintUpdate = function( updated ) {
-    var $nodes;
     updated = updated || {};
     // If the update object is a repeat node (cloned=true), do nothing
     if ( !updated.cloned ) {
-        $nodes = this.getRelatedNodes( 'data-constraint', '', updated )
+        this.getRelatedNodes( 'data-constraint', '', updated )
             // The filter below is commented out, because at the moment this.getRelatedNodes already takes
             // care of this (in enketo-core). However, it is not unrealistic to expect that in the future we will 
             // not be able to rely on that as it may be considered a performance hack too far. In that case, uncomment below.

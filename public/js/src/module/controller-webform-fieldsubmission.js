@@ -10,6 +10,7 @@ var gui = require( './gui' );
 var settings = require( './settings' );
 var Form = require( 'enketo-core' );
 var fileManager = require( './file-manager' );
+var Promise = require( 'lie' );
 var t = require( './translator' ).t;
 var $ = require( 'jquery' );
 var FieldSubmissionQueue = require( './field-submission-queue' );
@@ -19,7 +20,6 @@ var reasons = require( './reasons' );
 var DEFAULT_THANKS_URL = '/thanks';
 var form;
 var formSelector;
-var formData;
 var $formprogress;
 var ignoreBeforeUnload = false;
 
@@ -37,10 +37,9 @@ function init( selector, data ) {
     var loadErrors = [];
 
     formSelector = selector;
-    formData = data;
     $formprogress = $( '.form-progress' );
 
-    return new Promise( function( resolve, reject ) {
+    return new Promise( function( resolve ) {
 
             if ( data.instanceAttachments ) {
                 fileManager.setInstanceAttachments( data.instanceAttachments );
@@ -142,7 +141,7 @@ function _close( bypassAutoQuery ) {
 
     // First check if any constraints have been violated and prompt option to generate automatic queries
     if ( !bypassAutoQuery && $violated.length ) {
-        return new Promise( function( resolve, reject ) {
+        return new Promise( function( resolve ) {
             gui.confirm( {
                 heading: t( 'alert.default.heading' ),
                 errorMsg: t( 'fieldsubmission.confirm.autoquery.msg1' ),
@@ -325,7 +324,7 @@ function _complete( bypassConfirmation ) {
 
     // First check if any constraints have been violated and prompt option to generate automatic queries
     if ( !bypassConfirmation ) {
-        return new Promise( function( resolve, reject ) {
+        return new Promise( function( resolve ) {
             gui.confirm( {
                 heading: t( 'fieldsubmission.confirm.complete.heading' ),
                 msg: t( 'fieldsubmission.confirm.complete.msg' )

@@ -3,6 +3,7 @@
 var settings = require( './settings' );
 var t = require( './translator' ).t;
 var utils = require( './utils' );
+var Promise = require( 'lie' );
 var $ = require( 'jquery' );
 var gui = require( './gui' );
 var MD5 = require( 'crypto-js/md5' );
@@ -165,7 +166,7 @@ FieldSubmissionQueue.prototype._submitAll = function() {
                         } );
                 } );
             }, Promise.resolve() )
-            .then( function( lastResult ) {
+            .then( function() {
                 console.log( 'All done with queue submission. Current remaining queue is', that.submissionQueue );
                 if ( authRequired ) {
                     gui.confirmLogin();

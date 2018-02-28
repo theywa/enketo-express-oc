@@ -57,7 +57,7 @@ Model.prototype.getXmlFragmentStr = function( node ) {
 
     dataStr = ( new XMLSerializer() ).serializeToString( clone, 'text/xml' );
     // restore default namespaces
-    dataStr = dataStr.replace( /\s(data-)(xmlns\=("|')[^\s\>]+("|'))/g, ' $2' );
+    dataStr = dataStr.replace( /\s(data-)(xmlns=("|')[^\s>]+("|'))/g, ' $2' );
     return dataStr;
 };
 

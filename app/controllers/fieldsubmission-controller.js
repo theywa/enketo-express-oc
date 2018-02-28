@@ -3,7 +3,6 @@
 var communicator = require( '../lib/communicator' );
 var surveyModel = require( '../models/survey-model' );
 var userModel = require( '../models/user-model' );
-var utils = require( '../lib/utils' );
 var routerUtils = require( '../lib/router-utils' );
 var request = require( 'request' );
 var express = require( 'express' );

@@ -227,7 +227,7 @@ module.exports = function( grunt ) {
         grunt.log.writeln( 'File ' + SYSTEM_SASS_VARIABLES_PATH + ' created' );
     } );
 
-    grunt.registerTask( 'transforms', 'Creating forms.json', function( task ) {
+    grunt.registerTask( 'transforms', 'Creating forms.json', function() {
         var forms = {};
         var done = this.async();
         var jsonStringify = require( 'json-pretty' );

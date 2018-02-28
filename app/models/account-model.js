@@ -238,7 +238,6 @@ function remove( account ) {
  * @return {[type]} [description]
  */
 function getList() {
-    var error;
     var hardcodedAccount;
     var multi;
     var list = [];
@@ -322,7 +321,6 @@ function _stripProtocol( url ) {
  * @return {{linkedServer: string, key: string, quota: number}} account object
  */
 function _getAccount( serverUrl ) {
-    var error;
     var hardcodedAccount = _getHardcodedAccount();
 
     if ( _isAllowed( hardcodedAccount, serverUrl ) ) {
