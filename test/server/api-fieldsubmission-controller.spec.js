@@ -32,7 +32,6 @@ describe( 'api', function() {
     var beingEdited = 'beingEdited';
     var validServer = 'https://testserver.com/bob';
     var validFormId = 'something';
-    var invalidServer = 'https://someotherserver.com/john';
 
     beforeEach( function( done ) {
         // add survey if it doesn't exist in the db
@@ -101,7 +100,7 @@ describe( 'api', function() {
         var offlineEnabled = !!test.offline;
         var dataSendMethod = ( test.method === 'get' ) ? 'query' : 'send';
 
-        it( test.method.toUpperCase() + ' /api/v' + version + endpoint + ' with ' + authDesc + ' authentication and ' + server + ', ' +
+        it( test.method.toUpperCase() + ' /oc/api/v' + version + endpoint + ' with ' + authDesc + ' authentication and ' + server + ', ' +
             id + ', ' + ret + ', ' + instance + ', ' + instanceId + ', ' + test.theme +
             ', completeButton: ' + test.completeButton +
             ', parentWindowOrigin: ' + test.parentWindowOrigin + ', defaults: ' + JSON.stringify( test.defaults ) +
@@ -109,7 +108,7 @@ describe( 'api', function() {
             function( done ) {
                 app.set( 'offline enabled', offlineEnabled );
 
-                request( app )[ test.method ]( '/api/v' + version + endpoint )
+                request( app )[ test.method ]( '/oc/api/v' + version + endpoint )
                     .set( auth )[ dataSendMethod ]( {
                         server_url: server,
                         form_id: id,
@@ -130,8 +129,8 @@ describe( 'api', function() {
             } );
     }
 
-    describe( 'v2 fieldsubmission endpoints', function() {
-        var version = '2';
+    describe( 'oc/api/v1 endpoints', function() {
+        var version = '1';
 
         describe( '', function() {
             // POST /survey/single/fieldsubmission/iframe
@@ -314,114 +313,113 @@ describe( 'api', function() {
             } ).forEach( testResponse );
 
 
-            var readonlyInstanceTests =
-                [
-                    // valid token
-                    {
-                        method: 'post',
-                        auth: true,
-                        instanceId: 'AAA',
-                        instance: true,
-                        status: 201,
-                        res: {
-                            property: 'edit_iframe_url',
-                            // includes proper enketoID and not e.g. ::null 
-                            expected: /\/edit\/fs\/dn(\/c)?\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
-                        }
-                    },
-                    // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
-                    {
-                        method: 'post',
-                        auth: true,
-                        id: '{{random}}',
-                        instanceId: true,
-                        instance: true,
-                        status: 201,
-                        res: {
-                            property: 'edit_iframe_url',
-                            // includes proper enketoID and not e.g. ::null 
-                            expected: /\/edit\/fs\/dn(\/c)?\/i\/::[A-z0-9]{32}\?instance_id/
-                        }
-                    },
-                    // already being edited
-                    {
-                        method: 'post',
-                        auth: true,
-                        instanceId: beingEdited,
-                        instance: true,
-                        status: 405
-                    },
-                    // test return url in response
-                    {
-                        method: 'post',
-                        auth: true,
-                        ret: 'http://enke.to',
-                        instanceId: true,
-                        instance: true,
-                        status: 201,
-                        res: {
-                            property: 'edit_iframe_url',
-                            expected: /.+\?.*returnUrl=http%3A%2F%2Fenke.to/
-                        }
-                    },
-                    // test parentWindowOrigin
-                    {
-                        method: 'post',
-                        auth: true,
-                        parentWindowOrigin: 'http://example.com',
-                        ret: false,
-                        instanceId: true,
-                        instance: true,
-                        status: 201,
-                        res: {
-                            property: 'edit_iframe_url',
-                            expected: /.+\?.*parentWindowOrigin=http%3A%2F%2Fexample\.com$/
-                        },
-                        offline: false
-                    },
-                    // test completeButton in response
-                    {
-                        method: 'post',
-                        auth: true,
-                        ret: 'http://enke.to',
-                        completeButton: true,
-                        instanceId: true,
-                        instance: true,
-                        status: 201,
-                        res: {
-                            property: 'edit_iframe_url',
-                            expected: /.+\?.*completeButton=true/
-                        }
-                    },
-                    // invalid parameters
-                    {
-                        method: 'post',
-                        auth: true,
-                        id: '',
-                        instanceId: true,
-                        instance: true,
-                        status: 400
-                    }, {
-                        method: 'post',
-                        auth: true,
-                        instance: '',
-                        instanceId: true,
-                        status: 400
-                    }, {
-                        method: 'post',
-                        auth: true,
-                        instanceId: '',
-                        instance: true,
-                        status: 400
-                    }, {
-                        method: 'post',
-                        auth: true,
-                        instanceId: true,
-                        instance: true,
-                        server: '',
-                        status: 400
+            var readonlyInstanceTests = [
+                // valid token
+                {
+                    method: 'post',
+                    auth: true,
+                    instanceId: 'AAA',
+                    instance: true,
+                    status: 201,
+                    res: {
+                        property: 'edit_iframe_url',
+                        // includes proper enketoID and not e.g. ::null 
+                        expected: /\/edit\/fs\/dn(\/c)?\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
                     }
-                ];
+                },
+                // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
+                {
+                    method: 'post',
+                    auth: true,
+                    id: '{{random}}',
+                    instanceId: true,
+                    instance: true,
+                    status: 201,
+                    res: {
+                        property: 'edit_iframe_url',
+                        // includes proper enketoID and not e.g. ::null 
+                        expected: /\/edit\/fs\/dn(\/c)?\/i\/::[A-z0-9]{32}\?instance_id/
+                    }
+                },
+                // already being edited
+                {
+                    method: 'post',
+                    auth: true,
+                    instanceId: beingEdited,
+                    instance: true,
+                    status: 405
+                },
+                // test return url in response
+                {
+                    method: 'post',
+                    auth: true,
+                    ret: 'http://enke.to',
+                    instanceId: true,
+                    instance: true,
+                    status: 201,
+                    res: {
+                        property: 'edit_iframe_url',
+                        expected: /.+\?.*returnUrl=http%3A%2F%2Fenke.to/
+                    }
+                },
+                // test parentWindowOrigin
+                {
+                    method: 'post',
+                    auth: true,
+                    parentWindowOrigin: 'http://example.com',
+                    ret: false,
+                    instanceId: true,
+                    instance: true,
+                    status: 201,
+                    res: {
+                        property: 'edit_iframe_url',
+                        expected: /.+\?.*parentWindowOrigin=http%3A%2F%2Fexample\.com$/
+                    },
+                    offline: false
+                },
+                // test completeButton in response
+                {
+                    method: 'post',
+                    auth: true,
+                    ret: 'http://enke.to',
+                    completeButton: true,
+                    instanceId: true,
+                    instance: true,
+                    status: 201,
+                    res: {
+                        property: 'edit_iframe_url',
+                        expected: /.+\?.*completeButton=true/
+                    }
+                },
+                // invalid parameters
+                {
+                    method: 'post',
+                    auth: true,
+                    id: '',
+                    instanceId: true,
+                    instance: true,
+                    status: 400
+                }, {
+                    method: 'post',
+                    auth: true,
+                    instance: '',
+                    instanceId: true,
+                    status: 400
+                }, {
+                    method: 'post',
+                    auth: true,
+                    instanceId: '',
+                    instance: true,
+                    status: 400
+                }, {
+                    method: 'post',
+                    auth: true,
+                    instanceId: true,
+                    instance: true,
+                    server: '',
+                    status: 400
+                }
+            ];
 
             readonlyInstanceTests.map( function( obj ) {
                 obj.version = version;
