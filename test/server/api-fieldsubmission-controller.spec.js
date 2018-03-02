@@ -1,6 +1,4 @@
 /* global describe, require, it, beforeEach, afterEach */
-'use strict';
-
 // safer to ensure this here (in addition to grunt:env:test)
 process.env.NODE_ENV = 'test';
 
@@ -8,48 +6,48 @@ process.env.NODE_ENV = 'test';
  * Some of these tests use the special test Api Token and Server URLs defined in the API spec
  * at http://apidocs.enketo.org.
  */
-var request = require( 'supertest' );
-var config = require( '../../app/models/config-model' ).server;
+const request = require( 'supertest' );
+const config = require( '../../app/models/config-model' ).server;
 config[ 'base path' ] = '';
-var app = require( '../../config/express' );
-var surveyModel = require( '../../app/models/survey-model' );
-var instanceModel = require( '../../app/models/instance-model' );
-var redis = require( 'redis' );
-var client = redis.createClient( config.redis.main.port, config.redis.main.host, {
+const app = require( '../../config/express' );
+const surveyModel = require( '../../app/models/survey-model' );
+const instanceModel = require( '../../app/models/instance-model' );
+const redis = require( 'redis' );
+const client = redis.createClient( config.redis.main.port, config.redis.main.host, {
     auth_pass: config.redis.main.password
 } );
 
 
-describe( 'api', function() {
-    var validApiKey = 'abc';
-    var validAuth = {
-        'Authorization': 'Basic ' + new Buffer( validApiKey + ':' ).toString( 'base64' )
+describe( 'api', () => {
+    const validApiKey = 'abc';
+    const validAuth = {
+        'Authorization': `Basic ${new Buffer( `${validApiKey}:` ).toString( 'base64' )}`
     };
-    var invalidApiKey = 'def';
-    var invalidAuth = {
-        'Authorization': 'Basic ' + new Buffer( invalidApiKey + ':' ).toString( 'base64' )
+    const invalidApiKey = 'def';
+    const invalidAuth = {
+        'Authorization': `Basic ${new Buffer( `${invalidApiKey}:` ).toString( 'base64' )}`
     };
-    var beingEdited = 'beingEdited';
-    var validServer = 'https://testserver.com/bob';
-    var validFormId = 'something';
+    const beingEdited = 'beingEdited';
+    const validServer = 'https://testserver.com/bob';
+    const validFormId = 'something';
 
-    beforeEach( function( done ) {
+    beforeEach( done => {
         // add survey if it doesn't exist in the db
         surveyModel.set( {
             openRosaServer: validServer,
             openRosaId: validFormId,
-        } ).then( function() {
+        } ).then( () => {
             done();
         } );
     } );
 
-    afterEach( function( done ) {
+    afterEach( done => {
         /// select test database and flush it
-        client.select( 15, function( err ) {
+        client.select( 15, err => {
             if ( err ) {
                 return done( err );
             }
-            client.flushdb( function( err ) {
+            client.flushdb( err => {
                 if ( err ) {
                     return done( err );
                 }
@@ -59,7 +57,7 @@ describe( 'api', function() {
                     instanceId: beingEdited,
                     returnUrl: 'https://enketo.org',
                     instance: '<data></data>'
-                } ).then( function() {
+                } ).then( () => {
                     done();
                 } );
             } );
@@ -71,15 +69,15 @@ describe( 'api', function() {
     function responseCheck( value, expected ) {
         if ( typeof expected === 'string' || typeof expected === 'number' ) {
             if ( value !== expected ) {
-                return new Error( 'Response ' + value + ' not equal to ' + expected );
+                return new Error( `Response ${value} not equal to ${expected}` );
             }
         } else if ( expected instanceof RegExp && typeof value === 'object' ) {
             if ( !expected.test( JSON.stringify( value ) ) ) {
-                return new Error( 'Response ' + JSON.stringify( value ) + ' not matching ' + expected );
+                return new Error( `Response ${JSON.stringify( value )} not matching ${expected}` );
             }
         } else if ( expected instanceof RegExp ) {
             if ( !expected.test( value ) ) {
-                return new Error( 'Response ' + value + ' not matching ' + expected );
+                return new Error( `Response ${value} not matching ${expected}` );
             }
         } else {
             return new Error( 'This is not a valid expected value' );
@@ -87,32 +85,28 @@ describe( 'api', function() {
     }
 
     function testResponse( test ) {
-        var authDesc = test.auth === true ? 'valid' : ( test.auth === false ? 'invalid' : 'empty' );
-        var auth = test.auth === true ? validAuth : ( test.auth === false ? invalidAuth : {} );
-        var version = test.version;
-        var server = ( typeof test.server !== 'undefined' ) ? test.server : validServer;
-        var id = typeof test.id !== 'undefined' ? ( test.id !== '{{random}}' ? test.id : Math.floor( Math.random() * 10000 ).toString() ) : validFormId;
-        var ret = test.ret === true ? 'http://example.com' : test.ret;
-        var instance = test.instance === true ? '<data/>' : test.instance;
-        var instanceId = test.instanceId === true ? 'UUID:' + Math.random() : test.instanceId;
-        var endpoint = test.endpoint;
-        var resProp = ( test.res && test.res.property ) ? test.res.property : 'url';
-        var offlineEnabled = !!test.offline;
-        var dataSendMethod = ( test.method === 'get' ) ? 'query' : 'send';
+        const authDesc = test.auth === true ? 'valid' : ( test.auth === false ? 'invalid' : 'empty' );
+        const auth = test.auth === true ? validAuth : ( test.auth === false ? invalidAuth : {} );
+        const version = test.version;
+        const server = ( typeof test.server !== 'undefined' ) ? test.server : validServer;
+        const id = typeof test.id !== 'undefined' ? ( test.id !== '{{random}}' ? test.id : Math.floor( Math.random() * 10000 ).toString() ) : validFormId;
+        const ret = test.ret === true ? 'http://example.com' : test.ret;
+        const instance = test.instance === true ? '<data/>' : test.instance;
+        const instanceId = test.instanceId === true ? `UUID:${Math.random()}` : test.instanceId;
+        const endpoint = test.endpoint;
+        const resProp = ( test.res && test.res.property ) ? test.res.property : 'url';
+        const offlineEnabled = !!test.offline;
+        const dataSendMethod = ( test.method === 'get' ) ? 'query' : 'send';
 
-        it( test.method.toUpperCase() + ' /oc/api/v' + version + endpoint + ' with ' + authDesc + ' authentication and ' + server + ', ' +
-            id + ', ' + ret + ', ' + instance + ', ' + instanceId + ', ' + test.theme +
-            ', completeButton: ' + test.completeButton +
-            ', parentWindowOrigin: ' + test.parentWindowOrigin + ', defaults: ' + JSON.stringify( test.defaults ) +
-            ' responds with ' + test.status + ' when offline enabled: ' + offlineEnabled,
-            function( done ) {
+        it( `${test.method.toUpperCase()} /oc/api/v${version}${endpoint} with ${authDesc} authentication and ${server}, ${id}, ${ret}, ${instance}, ${instanceId}, ${test.theme}, completeButton: ${test.completeButton}, parentWindowOrigin: ${test.parentWindowOrigin}, defaults: ${JSON.stringify( test.defaults )} responds with ${test.status} when offline enabled: ${offlineEnabled}`,
+            done => {
                 app.set( 'offline enabled', offlineEnabled );
 
-                request( app )[ test.method ]( '/oc/api/v' + version + endpoint )
+                request( app )[ test.method ]( `/oc/api/v${version}${endpoint}` )
                     .set( auth )[ dataSendMethod ]( {
                         server_url: server,
                         form_id: id,
-                        instance: instance,
+                        instance,
                         instance_id: instanceId,
                         complete_button: test.completeButton,
                         return_url: ret,
@@ -120,7 +114,7 @@ describe( 'api', function() {
                         parent_window_origin: test.parentWindowOrigin
                     } )
                     .expect( test.status )
-                    .expect( function( resp ) {
+                    .expect( resp => {
                         if ( test.res && test.res.expected ) {
                             return responseCheck( resp.body[ resProp ], test.res.expected );
                         }
@@ -129,13 +123,13 @@ describe( 'api', function() {
             } );
     }
 
-    describe( 'oc/api/v1 endpoints', function() {
-        var version = '1';
+    describe( 'oc/api/v1 endpoints', () => {
+        const version = '1';
 
-        describe( '', function() {
+        describe( '', () => {
             // POST /survey/single/fieldsubmission/iframe
             testResponse( {
-                version: version,
+                version,
                 endpoint: '/survey/single/fieldsubmission/iframe',
                 method: 'post',
                 // test whether completeButton is ignored as it should be
@@ -151,7 +145,7 @@ describe( 'api', function() {
             } );
             // with parent_window_origin
             testResponse( {
-                version: version,
+                version,
                 endpoint: '/survey/single/fieldsubmission/iframe',
                 method: 'post',
                 parentWindowOrigin: 'http://example.com',
@@ -166,7 +160,7 @@ describe( 'api', function() {
             } );
             // POST /survey/single/fieldsubmission/c/iframe
             testResponse( {
-                version: version,
+                version,
                 endpoint: '/survey/single/fieldsubmission/c/iframe',
                 method: 'post',
                 ret: false,
@@ -180,7 +174,7 @@ describe( 'api', function() {
             } );
         } );
 
-        describe( '', function() {
+        describe( '', () => {
             [
                 // valid token
                 {
@@ -286,7 +280,7 @@ describe( 'api', function() {
                     server: '',
                     status: 400
                 }
-            ].map( function( obj ) {
+            ].map( obj => {
                 obj.version = version;
                 obj.endpoint = '/instance/fieldsubmission/iframe';
                 return obj;
@@ -306,14 +300,14 @@ describe( 'api', function() {
                         expected: /\/edit\/fs\/c?\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
                     }
                 },
-            ].map( function( obj ) {
+            ].map( obj => {
                 obj.version = version;
                 obj.endpoint = '/instance/fieldsubmission/c/iframe';
                 return obj;
             } ).forEach( testResponse );
 
 
-            var readonlyInstanceTests = [
+            const readonlyInstanceTests = [
                 // valid token
                 {
                     method: 'post',
@@ -421,13 +415,13 @@ describe( 'api', function() {
                 }
             ];
 
-            readonlyInstanceTests.map( function( obj ) {
+            readonlyInstanceTests.map( obj => {
                 obj.version = version;
                 obj.endpoint = '/instance/fieldsubmission/note/iframe';
                 return obj;
             } ).forEach( testResponse );
 
-            readonlyInstanceTests.map( function( obj ) {
+            readonlyInstanceTests.map( obj => {
                 obj.version = version;
                 obj.endpoint = '/instance/fieldsubmission/note/c/iframe';
                 return obj;
