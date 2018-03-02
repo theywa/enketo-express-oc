@@ -101,9 +101,7 @@ function isCacheUpToDate( survey ) {
 
     return new Promise( function( resolve, reject ) {
         if ( !survey || !survey.openRosaServer || !survey.openRosaId || !survey.info.hash ) {
-            var debugStr = typeof survey === 'object' ? ' Received: { openRosaServer: ' + survey.openRosaServer +
-                ', openRosaId: ' + survey.openRosaId + ', survey hash: ' + survey.info.hash + ' }' : ' no survey object or null';
-            error = new Error( 'Bad Request. Survey information to perform cache check is not complete.' + debugStr );
+            error = new Error( 'Bad Request. Survey information to perform cache check is not complete.' );
             error.status = 400;
             reject( error );
         } else {
