@@ -279,14 +279,13 @@ function _generateWebformUrls( id, req ) {
     const protocol = req.headers[ 'x-forwarded-proto' ] || req.protocol;
     const baseUrl = `${protocol}://${req.headers.host}${req.app.get( 'base path' )}/`;
     const idPartOnline = `::${id}`;
-    const idPartOnce = `::${utils.insecureAes192Encrypt( id, keys.singleOnce )}`;
     const idPartView = `::${utils.insecureAes192Encrypt( id, keys.view )}`;
     const idPartViewDn = `::${utils.insecureAes192Encrypt( id, keys.viewDn )}`;
     const idPartViewDnc = `::${utils.insecureAes192Encrypt( id, keys.viewDnc )}`;
     const idPartFsC = `::${utils.insecureAes192Encrypt( id, keys.fsC )}`;
     let queryParts;
 
-    req.webformType = req.webformType || 'default';
+    req.webformType = req.webformType || 'single';
 
     switch ( req.webformType ) {
         case 'preview':
@@ -304,11 +303,7 @@ function _generateWebformUrls( id, req ) {
                 queryParts.push( req.parentWindowOriginParam );
             }
             queryString = _generateQueryString( queryParts );
-            if ( !req.fieldSubmission ) {
-                url = `${baseUrl}single/${iframePart}${req.multipleAllowed === false ? idPartOnce : idPartOnline}${queryString}`;
-            } else {
-                url = `${baseUrl}single/${fsPart}${dnClosePart}${iframePart}${dnClosePart ? idPartFsC : idPartOnline}${queryString}`;
-            }
+            url = `${baseUrl}single/${fsPart}${dnClosePart}${iframePart}${dnClosePart ? idPartFsC : idPartOnline}${queryString}`;
             break;
         case 'view':
         case 'view-instance':
@@ -338,13 +333,7 @@ function _generateWebformUrls( id, req ) {
                 break;
             }
         default:
-            // TODO: is this used?
-            queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam ] );
-            if ( iframePart ) {
-                url = baseUrl + iframePart + idPartOnline + queryString;
-            } else {
-                url = baseUrl + idPartOnline + queryString;
-            }
+            url = 'Could not generate a webform URL. Unknown webform type.';
 
             break;
     }
