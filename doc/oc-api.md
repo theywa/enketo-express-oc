@@ -1,10 +1,10 @@
-## Fieldsubmission Webform view
+## OpenClinica API
 
-There are special fieldsubmission webform views that submit data to [OpenClinica's Fieldsubmission API](https://swaggerhub.com/api/martijnr/openclinica-fieldsubmission) instead of the regular OpenRosa Submission API.
+OpenClinica is using its own custom Enketo API at **/oc/api/v1** and is not using the default Enketo Express API at /api/v2. This was done to create a cleaner API design for views that submit data to submit data to [OpenClinica's Fieldsubmission API](https://swaggerhub.com/api/martijnr/openclinica-fieldsubmission) instead of the regular OpenRosa Submission API.
 
 **Make sure to enable the ['ordinals' feature](./ordinals.md) because the fieldsubmission feature requires this for forms that contain repeats.**
 
-The following custom Enketo API endpoints return a fieldsubmission webform view:
+The following **/oc/api/v1/..** endpoints are available:
 
 
 ### POST /survey/single/fieldsubmission/iframe

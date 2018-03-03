@@ -94,7 +94,6 @@ describe( 'api', () => {
         const instance = test.instance === true ? '<data/>' : test.instance;
         const instanceId = test.instanceId === true ? `UUID:${Math.random()}` : test.instanceId;
         const endpoint = test.endpoint;
-        const resProp = ( test.res && test.res.property ) ? test.res.property : 'url';
         const offlineEnabled = !!test.offline;
         const dataSendMethod = ( test.method === 'get' ) ? 'query' : 'send';
 
@@ -115,8 +114,8 @@ describe( 'api', () => {
                     } )
                     .expect( test.status )
                     .expect( resp => {
-                        if ( test.res && test.res.expected ) {
-                            return responseCheck( resp.body[ resProp ], test.res.expected );
+                        if ( test.expected ) {
+                            return responseCheck( resp.body.url, test.expected );
                         }
                     } )
                     .end( done );
@@ -130,46 +129,37 @@ describe( 'api', () => {
             // POST /survey/single/fieldsubmission/iframe
             testResponse( {
                 version,
-                endpoint: '/survey/single/fieldsubmission/iframe',
+                endpoint: '/survey/collect',
                 method: 'post',
                 // test whether completeButton is ignored as it should be
                 completeButton: true,
                 ret: false,
                 auth: true,
                 status: 200,
-                res: {
-                    property: 'single_fieldsubmission_iframe_url',
-                    expected: /\/single\/fs\/i\/::[A-z0-9]{4}$/
-                },
+                expected: /\/single\/fs\/i\/::[A-z0-9]{4}$/,
                 offline: false
             } );
             // with parent_window_origin
             testResponse( {
                 version,
-                endpoint: '/survey/single/fieldsubmission/iframe',
+                endpoint: '/survey/collect',
                 method: 'post',
                 parentWindowOrigin: 'http://example.com',
                 ret: false,
                 auth: true,
                 status: 200,
-                res: {
-                    property: 'single_fieldsubmission_iframe_url',
-                    expected: /\/single\/fs\/i\/::[A-z0-9]{4}\?parentWindowOrigin=http%3A%2F%2Fexample\.com$/
-                },
+                expected: /\/single\/fs\/i\/::[A-z0-9]{4}\?parentWindowOrigin=http%3A%2F%2Fexample\.com$/,
                 offline: false
             } );
             // POST /survey/single/fieldsubmission/c/iframe
             testResponse( {
                 version,
-                endpoint: '/survey/single/fieldsubmission/c/iframe',
+                endpoint: '/survey/collect/c',
                 method: 'post',
                 ret: false,
                 auth: true,
                 status: 200,
-                res: {
-                    property: 'single_fieldsubmission_iframe_url',
-                    expected: /\/single\/fs\/c\/i\/::[A-z0-9]{32}$/
-                },
+                expected: /\/single\/fs\/c\/i\/::[A-z0-9]{32}$/,
                 offline: false
             } );
         } );
@@ -183,11 +173,9 @@ describe( 'api', () => {
                     instanceId: 'AAA',
                     instance: true,
                     status: 201,
-                    res: {
-                        property: 'edit_url',
-                        // includes proper enketoID and not e.g. ::null 
-                        expected: /::YYY/
-                    }
+                    // includes proper enketoID and not e.g. ::null 
+                    expected: /::YYY/
+
                 },
                 // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
                 {
@@ -197,11 +185,9 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    res: {
-                        property: 'edit_url',
-                        // includes proper enketoID and not e.g. ::null 
-                        expected: /::YYY/
-                    }
+                    // includes proper enketoID and not e.g. ::null 
+                    expected: /::YYY/
+
                 },
                 // already being edited
                 {
@@ -219,10 +205,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    res: {
-                        property: 'edit_url',
-                        expected: /.+\?.*returnUrl=http%3A%2F%2Fenke.to/
-                    }
+                    expected: /.+\?.*returnUrl=http%3A%2F%2Fenke.to/,
                 },
                 // test completeButton in response
                 {
@@ -233,10 +216,7 @@ describe( 'api', () => {
                     instance: true,
                     completeButton: 'true',
                     status: 201,
-                    res: {
-                        property: 'edit_url',
-                        expected: /.+\?.*completeButton=true/
-                    }
+                    expected: /.+\?.*completeButton=true/
                 },
                 // test completeButton in response
                 {
@@ -247,10 +227,8 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    res: {
-                        property: 'edit_url',
-                        expected: /.+\?.*completeButton=false/
-                    }
+
+                    expected: /.+\?.*completeButton=false/
                 },
                 // invalid parameters
                 {
@@ -282,7 +260,7 @@ describe( 'api', () => {
                 }
             ].map( obj => {
                 obj.version = version;
-                obj.endpoint = '/instance/fieldsubmission/iframe';
+                obj.endpoint = '/instance/edit';
                 return obj;
             } ).forEach( testResponse );
 
@@ -294,15 +272,12 @@ describe( 'api', () => {
                     instanceId: 'AAA',
                     instance: true,
                     status: 201,
-                    res: {
-                        property: 'edit_url',
-                        // includes proper enketoID and not e.g. ::null 
-                        expected: /\/edit\/fs\/c?\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
-                    }
+                    // includes proper enketoID and not e.g. ::null 
+                    expected: /\/edit\/fs\/c?\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
                 },
             ].map( obj => {
                 obj.version = version;
-                obj.endpoint = '/instance/fieldsubmission/c/iframe';
+                obj.endpoint = '/instance/edit/c';
                 return obj;
             } ).forEach( testResponse );
 
@@ -315,11 +290,8 @@ describe( 'api', () => {
                     instanceId: 'AAA',
                     instance: true,
                     status: 201,
-                    res: {
-                        property: 'edit_iframe_url',
-                        // includes proper enketoID and not e.g. ::null 
-                        expected: /\/edit\/fs\/dn(\/c)?\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
-                    }
+                    // includes proper enketoID and not e.g. ::null 
+                    expected: /\/edit\/fs\/dn(\/c)?\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
                 },
                 // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
                 {
@@ -329,11 +301,8 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    res: {
-                        property: 'edit_iframe_url',
-                        // includes proper enketoID and not e.g. ::null 
-                        expected: /\/edit\/fs\/dn(\/c)?\/i\/::[A-z0-9]{32}\?instance_id/
-                    }
+                    // includes proper enketoID and not e.g. ::null 
+                    expected: /\/edit\/fs\/dn(\/c)?\/i\/::[A-z0-9]{32}\?instance_id/
                 },
                 // already being edited
                 {
@@ -351,10 +320,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    res: {
-                        property: 'edit_iframe_url',
-                        expected: /.+\?.*returnUrl=http%3A%2F%2Fenke.to/
-                    }
+                    expected: /.+\?.*returnUrl=http%3A%2F%2Fenke.to/
                 },
                 // test parentWindowOrigin
                 {
@@ -365,10 +331,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    res: {
-                        property: 'edit_iframe_url',
-                        expected: /.+\?.*parentWindowOrigin=http%3A%2F%2Fexample\.com$/
-                    },
+                    expected: /.+\?.*parentWindowOrigin=http%3A%2F%2Fexample\.com$/,
                     offline: false
                 },
                 // test completeButton in response
@@ -380,10 +343,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    res: {
-                        property: 'edit_iframe_url',
-                        expected: /.+\?.*completeButton=true/
-                    }
+                    expected: /.+\?.*completeButton=true/
                 },
                 // invalid parameters
                 {
@@ -417,13 +377,13 @@ describe( 'api', () => {
 
             readonlyInstanceTests.map( obj => {
                 obj.version = version;
-                obj.endpoint = '/instance/fieldsubmission/note/iframe';
+                obj.endpoint = '/instance/note';
                 return obj;
             } ).forEach( testResponse );
 
             readonlyInstanceTests.map( obj => {
                 obj.version = version;
-                obj.endpoint = '/instance/fieldsubmission/note/c/iframe';
+                obj.endpoint = '/instance/note/c/';
                 return obj;
             } ).forEach( testResponse );
         } );

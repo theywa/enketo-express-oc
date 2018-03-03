@@ -21,38 +21,18 @@ router
     .all( '*', authCheck )
     .all( '*', _setQuotaUsed )
     .all( '*', _setDefaultsQueryParam )
-    .all( '/*/iframe', _setIframe )
-    .all( '/survey/all', _setIframe )
-    .all( '/surveys/list', _setIframe )
+    .all( '*', _setReturnQueryParam )
+    .all( '*', _setGoToHash )
+    .all( '*', _setParentWindow )
     .all( '/survey/preview*', ( req, res, next ) => {
         req.webformType = 'preview';
-        next();
-    } )
-    .all( '/survey/all', ( req, res, next ) => {
-        req.webformType = 'all';
-        next();
-    } )
-    .all( '/surveys/list', ( req, res, next ) => {
-        req.webformType = 'all';
         next();
     } )
     .all( '/instance*', ( req, res, next ) => {
         req.webformType = 'edit';
         next();
     } )
-    .all( '/survey/single*', ( req, res, next ) => {
-        req.webformType = 'single';
-        next();
-    } )
-    .all( '/survey/single/once*', ( req, res, next ) => {
-        req.multipleAllowed = false;
-        next();
-    } )
-    .all( '*/fieldsubmission*', ( req, res, next ) => {
-        req.fieldSubmission = true;
-        next();
-    } )
-    .all( '*/c/*', ( req, res, next ) => {
+    .all( '*/c', ( req, res, next ) => {
         req.dnClose = true;
         next();
     } )
@@ -64,65 +44,22 @@ router
         req.webformType = 'view-instance';
         next();
     } )
-    .all( '/instance/fieldsubmission/note/*', ( req, res, next ) => {
+    .all( '/instance/note*', ( req, res, next ) => {
         req.webformType = 'view-instance-dn';
         next();
     } )
-    .all( '/survey/offline*', ( req, res, next ) => {
-        let error;
-        if ( req.app.get( 'offline enabled' ) ) {
-            req.webformType = 'offline';
-            next();
-        } else {
-            error = new Error( 'Not Allowed.' );
-            error.status = 405;
-            next( error );
-        }
-    } )
-    .all( '*', _setReturnQueryParam )
-    .all( '*', _setGoToHash )
-    .get( '/survey', getExistingSurvey )
-    .get( '/survey/offline', getExistingSurvey )
-    .get( '/survey/iframe', getExistingSurvey )
-    .post( '/survey', getNewOrExistingSurvey )
-    .post( '/survey/offline', getNewOrExistingSurvey )
-    .post( '/survey/iframe', getNewOrExistingSurvey )
-    .delete( '/survey', deactivateSurvey )
     .delete( '/survey/cache', emptySurveyCache )
-    .get( '/survey/single', getExistingSurvey )
-    .get( '/survey/single/iframe', getExistingSurvey )
-    .get( '/survey/single/once', getExistingSurvey )
-    .get( '/survey/single/once/iframe', getExistingSurvey )
-    .post( '/survey/single', getNewOrExistingSurvey )
-    .post( '/survey/single/iframe', getNewOrExistingSurvey )
-    .post( '/survey/single/once', getNewOrExistingSurvey )
-    .post( '/survey/single/once/iframe', getNewOrExistingSurvey )
-    .get( '/survey/preview', getExistingSurvey )
-    .get( '/survey/preview/iframe', getExistingSurvey )
     .post( '/survey/preview', getNewOrExistingSurvey )
-    .post( '/survey/preview/iframe', getNewOrExistingSurvey )
-    .get( '/survey/view', getExistingSurvey )
-    .get( '/survey/view/iframe', getExistingSurvey )
     .post( '/survey/view', getNewOrExistingSurvey )
-    .post( '/survey/view/iframe', getNewOrExistingSurvey )
-    .get( '/survey/all', getExistingSurvey )
-    .post( '/survey/all', getNewOrExistingSurvey )
-    .get( '/surveys/number', getNumber )
-    .post( '/surveys/number', getNumber )
-    .get( '/surveys/list', getList )
-    .post( '/surveys/list', getList )
-    .post( '/instance', cacheInstance )
-    .post( '/instance/iframe', cacheInstance )
+    .post( '/survey/collect', getNewOrExistingSurvey )
+    .post( '/survey/collect/c', getNewOrExistingSurvey )
+    .delete( '/instance/', removeInstance )
+    .post( '/instance/*', _setCompleteButtonParam )
     .post( '/instance/view', cacheInstance )
-    .post( '/instance/view/iframe', cacheInstance )
-    .delete( '/instance', removeInstance )
-    .post( '/survey/single/fieldsubmission/iframe', getNewOrExistingSurvey )
-    .post( '/survey/single/fieldsubmission/c/iframe', getNewOrExistingSurvey )
-    .post( '/instance/fieldsubmission*', _setCompleteButtonParam )
-    .post( '/instance/fieldsubmission/iframe', cacheInstance )
-    .post( '/instance/fieldsubmission/c/iframe', cacheInstance )
-    .post( '/instance/fieldsubmission/note/iframe', cacheInstance )
-    .post( '/instance/fieldsubmission/note/c/iframe', cacheInstance )
+    .post( '/instance/edit', cacheInstance )
+    .post( '/instance/edit/c', cacheInstance )
+    .post( '/instance/note', cacheInstance )
+    .post( '/instance/note/c', cacheInstance )
     .all( '*', ( req, res, next ) => {
         const error = new Error( 'Not allowed.' );
         error.status = 405;
@@ -151,27 +88,6 @@ function authCheck( req, res, next ) {
             } else {
                 req.account = account;
                 next();
-            }
-        } )
-        .catch( next );
-}
-
-function getExistingSurvey( req, res, next ) {
-
-    if ( req.account.quota < req.account.quotaUsed ) {
-        return _render( 403, quotaErrorMessage, res );
-    }
-
-    return surveyModel
-        .getId( {
-            openRosaServer: req.query.server_url,
-            openRosaId: req.query.form_id
-        } )
-        .then( id => {
-            if ( id ) {
-                _render( 200, _generateWebformUrls( id, req ), res );
-            } else {
-                _render( 404, 'Survey not found.', res );
             }
         } )
         .catch( next );
@@ -209,24 +125,6 @@ function getNewOrExistingSurvey( req, res, next ) {
         .catch( next );
 }
 
-function deactivateSurvey( req, res, next ) {
-
-    return surveyModel
-        .update( {
-            openRosaServer: req.body.server_url,
-            openRosaId: req.body.form_id,
-            active: false
-        } )
-        .then( id => {
-            if ( id ) {
-                _render( 204, null, res );
-            } else {
-                _render( 404, 'Survey not found.', res );
-            }
-        } )
-        .catch( next );
-}
-
 function emptySurveyCache( req, res, next ) {
 
     return cacheModel
@@ -236,44 +134,6 @@ function emptySurveyCache( req, res, next ) {
         } )
         .then( () => {
             _render( 204, null, res );
-        } )
-        .catch( next );
-}
-
-function getNumber( req, res, next ) {
-
-    return surveyModel
-        .getNumber( req.body.server_url || req.query.server_url )
-        .then( number => {
-            if ( number ) {
-                _render( 200, {
-                    code: 200,
-                    number
-                }, res );
-            } else {
-                // this cannot be reached I think
-                _render( 404, 'No surveys found.', res );
-            }
-        } )
-        .catch( next );
-}
-
-function getList( req, res, next ) {
-    let obj;
-
-    return surveyModel
-        .getList( req.body.server_url || req.query.server_url )
-        .then( list => {
-            list = list.map( survey => {
-                obj = _generateWebformUrls( survey.enketoId, req );
-                obj.form_id = survey.openRosaId;
-                obj.server_url = survey.openRosaServer;
-                return obj;
-            } );
-            _render( 200, {
-                code: 200,
-                forms: list
-            }, res );
         } )
         .catch( next );
 }
@@ -369,10 +229,9 @@ function _setGoToHash( req, res, next ) {
     next();
 }
 
-function _setIframe( req, res, next ) {
+function _setParentWindow( req, res, next ) {
     const parentWindowOrigin = req.body.parent_window_origin || req.query.parent_window_origin;
 
-    req.iframe = true;
     if ( parentWindowOrigin ) {
         req.parentWindowOriginParam = `parentWindowOrigin=${encodeURIComponent( decodeURIComponent( parentWindowOrigin ) )}`;
     }
@@ -409,18 +268,17 @@ function _generateQueryString( params ) {
 
 function _generateWebformUrls( id, req ) {
     let queryString;
-    const obj = {};
+    let url;
     const IFRAMEPATH = 'i/';
-    const OFFLINEPATH = 'x/';
+    const iframePart = IFRAMEPATH;
     const FSPATH = 'fs/';
-    const fsPart = ( req.fieldSubmission ) ? FSPATH : '';
+    const fsPart = FSPATH;
     const dnClosePart = ( req.dnClose ) ? 'c/' : '';
     const hash = req.goTo;
-    const iframePart = ( req.iframe ) ? IFRAMEPATH : '';
+
     const protocol = req.headers[ 'x-forwarded-proto' ] || req.protocol;
     const baseUrl = `${protocol}://${req.headers.host}${req.app.get( 'base path' )}/`;
     const idPartOnline = `::${id}`;
-    const idPartOffline = `#${id}`;
     const idPartOnce = `::${utils.insecureAes192Encrypt( id, keys.singleOnce )}`;
     const idPartView = `::${utils.insecureAes192Encrypt( id, keys.view )}`;
     const idPartViewDn = `::${utils.insecureAes192Encrypt( id, keys.viewDn )}`;
@@ -433,12 +291,12 @@ function _generateWebformUrls( id, req ) {
     switch ( req.webformType ) {
         case 'preview':
             queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam ] );
-            obj.preview_url = `${baseUrl}preview/${iframePart}${idPartOnline}${queryString}${hash}`;
+            url = `${baseUrl}preview/${iframePart}${idPartOnline}${queryString}${hash}`;
             break;
         case 'edit':
             // no defaults query parameter in edit view
             queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.completeButtonParam, req.reasonForChangeParam ] );
-            obj.edit_url = `${baseUrl}edit/${fsPart}${dnClosePart}${iframePart}${dnClosePart ? idPartFsC : idPartOnline}${queryString}${hash}`;
+            url = `${baseUrl}edit/${fsPart}${dnClosePart}${iframePart}${dnClosePart ? idPartFsC : idPartOnline}${queryString}${hash}`;
             break;
         case 'single':
             queryParts = [ req.defaultsQueryParam, req.returnQueryParam ];
@@ -447,9 +305,9 @@ function _generateWebformUrls( id, req ) {
             }
             queryString = _generateQueryString( queryParts );
             if ( !req.fieldSubmission ) {
-                obj[ `single${req.multipleAllowed === false ? '_once' : ''}${iframePart ? '_iframe' : ''}_url` ] = `${baseUrl}single/${iframePart}${req.multipleAllowed === false ? idPartOnce : idPartOnline}${queryString}`;
+                url = `${baseUrl}single/${iframePart}${req.multipleAllowed === false ? idPartOnce : idPartOnline}${queryString}`;
             } else {
-                obj[ `single_fieldsubmission${iframePart ? '_iframe' : ''}_url` ] = `${baseUrl}single/${fsPart}${dnClosePart}${iframePart}${dnClosePart ? idPartFsC : idPartOnline}${queryString}`;
+                url = `${baseUrl}single/${fsPart}${dnClosePart}${iframePart}${dnClosePart ? idPartFsC : idPartOnline}${queryString}`;
             }
             break;
         case 'view':
@@ -463,10 +321,10 @@ function _generateWebformUrls( id, req ) {
             }
             queryParts.push( req.returnQueryParam );
             queryString = _generateQueryString( queryParts );
-            obj[ `view${iframePart ? '_iframe' : ''}_url` ] = `${baseUrl}view/${iframePart}${idPartView}${queryString}${hash}`;
+            url = `${baseUrl}view/${iframePart}${idPartView}${queryString}${hash}`;
             break;
         case 'view-instance-dn':
-            // inside {block} because to use scope for new variables
+            // inside {block} to properly scope for new variables (eslint)
             {
                 const viewId = dnClosePart ? idPartViewDnc : idPartViewDn;
                 const viewPath = `edit/${FSPATH}dn/`;
@@ -476,46 +334,22 @@ function _generateWebformUrls( id, req ) {
                 }
                 queryParts.push( req.returnQueryParam );
                 queryString = _generateQueryString( queryParts );
-                obj[ `edit${iframePart ? '_iframe' : ''}_url` ] = baseUrl + viewPath + dnClosePart + iframePart + viewId + queryString + hash;
+                url = baseUrl + viewPath + dnClosePart + iframePart + viewId + queryString + hash;
                 break;
             }
-        case 'all':
-            // non-iframe views
-            queryString = _generateQueryString( [ req.defaultsQueryParam ] );
-            obj.url = baseUrl + idPartOnline + queryString;
-            obj.single_url = baseUrl + idPartOnline + queryString;
-            obj.single_once_url = baseUrl + idPartOnce + queryString;
-            obj.single_url = `${baseUrl}single/${idPartOnline}${queryString}`;
-            obj.single_once_url = `${baseUrl}single/${idPartOnce}${queryString}`;
-            obj.offline_url = baseUrl + OFFLINEPATH + idPartOffline;
-            obj.preview_url = `${baseUrl}preview/${idPartOnline}${queryString}`;
-            // iframe views
-            queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam ] );
-            obj.iframe_url = baseUrl + IFRAMEPATH + idPartOnline + queryString;
-            obj.single_iframe_url = baseUrl + IFRAMEPATH + idPartOnline + queryString;
-            obj.single_once_iframe_url = baseUrl + IFRAMEPATH + idPartOnce + queryString;
-            obj.single_iframe_url = `${baseUrl}single/${IFRAMEPATH}${idPartOnline}${queryString}`;
-            obj.single_once_iframe_url = `${baseUrl}single/${IFRAMEPATH}${idPartOnce}${queryString}`;
-            obj.preview_iframe_url = `${baseUrl}preview/${IFRAMEPATH}${idPartOnline}${queryString}`;
-            // rest
-            obj.enketo_id = id;
-            break;
-
-        case 'offline':
-            obj.offline_url = baseUrl + OFFLINEPATH + idPartOffline;
-            break;
         default:
+            // TODO: is this used?
             queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam ] );
             if ( iframePart ) {
-                obj.iframe_url = baseUrl + iframePart + idPartOnline + queryString;
+                url = baseUrl + iframePart + idPartOnline + queryString;
             } else {
-                obj.url = baseUrl + idPartOnline + queryString;
+                url = baseUrl + idPartOnline + queryString;
             }
 
             break;
     }
 
-    return obj;
+    return { url };
 }
 
 function _render( status, body, res ) {
