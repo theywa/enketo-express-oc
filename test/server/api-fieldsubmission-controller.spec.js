@@ -94,12 +94,10 @@ describe( 'api', () => {
         const instance = test.instance === true ? '<data/>' : test.instance;
         const instanceId = test.instanceId === true ? `UUID:${Math.random()}` : test.instanceId;
         const endpoint = test.endpoint;
-        const offlineEnabled = !!test.offline;
         const dataSendMethod = ( test.method === 'get' ) ? 'query' : 'send';
 
-        it( `${test.method.toUpperCase()} /oc/api/v${version}${endpoint} with ${authDesc} authentication and ${server}, ${id}, ${ret}, ${instance}, ${instanceId}, ${test.theme}, completeButton: ${test.completeButton}, parentWindowOrigin: ${test.parentWindowOrigin}, defaults: ${JSON.stringify( test.defaults )} responds with ${test.status} when offline enabled: ${offlineEnabled}`,
+        it( `${test.method.toUpperCase()} /oc/api/v${version}${endpoint} with ${authDesc} authentication and ${server}, ${id}, ${ret}, ${instance}, ${instanceId}, ${test.theme}, completeButton: ${test.completeButton}, parentWindowOrigin: ${test.parentWindowOrigin}, defaults: ${JSON.stringify( test.defaults )} responds with ${test.status}`,
             done => {
-                app.set( 'offline enabled', offlineEnabled );
 
                 request( app )[ test.method ]( `/oc/api/v${version}${endpoint}` )
                     .set( auth )[ dataSendMethod ]( {
@@ -126,7 +124,7 @@ describe( 'api', () => {
         const version = '1';
 
         describe( '', () => {
-            // POST /survey/single/fieldsubmission/iframe
+            // POST /survey/collect
             testResponse( {
                 version,
                 endpoint: '/survey/collect',
@@ -137,9 +135,17 @@ describe( 'api', () => {
                 auth: true,
                 status: 200,
                 expected: /\/single\/fs\/i\/::[A-z0-9]{4}$/,
-                offline: false
             } );
-            // with parent_window_origin
+            // GET /survey/collect
+            testResponse( {
+                version,
+                endpoint: '/survey/collect',
+                method: 'get',
+                ret: false,
+                auth: true,
+                status: 405
+            } );
+            // POST /survey/collect with parent_window_origin
             testResponse( {
                 version,
                 endpoint: '/survey/collect',
@@ -149,9 +155,8 @@ describe( 'api', () => {
                 auth: true,
                 status: 200,
                 expected: /\/single\/fs\/i\/::[A-z0-9]{4}\?parentWindowOrigin=http%3A%2F%2Fexample\.com$/,
-                offline: false
             } );
-            // POST /survey/single/fieldsubmission/c/iframe
+            // POST /survey/collect/c
             testResponse( {
                 version,
                 endpoint: '/survey/collect/c',
@@ -160,7 +165,38 @@ describe( 'api', () => {
                 auth: true,
                 status: 200,
                 expected: /\/single\/fs\/c\/i\/::[A-z0-9]{32}$/,
-                offline: false
+            } );
+            // with parent_window_origin
+            testResponse( {
+                version,
+                endpoint: '/survey/collect/c',
+                method: 'post',
+                parentWindowOrigin: 'http://example.com',
+                ret: false,
+                auth: true,
+                status: 200,
+                expected: /\/single\/fs\/c\/i\/::[A-z0-9]{32}\?parentWindowOrigin=http%3A%2F%2Fexample\.com$/,
+            } );
+            // POST /survey/view
+            testResponse( {
+                version,
+                endpoint: '/survey/view',
+                method: 'post',
+                ret: false,
+                auth: true,
+                status: 200,
+                expected: /\/view\/i\/::[A-z0-9]{32}$/,
+
+            } );
+            // POST /survey/preview
+            testResponse( {
+                version,
+                endpoint: '/survey/preview',
+                method: 'post',
+                ret: false,
+                auth: true,
+                status: 200,
+                expected: /\/preview\/i\/::[A-z0-9]{4}$/,
             } );
         } );
 
@@ -175,7 +211,6 @@ describe( 'api', () => {
                     status: 201,
                     // includes proper enketoID and not e.g. ::null 
                     expected: /::YYY/
-
                 },
                 // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
                 {
@@ -187,7 +222,6 @@ describe( 'api', () => {
                     status: 201,
                     // includes proper enketoID and not e.g. ::null 
                     expected: /::YYY/
-
                 },
                 // already being edited
                 {
@@ -201,17 +235,17 @@ describe( 'api', () => {
                 {
                     method: 'post',
                     auth: true,
-                    ret: 'http://enke.to',
+                    ret: 'https://enke.to',
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /.+\?.*returnUrl=http%3A%2F%2Fenke.to/,
+                    expected: /.+\?.*returnUrl=https%3A%2F%2Fenke.to/,
                 },
                 // test completeButton in response
                 {
                     method: 'post',
                     auth: true,
-                    ret: 'http://enke.to',
+                    ret: 'https://enke.to',
                     instanceId: true,
                     instance: true,
                     completeButton: 'true',
@@ -222,12 +256,11 @@ describe( 'api', () => {
                 {
                     method: 'post',
                     auth: true,
-                    ret: 'http://enke.to',
+                    ret: 'https://enke.to',
                     completeButton: 'false',
                     instanceId: true,
                     instance: true,
                     status: 201,
-
                     expected: /.+\?.*completeButton=false/
                 },
                 // invalid parameters
@@ -282,7 +315,7 @@ describe( 'api', () => {
             } ).forEach( testResponse );
 
 
-            const readonlyInstanceTests = [
+            const noteOnlyInstanceTests = [
                 // valid token
                 {
                     method: 'post',
@@ -316,11 +349,11 @@ describe( 'api', () => {
                 {
                     method: 'post',
                     auth: true,
-                    ret: 'http://enke.to',
+                    ret: 'https://enke.to',
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /.+\?.*returnUrl=http%3A%2F%2Fenke.to/
+                    expected: /.+\?.*returnUrl=https%3A%2F%2Fenke.to/
                 },
                 // test parentWindowOrigin
                 {
@@ -332,13 +365,13 @@ describe( 'api', () => {
                     instance: true,
                     status: 201,
                     expected: /.+\?.*parentWindowOrigin=http%3A%2F%2Fexample\.com$/,
-                    offline: false
+
                 },
                 // test completeButton in response
                 {
                     method: 'post',
                     auth: true,
-                    ret: 'http://enke.to',
+                    ret: 'https://enke.to',
                     completeButton: true,
                     instanceId: true,
                     instance: true,
@@ -375,15 +408,112 @@ describe( 'api', () => {
                 }
             ];
 
-            readonlyInstanceTests.map( obj => {
+            noteOnlyInstanceTests.map( obj => {
                 obj.version = version;
                 obj.endpoint = '/instance/note';
                 return obj;
             } ).forEach( testResponse );
 
-            readonlyInstanceTests.map( obj => {
+            noteOnlyInstanceTests.map( obj => {
                 obj.version = version;
-                obj.endpoint = '/instance/note/c/';
+                obj.endpoint = '/instance/note/c';
+                return obj;
+            } ).forEach( testResponse );
+
+            // Readonly tests
+            [
+                // valid token
+                {
+                    method: 'post',
+                    auth: true,
+                    instanceId: 'AAA',
+                    instance: true,
+                    status: 201,
+                    // includes proper enketoID and not e.g. ::null 
+                    expected: /\/view\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
+                },
+                // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
+                {
+                    method: 'post',
+                    auth: true,
+                    id: '{{random}}',
+                    instanceId: true,
+                    instance: true,
+                    status: 201,
+                    // includes proper enketoID and not e.g. ::null 
+                    expected: /\/view\/i\/::[A-z0-9]{32}\?instance_id/
+                },
+                // already being edited
+                {
+                    method: 'post',
+                    auth: true,
+                    instanceId: beingEdited,
+                    instance: true,
+                    status: 405
+                },
+                // test return url in response
+                {
+                    method: 'post',
+                    auth: true,
+                    ret: 'https://enke.to',
+                    instanceId: true,
+                    instance: true,
+                    status: 201,
+                    expected: /.+\?.*returnUrl=https%3A%2F%2Fenke.to/
+                },
+                // test parentWindowOrigin
+                {
+                    method: 'post',
+                    auth: true,
+                    parentWindowOrigin: 'http://example.com',
+                    ret: false,
+                    instanceId: true,
+                    instance: true,
+                    status: 201,
+                    expected: /.+\?.*parentWindowOrigin=http%3A%2F%2Fexample\.com$/,
+                },
+                // test ignoring completeButton in response
+                {
+                    method: 'post',
+                    auth: true,
+                    ret: 'https://enke.to',
+                    completeButton: true,
+                    instanceId: true,
+                    instance: true,
+                    status: 201,
+                    expected: /\/view\/i\/::[A-z0-9]{32}\?instance_id/
+                },
+                // invalid parameters
+                {
+                    method: 'post',
+                    auth: true,
+                    id: '',
+                    instanceId: true,
+                    instance: true,
+                    status: 400
+                }, {
+                    method: 'post',
+                    auth: true,
+                    instance: '',
+                    instanceId: true,
+                    status: 400
+                }, {
+                    method: 'post',
+                    auth: true,
+                    instanceId: '',
+                    instance: true,
+                    status: 400
+                }, {
+                    method: 'post',
+                    auth: true,
+                    instanceId: true,
+                    instance: true,
+                    server: '',
+                    status: 400
+                }
+            ].map( obj => {
+                obj.version = version;
+                obj.endpoint = '/instance/view';
                 return obj;
             } ).forEach( testResponse );
         } );
