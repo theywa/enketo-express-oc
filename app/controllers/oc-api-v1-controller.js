@@ -66,19 +66,21 @@ router
         next( error );
     } );
 
+
+// API uses Basic authentication with just the username
 function authCheck( req, res, next ) {
     // check authentication and account
     let error;
     const creds = auth( req );
     const key = ( creds ) ? creds.name : undefined;
-    const server = req.body.server_url || req.query.server_url;
+    const server = req.body.server_url;
 
     // set content-type to json to provide appropriate json Error responses
     res.set( 'Content-Type', 'application/json' );
 
     account.get( server )
         .then( account => {
-            if ( !key || ( key !== account.key ) ) {
+            if ( !key || key !== account.key ) {
                 error = new Error( 'Not Allowed. Invalid API key.' );
                 error.status = 401;
                 res
@@ -96,9 +98,9 @@ function authCheck( req, res, next ) {
 function getNewOrExistingSurvey( req, res, next ) {
     let status;
     const survey = {
-        openRosaServer: req.body.server_url || req.query.server_url,
-        openRosaId: req.body.form_id || req.query.form_id,
-        theme: req.body.theme || req.query.theme
+        openRosaServer: req.body.server_url,
+        openRosaId: req.body.form_id,
+        theme: req.body.theme
     };
 
     if ( req.account.quota < req.account.quotaUsed ) {
@@ -208,7 +210,7 @@ function _setQuotaUsed( req, res, next ) {
 
 function _setDefaultsQueryParam( req, res, next ) {
     let queryParam = '';
-    const map = req.body.defaults || req.query.defaults;
+    const map = req.body.defaults;
 
     if ( map ) {
         for ( const prop in map ) {
@@ -223,14 +225,14 @@ function _setDefaultsQueryParam( req, res, next ) {
 }
 
 function _setGoToHash( req, res, next ) {
-    const goTo = req.body.go_to || req.query.go_to;
+    const goTo = req.body.go_to;
     req.goTo = ( goTo ) ? `#${goTo}` : '';
 
     next();
 }
 
 function _setParentWindow( req, res, next ) {
-    const parentWindowOrigin = req.body.parent_window_origin || req.query.parent_window_origin;
+    const parentWindowOrigin = req.body.parent_window_origin;
 
     if ( parentWindowOrigin ) {
         req.parentWindowOriginParam = `parentWindowOrigin=${encodeURIComponent( decodeURIComponent( parentWindowOrigin ) )}`;
@@ -239,7 +241,7 @@ function _setParentWindow( req, res, next ) {
 }
 
 function _setReturnQueryParam( req, res, next ) {
-    const returnUrl = req.body.return_url || req.query.return_url;
+    const returnUrl = req.body.return_url;
 
     if ( returnUrl ) {
         req.returnQueryParam = `returnUrl=${encodeURIComponent( decodeURIComponent( returnUrl ) )}`;
@@ -256,10 +258,8 @@ function _setCompleteButtonParam( req, res, next ) {
     next();
 }
 
-function _generateQueryString( params ) {
+function _generateQueryString( params = [] ) {
     let paramsJoined;
-
-    params = params || [];
 
     paramsJoined = params.filter( part => part && part.length > 0 ).join( '&' );
 
@@ -267,69 +267,73 @@ function _generateQueryString( params ) {
 }
 
 function _generateWebformUrls( id, req ) {
-    let queryString;
-    let url;
     const IFRAMEPATH = 'i/';
-    const iframePart = IFRAMEPATH;
     const FSPATH = 'fs/';
-    const fsPart = FSPATH;
     const dnClosePart = ( req.dnClose ) ? 'c/' : '';
     const hash = req.goTo;
-
     const protocol = req.headers[ 'x-forwarded-proto' ] || req.protocol;
-    const baseUrl = `${protocol}://${req.headers.host}${req.app.get( 'base path' )}/`;
+    const BASEURL = `${protocol}://${req.headers.host}${req.app.get( 'base path' )}/`;
     const idPartOnline = `::${id}`;
     const idPartView = `::${utils.insecureAes192Encrypt( id, keys.view )}`;
     const idPartViewDn = `::${utils.insecureAes192Encrypt( id, keys.viewDn )}`;
     const idPartViewDnc = `::${utils.insecureAes192Encrypt( id, keys.viewDnc )}`;
     const idPartFsC = `::${utils.insecureAes192Encrypt( id, keys.fsC )}`;
-    let queryParts;
+    let url;
+
 
     req.webformType = req.webformType || 'single';
 
     switch ( req.webformType ) {
         case 'preview':
-            queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam ] );
-            url = `${baseUrl}preview/${iframePart}${idPartOnline}${queryString}${hash}`;
-            break;
-        case 'edit':
-            // no defaults query parameter in edit view
-            queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.completeButtonParam, req.reasonForChangeParam ] );
-            url = `${baseUrl}edit/${fsPart}${dnClosePart}${iframePart}${dnClosePart ? idPartFsC : idPartOnline}${queryString}${hash}`;
-            break;
-        case 'single':
-            queryParts = [ req.defaultsQueryParam, req.returnQueryParam ];
-            if ( iframePart ) {
-                queryParts.push( req.parentWindowOriginParam );
+            {
+                const queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam ] );
+                url = `${BASEURL}preview/${IFRAMEPATH}${idPartOnline}${queryString}${hash}`;
+                break;
             }
-            queryString = _generateQueryString( queryParts );
-            url = `${baseUrl}single/${fsPart}${dnClosePart}${iframePart}${dnClosePart ? idPartFsC : idPartOnline}${queryString}`;
-            break;
+        case 'edit':
+            {
+                // no defaults query parameter in edit view
+                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.completeButtonParam, req.reasonForChangeParam ] );
+                url = `${BASEURL}edit/${FSPATH}${dnClosePart}${IFRAMEPATH}${dnClosePart ? idPartFsC : idPartOnline}${queryString}${hash}`;
+                break;
+            }
+        case 'single':
+            {
+                let queryParts = [ req.defaultsQueryParam, req.returnQueryParam ];
+                if ( IFRAMEPATH ) {
+                    queryParts.push( req.parentWindowOriginParam );
+                }
+                const queryString = _generateQueryString( queryParts );
+                url = `${BASEURL}single/${FSPATH}${dnClosePart}${IFRAMEPATH}${dnClosePart ? idPartFsC : idPartOnline}${queryString}`;
+                break;
+            }
         case 'view':
         case 'view-instance':
-            queryParts = [];
-            if ( req.webformType === 'view-instance' ) {
-                queryParts.push( `instance_id=${req.body.instance_id}` );
+            {
+                let queryParts = [];
+                if ( req.webformType === 'view-instance' ) {
+                    queryParts.push( `instance_id=${req.body.instance_id}` );
+                }
+                if ( IFRAMEPATH ) {
+                    queryParts.push( req.parentWindowOriginParam );
+                }
+                queryParts.push( req.returnQueryParam );
+                const queryString = _generateQueryString( queryParts );
+                url = `${BASEURL}view/${IFRAMEPATH}${idPartView}${queryString}${hash}`;
+                break;
             }
-            if ( iframePart ) {
-                queryParts.push( req.parentWindowOriginParam );
-            }
-            queryParts.push( req.returnQueryParam );
-            queryString = _generateQueryString( queryParts );
-            url = `${baseUrl}view/${iframePart}${idPartView}${queryString}${hash}`;
-            break;
         case 'view-instance-dn':
             // inside {block} to properly scope for new variables (eslint)
             {
                 const viewId = dnClosePart ? idPartViewDnc : idPartViewDn;
                 const viewPath = `edit/${FSPATH}dn/`;
                 queryParts = [ `instance_id=${req.body.instance_id}`, req.completeButtonParam ];
-                if ( iframePart ) {
+                if ( IFRAMEPATH ) {
                     queryParts.push( req.parentWindowOriginParam );
                 }
                 queryParts.push( req.returnQueryParam );
                 queryString = _generateQueryString( queryParts );
-                url = baseUrl + viewPath + dnClosePart + iframePart + viewId + queryString + hash;
+                url = BASEURL + viewPath + dnClosePart + IFRAMEPATH + viewId + queryString + hash;
                 break;
             }
         default:
