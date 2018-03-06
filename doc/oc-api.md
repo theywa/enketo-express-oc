@@ -2,13 +2,13 @@
 
 OpenClinica is using its own custom Enketo API at **/oc/api/v1** and has disabled the default Enketo Express API at /api/v2. This was done to create a cleaner, less verbose API for all views used by OC, including ones that submit data to [OpenClinica's Fieldsubmission API](https://swaggerhub.com/api/martijnr/openclinica-fieldsubmission) instead of the regular OpenRosa Submission API.
 
-### Authentication for all /oc/api/v1 requests
+### Authentication for all /oc/api/v1/..s requests
 
 Api authentication is done via a Authorization header using the well-known [Basic Authentication Scheme](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) with the API key as username and an empty string as password (over https always).
 
-### Responses for all /oc/api/v1 requests
+### Responses for all /oc/api/v1/.. requests
 
-Successful **POST** response (always has `url` property) with 200 or 201 HTTP status. The code is identical HTTP statuscode of the response. It is recommended to check the HTTP statuscode (and ignore the body code).
+A successful **POST** response (always has `url` property) with 200 or 201 HTTP status. The code is identical to the HTTP statuscode of the response. It is recommended to check the HTTP statuscode (and ignore the body code).
 
 ```xml
 {
