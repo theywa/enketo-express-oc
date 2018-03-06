@@ -18,33 +18,34 @@ router
     .get( '/', ( req, res ) => {
         res.redirect( 'https://github.com/OpenClinica/enketo-express-oc/blob/master/doc/oc-api.md' );
     } )
-    .all( '*', authCheck )
-    .all( '*', _setQuotaUsed )
-    .all( '*', _setDefaultsQueryParam )
-    .all( '*', _setReturnQueryParam )
-    .all( '*', _setGoToHash )
-    .all( '*', _setParentWindow )
-    .all( '/survey/preview*', ( req, res, next ) => {
+    .post( '*', authCheck )
+    .delete( '*', authCheck )
+    .post( '*', _setQuotaUsed )
+    .post( '*', _setDefaultsQueryParam )
+    .post( '*', _setReturnQueryParam )
+    .post( '*', _setGoToHash )
+    .post( '*', _setParentWindow )
+    .post( '/survey/preview*', ( req, res, next ) => {
         req.webformType = 'preview';
         next();
     } )
-    .all( '/instance*', ( req, res, next ) => {
+    .post( '/instance*', ( req, res, next ) => {
         req.webformType = 'edit';
         next();
     } )
-    .all( '*/c', ( req, res, next ) => {
+    .post( '*/c', ( req, res, next ) => {
         req.dnClose = true;
         next();
     } )
-    .all( '/survey/view*', ( req, res, next ) => {
+    .post( '/survey/view*', ( req, res, next ) => {
         req.webformType = 'view';
         next();
     } )
-    .all( '/instance/view*', ( req, res, next ) => {
+    .post( '/instance/view*', ( req, res, next ) => {
         req.webformType = 'view-instance';
         next();
     } )
-    .all( '/instance/note*', ( req, res, next ) => {
+    .post( '/instance/note*', ( req, res, next ) => {
         req.webformType = 'view-instance-dn';
         next();
     } )
@@ -299,7 +300,7 @@ function _generateWebformUrls( id, req ) {
             }
         case 'single':
             {
-                let queryParts = [ req.defaultsQueryParam, req.returnQueryParam ];
+                const queryParts = [ req.defaultsQueryParam, req.returnQueryParam ];
                 if ( IFRAMEPATH ) {
                     queryParts.push( req.parentWindowOriginParam );
                 }
@@ -310,7 +311,7 @@ function _generateWebformUrls( id, req ) {
         case 'view':
         case 'view-instance':
             {
-                let queryParts = [];
+                const queryParts = [];
                 if ( req.webformType === 'view-instance' ) {
                     queryParts.push( `instance_id=${req.body.instance_id}` );
                 }
@@ -327,12 +328,12 @@ function _generateWebformUrls( id, req ) {
             {
                 const viewId = dnClosePart ? idPartViewDnc : idPartViewDn;
                 const viewPath = `edit/${FSPATH}dn/`;
-                queryParts = [ `instance_id=${req.body.instance_id}`, req.completeButtonParam ];
+                const queryParts = [ `instance_id=${req.body.instance_id}`, req.completeButtonParam ];
                 if ( IFRAMEPATH ) {
                     queryParts.push( req.parentWindowOriginParam );
                 }
                 queryParts.push( req.returnQueryParam );
-                queryString = _generateQueryString( queryParts );
+                const queryString = _generateQueryString( queryParts );
                 url = BASEURL + viewPath + dnClosePart + IFRAMEPATH + viewId + queryString + hash;
                 break;
             }
