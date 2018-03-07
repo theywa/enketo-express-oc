@@ -39,17 +39,17 @@ Use exactly as [POST /survey/single](http://apidocs.enketo.org/v2/#/post-survey-
 
 ### POST /survey/collect/c
 
-Same as POST /survey/collect except this view has a Close button in the Discrepancy Note Widget.
+Same as POST /survey/collect except this view has a **Close button** in the Discrepancy Note Widget.
 
 ### POST /survey/view
 
-Returns a url that points to an iframe-friendly empty readonly form.
+Returns a url that points to an iframe-friendly **empty readonly** form.
 
 Use exactly as [POST /survey/view](http://apidocs.enketo.org/v2/#/post-survey-view)
 
 ### POST /survey/preview
 
-Returns a url that points to an iframe-friendly empty readonly form.
+Returns a url that points to an iframe-friendly **empty** form.
 
 Use exactly as [POST /survey/preview](http://apidocs.enketo.org/v2/#/post-survey-preview)
 
@@ -61,7 +61,7 @@ Use exactly as [DELETE /survey/cache](https://apidocs.enketo.org/v2#/delete-surv
 
 ### POST /instance/edit
 
-Returns a url that points to a regular webform fieldsubmission view with an existing record. No Close button present in the Discrepancy Note Widget.
+Returns a url that points to a regular webform fieldsubmission view with an **existing record**. No Close button present in the Discrepancy Note Widget.
 
 Has an optional `complete_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"false"`. This parameter determines 
 whether a _Complete_ button is present below the form in addition to the always-present _Close_ button. \[**THIS WILL BE REMOVED**\]
@@ -70,17 +70,17 @@ Otherwise, use exactly as [POST /instance](http://apidocs.enketo.org/v2/#/post-i
 
 ### POST /instance/edit/c
 
-Same as POST /instance/edit except that this view has a Close button in the Discrepancy Note Widget.
+Same as POST /instance/edit except that this view has a **Close button** in the Discrepancy Note Widget.
 
 ### POST /instance/view
 
-Returns a url that points to form with a record loaded into it.
+Returns a url that points to a **readonly** form with a record loaded into it.
 
 Use exactly as [POST /instance/view](https://apidocs.enketo.org/v2#/post-instance-view)
 
 ### POST /instance/note
 
-Returns a url that points to a readonly view of an existing record where only the discrepancy notes widgets are enabled, and the discrepancy notes widgets **do not have** a Close button.
+Returns a url that points to a readonly view of an existing record where **only the discrepancy notes widgets are enabled**, and the discrepancy notes widgets **do not have** a Close button.
 
 Has an optional `complete_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"false"`. This parameter determines 
 whether a _Complete_ button is present below the form in addition to the always-present _Close_ button. \[**THIS WILL BE REMOVED**\]
@@ -89,7 +89,7 @@ Otherwise, use exactly as [POST /instance/view](https://apidocs.enketo.org/v2#/p
 
 ### POST /instance/note/c
 
-Same as POST /instance/note except that this view has a Close button in the Discrepancy Note Widget.
+Same as POST /instance/note except that this view has a **Close button** in the Discrepancy Note Widget.
 
 ### POST /instance/edit/rfc 
 
