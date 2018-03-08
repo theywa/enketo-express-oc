@@ -136,7 +136,7 @@ settings.goTo = settings.type === 'edit' || settings.type === 'preview' || setti
 settings.printRelevantOnly = !( ( settings.type === 'view' && !settings.instanceId ) || settings.type === 'preview' );
 
 // Reason for change functionality
-settings.reasonForChange = settings.type === 'edit' && !settings.completeButton && !( /\/fs\/dnc?\//.test( window.location.pathname ) );
+settings.reasonForChange = /\/rfc\//.test( window.location.pathname );
 
 function _getEnketoId( prefix, haystack ) {
     var id = new RegExp( prefix ).test( haystack ) ? haystack.substring( haystack.lastIndexOf( prefix ) + prefix.length ) : null;

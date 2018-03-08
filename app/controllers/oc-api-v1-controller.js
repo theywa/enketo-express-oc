@@ -285,7 +285,9 @@ function _generateWebformUrls( id, req ) {
     const idPartViewDn = `::${utils.insecureAes192Encrypt( id, keys.viewDn )}`;
     const idPartViewDnc = `::${utils.insecureAes192Encrypt( id, keys.viewDnc )}`;
     const idPartEditRfc = `::${utils.insecureAes192Encrypt( id, keys.editRfc )}`;
+    const idPartEditRfcC = `::${utils.insecureAes192Encrypt( id, keys.editRfcC )}`;
     const idPartFsC = `::${utils.insecureAes192Encrypt( id, keys.fsC )}`;
+
     let url;
 
     req.webformType = req.webformType || 'single';
@@ -306,8 +308,9 @@ function _generateWebformUrls( id, req ) {
             }
         case 'rfc':
             {
+                const rfcId = dnClosePart ? idPartEditRfcC : idPartEditRfc;
                 const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam ] );
-                url = `${BASEURL}edit/${FSPATH}rfc/${dnClosePart}${IFRAMEPATH}${idPartEditRfc}${queryString}${hash}`;
+                url = `${BASEURL}edit/${FSPATH}rfc/${dnClosePart}${IFRAMEPATH}${rfcId}${queryString}${hash}`;
                 break;
             }
         case 'single':

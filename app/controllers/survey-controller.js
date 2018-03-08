@@ -21,6 +21,8 @@ router.param( 'encrypted_enketo_id_view', routerUtils.encryptedEnketoIdView );
 router.param( 'encrypted_enketo_id_view_dn', routerUtils.encryptedEnketoIdViewDn );
 router.param( 'encrypted_enketo_id_view_dnc', routerUtils.encryptedEnketoIdViewDnc );
 router.param( 'encrypted_enketo_id_fs_c', routerUtils.encryptedEnketoIdFsC );
+router.param( 'encrypted_enketo_id_rfc', routerUtils.encryptedEnketoIdEditRfc );
+router.param( 'encrypted_enketo_id_rfc_c', routerUtils.encryptedEnketoIdEditRfcC );
 
 router.param( 'mod', function( req, rex, next, mod ) {
     if ( mod === 'i' ) {
@@ -52,6 +54,8 @@ router
     .get( '/view/:mod/:encrypted_enketo_id_view', view )
     .get( '/edit/:enketo_id', edit )
     .get( '/edit/:mod/:enketo_id', edit )
+    .get( '/edit/fs/rfc/:mod/:encrypted_enketo_id_rfc', fieldSubmission )
+    .get( '/edit/fs/rfc/c/:mod/:encrypted_enketo_id_rfc_c', fieldSubmission )
     .get( '/edit/fs/:mod/:enketo_id', fieldSubmission )
     .get( '/edit/fs/c/:mod/:encrypted_enketo_id_fs_c', fieldSubmission )
     .get( '/edit/fs/dn/:mod/:encrypted_enketo_id_view_dn', fieldSubmission )
