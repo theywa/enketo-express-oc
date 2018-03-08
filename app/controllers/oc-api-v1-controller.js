@@ -49,6 +49,10 @@ router
         req.webformType = 'view-instance-dn';
         next();
     } )
+    .post( '/instance/edit/rfc*', ( req, res, next ) => {
+        req.webformType = 'rfc';
+        next();
+    } )
     .delete( '/survey/cache', emptySurveyCache )
     .post( '/survey/preview', getNewOrExistingSurvey )
     .post( '/survey/view', getNewOrExistingSurvey )
@@ -59,6 +63,8 @@ router
     .post( '/instance/view', cacheInstance )
     .post( '/instance/edit', cacheInstance )
     .post( '/instance/edit/c', cacheInstance )
+    .post( '/instance/edit/rfc', cacheInstance )
+    .post( '/instance/edit/rfc/c', cacheInstance )
     .post( '/instance/note', cacheInstance )
     .post( '/instance/note/c', cacheInstance )
     .all( '*', ( req, res, next ) => {
@@ -278,6 +284,7 @@ function _generateWebformUrls( id, req ) {
     const idPartView = `::${utils.insecureAes192Encrypt( id, keys.view )}`;
     const idPartViewDn = `::${utils.insecureAes192Encrypt( id, keys.viewDn )}`;
     const idPartViewDnc = `::${utils.insecureAes192Encrypt( id, keys.viewDnc )}`;
+    const idPartEditRfc = `::${utils.insecureAes192Encrypt( id, keys.editRfc )}`;
     const idPartFsC = `::${utils.insecureAes192Encrypt( id, keys.fsC )}`;
     let url;
 
@@ -292,32 +299,30 @@ function _generateWebformUrls( id, req ) {
             }
         case 'edit':
             {
-                // no defaults query parameter in edit view
-                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.completeButtonParam, req.reasonForChangeParam ] );
-                url = `${BASEURL}edit/${FSPATH}${dnClosePart}${IFRAMEPATH}${dnClosePart ? idPartFsC : idPartOnline}${queryString}${hash}`;
+                const editId = dnClosePart ? idPartFsC : idPartOnline;
+                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.completeButtonParam ] );
+                url = `${BASEURL}edit/${FSPATH}${dnClosePart}${IFRAMEPATH}${editId}${queryString}${hash}`;
+                break;
+            }
+        case 'rfc':
+            {
+                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam ] );
+                url = `${BASEURL}edit/${FSPATH}rfc/${dnClosePart}${IFRAMEPATH}${idPartEditRfc}${queryString}${hash}`;
                 break;
             }
         case 'single':
             {
-                const queryParts = [ req.defaultsQueryParam, req.returnQueryParam ];
-                if ( IFRAMEPATH ) {
-                    queryParts.push( req.parentWindowOriginParam );
-                }
-                const queryString = _generateQueryString( queryParts );
+                const queryString = _generateQueryString( [ req.defaultsQueryParam, req.returnQueryParam, req.parentWindowOriginParam ] );
                 url = `${BASEURL}single/${FSPATH}${dnClosePart}${IFRAMEPATH}${dnClosePart ? idPartFsC : idPartOnline}${queryString}`;
                 break;
             }
         case 'view':
         case 'view-instance':
             {
-                const queryParts = [];
+                const queryParts = [ req.parentWindowOriginParam, req.returnQueryParam ];
                 if ( req.webformType === 'view-instance' ) {
-                    queryParts.push( `instance_id=${req.body.instance_id}` );
+                    queryParts.unshift( `instance_id=${req.body.instance_id}` );
                 }
-                if ( IFRAMEPATH ) {
-                    queryParts.push( req.parentWindowOriginParam );
-                }
-                queryParts.push( req.returnQueryParam );
                 const queryString = _generateQueryString( queryParts );
                 url = `${BASEURL}view/${IFRAMEPATH}${idPartView}${queryString}${hash}`;
                 break;
@@ -326,14 +331,8 @@ function _generateWebformUrls( id, req ) {
             // inside {block} to properly scope for new variables (eslint)
             {
                 const viewId = dnClosePart ? idPartViewDnc : idPartViewDn;
-                const viewPath = `edit/${FSPATH}dn/`;
-                const queryParts = [ `instance_id=${req.body.instance_id}`, req.completeButtonParam ];
-                if ( IFRAMEPATH ) {
-                    queryParts.push( req.parentWindowOriginParam );
-                }
-                queryParts.push( req.returnQueryParam );
-                const queryString = _generateQueryString( queryParts );
-                url = BASEURL + viewPath + dnClosePart + IFRAMEPATH + viewId + queryString + hash;
+                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.completeButtonParam, req.parentWindowOriginParam, req.returnQueryParam ] );
+                url = `${BASEURL}edit/${FSPATH}dn/${dnClosePart}${IFRAMEPATH}${viewId}${queryString}${hash}`;
                 break;
             }
         default:

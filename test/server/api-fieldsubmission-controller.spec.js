@@ -297,20 +297,37 @@ describe( 'api', () => {
                 return obj;
             } ).forEach( testResponse );
 
-            [
-                // valid token
-                {
-                    method: 'post',
-                    auth: true,
-                    instanceId: 'AAA',
-                    instance: true,
-                    status: 201,
-                    // includes proper enketoID and not e.g. ::null 
-                    expected: /\/edit\/fs\/c?\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
-                },
-            ].map( obj => {
+            [ {
+                // edit with Close button in dn widget
+                method: 'post',
+                endpoint: '/instance/edit/c',
+                auth: true,
+                instanceId: 'AAA',
+                instance: true,
+                status: 201,
+                expected: /\/edit\/fs\/c\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
+            }, {
+                // edit with RFC UI
+                method: 'post',
+                endpoint: '/instance/edit/rfc',
+                auth: true,
+                instanceId: 'AAA',
+                instance: true,
+                status: 201,
+                // includes proper enketoID and not e.g. ::null 
+                expected: /\/edit\/fs\/rfc\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
+            }, {
+                // edit with RFC UI and with Close button in dn widget
+                method: 'post',
+                endpoint: '/instance/edit/rfc/c',
+                auth: true,
+                instanceId: 'AAA',
+                instance: true,
+                status: 201,
+                // includes proper enketoID and not e.g. ::null 
+                expected: /\/edit\/fs\/rfc\/c\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
+            } ].map( obj => {
                 obj.version = version;
-                obj.endpoint = '/instance/edit/c';
                 return obj;
             } ).forEach( testResponse );
 

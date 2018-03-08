@@ -72,6 +72,17 @@ Otherwise, use exactly as [POST /instance](http://apidocs.enketo.org/v2/#/post-i
 
 Same as POST /instance/edit except that this view has a **Close button** in the Discrepancy Note Widget.
 
+### POST /instance/edit/rfc 
+
+Returns a url that points to webform fieldsubmission view with an existing record **and a reason-for-change UI**. No Close button present in the Discrepancy Note widget.
+
+Use exactly as [POST /instance](http://apidocs.enketo.org/v2/#/post-instance)
+
+### POST /instance/edit/rfc/c 
+
+Same as POST /instance/edit/rfc except that this view has a **Close button** in the Discrepancy Note Widget.
+
+
 ### POST /instance/view
 
 Returns a url that points to a **readonly** form with a record loaded into it.
@@ -91,13 +102,6 @@ Otherwise, use exactly as [POST /instance/view](https://apidocs.enketo.org/v2#/p
 
 Same as POST /instance/note except that this view has a **Close button** in the Discrepancy Note Widget.
 
-### POST /instance/edit/rfc 
-
-reserved for future addition
-
-### POST /instance/edit/rfc/c 
-
-reserved for future addition
 
 ### DELETE /instance
 
