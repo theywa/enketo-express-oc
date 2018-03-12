@@ -44,7 +44,7 @@ $padding: 30px;
             @extend .small;
 
             margin-bottom: 0;
-            margin-top: 10px;
+            margin-top: 0;
 
             &.btn-default {
                 // override .question .btn-default
@@ -60,6 +60,7 @@ $padding: 30px;
 
             @include flex-wrap(wrap);
 
+            margin-bottom: 10px; // push down Close/Update button on small screens
             &__dn-assignee {
                 @include flex(1);
 
