@@ -5,6 +5,14 @@ $secondary-color: #eeeeee;
     display: none;
 }
 
+// centering of image labels
+.or .question-label~img {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 90%;
+    max-height: inherit;
+}
+
 // readonly and note-only views
 .oc-view,
 .touch .oc-view {
