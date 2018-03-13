@@ -1,15 +1,13 @@
-'use strict';
-
-var utils = require( './utils' );
-var config = require( '../models/config-model' ).server;
-var keys = {
+const utils = require( './utils' );
+const config = require( '../models/config-model' ).server;
+const keys = {
     singleOnce: config[ 'less secure encryption key' ],
-    view: config[ 'less secure encryption key' ] + 'view',
-    viewDn: config[ 'less secure encryption key' ] + 'view-dn',
-    viewDnc: config[ 'less secure encryption key' ] + 'view-dnc',
-    fsC: config[ 'less secure encryption key' ] + 'fs-c',
-    editRfc: config[ 'less secure encryption key' ] + 'edit-rfc',
-    editRfcC: config[ 'less secure encryption key' ] + 'edit-rfc-c',
+    view: `${config[ 'less secure encryption key' ]}view`,
+    viewDn: `${config[ 'less secure encryption key' ]}view-dn`,
+    viewDnc: `${config[ 'less secure encryption key' ]}view-dnc`,
+    fsC: `${config[ 'less secure encryption key' ]}fs-c`,
+    editRfc: `${config[ 'less secure encryption key' ]}edit-rfc`,
+    editRfcC: `${config[ 'less secure encryption key' ]}edit-rfc-c`,
 };
 
 function enketoIdParam( req, res, next, id ) {
@@ -65,7 +63,7 @@ function _encryptedEnketoIdParam( req, res, next, id, key ) {
                 req.enketoId = decrypted;
                 next();
             } else {
-                console.error( 'decryption with' + key + 'worked but result is not alphanumeric, ignoring result:', decrypted );
+                console.error( `decryption with${key}worked but result is not alphanumeric, ignoring result:`, decrypted );
                 next( 'route' );
             }
         } catch ( e ) {

@@ -5,7 +5,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [Unreleased]
 ---------------------
 ##### Fixed:
+- Repeats with images become exponentially slower to load for each new repeat that is added.
+- In offline-capable views, the Image Map widget inside a repeat shows 'SVG image cannot be loaded' message when all is okay.
+
+[1.61.4] - 2018-03-09
+---------------------
+##### Fixed:
+- When radiobutton or checkbox is cleared programmatically the `data-checked` attribute is not updated.
+- Filenames of signature, annotation and drawing inputs are set to undefined-xx.png.
+
+[1.61.3] - 2018-03-05
+---------------------
+##### Fixed:
 - If existing drawing/signature/annotion is loaded from a http URL (editing submitted record), an exception occurs.
+- Submissions not being made in offline-capable webform views.
 
 [1.61.2] - 2018-03-02
 ---------------------
