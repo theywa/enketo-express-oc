@@ -198,6 +198,7 @@ function _close( bypassAutoQuery ) {
                     negButton: t( 'fieldsubmission.confirm.leaveanyway.button' ),
                     posAction: function() {},
                     negAction: function() {
+                        $( document ).trigger( 'close' );
                         _redirect( 100 );
                     }
                 } );
@@ -250,6 +251,7 @@ function _closeSimple() {
                     negButton: t( 'fieldsubmission.confirm.leaveanyway.button' ),
                     posAction: function() {},
                     negAction: function() {
+                        $( document ).trigger( 'close' );
                         _redirect( 100 );
                     }
                 } );
