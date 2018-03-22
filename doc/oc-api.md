@@ -89,6 +89,12 @@ Returns a url that points to a **readonly** form with a record loaded into it.
 
 Use exactly as [POST /instance/view](https://apidocs.enketo.org/v2#/post-instance-view)
 
+### POST /instance/view/pdf
+
+Returns a PDF of a form with a record loaded into it or a JSON error response.
+
+Use exactly as [POST /instance/view/pdf](https://apidocs.enketo.org/v2#/post-instance-view-pdf)
+
 ### POST /instance/note
 
 Returns a url that points to a readonly view of an existing record where **only the discrepancy notes widgets are enabled**, and the discrepancy notes widgets **do not have** a Close button.

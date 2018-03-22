@@ -2,6 +2,7 @@ const surveyModel = require( '../models/survey-model' );
 const instanceModel = require( '../models/instance-model' );
 const cacheModel = require( '../models/cache-model' );
 const account = require( '../models/account-model' );
+const pdf = require( '../lib/pdf' );
 const auth = require( 'basic-auth' );
 const express = require( 'express' );
 const utils = require( '../lib/utils' );
@@ -25,6 +26,7 @@ router
     .post( '*', _setReturnQueryParam )
     .post( '*', _setGoToHash )
     .post( '*', _setParentWindow )
+    .all( '*/pdf', _setPage )
     .post( '/survey/preview*', ( req, res, next ) => {
         req.webformType = 'preview';
         next();
@@ -45,6 +47,10 @@ router
         req.webformType = 'view-instance';
         next();
     } )
+    .post( '*/pdf', ( req, res, next ) => {
+        req.webformType = 'pdf';
+        next();
+    } )
     .post( '/instance/note*', ( req, res, next ) => {
         req.webformType = 'view-instance-dn';
         next();
@@ -61,6 +67,7 @@ router
     .delete( '/instance/', removeInstance )
     .post( '/instance/*', _setCompleteButtonParam )
     .post( '/instance/view', cacheInstance )
+    .post( '/instance/view/pdf', cacheInstance )
     .post( '/instance/edit', cacheInstance )
     .post( '/instance/edit/c', cacheInstance )
     .post( '/instance/edit/rfc', cacheInstance )
@@ -182,7 +189,12 @@ function cacheInstance( req, res, next ) {
             return instanceModel.set( survey );
         } )
         .then( () => {
-            _render( 201, _generateWebformUrls( enketoId, req ), res );
+            const status = 201;
+            if ( req.webformType === 'pdf' ) {
+                _renderPdf( status, enketoId, req, res );
+            } else {
+                _render( status, _generateWebformUrls( enketoId, req ), res );
+            }
         } )
         .catch( next );
 }
@@ -213,6 +225,42 @@ function _setQuotaUsed( req, res, next ) {
             next();
         } )
         .catch( next );
+}
+
+function _setPage( req, res, next ) {
+    req.page = {};
+    req.page.format = req.body.format || req.query.format;
+    if ( req.page.format && !/^(Letter|Legal|Tabloid|Ledger|A0|A1|A2|A3|A4|A5|A6)$/.test( req.page.format ) ) {
+        const error = new Error( 'Format parameter is not valid.' );
+        error.status = 400;
+        throw error;
+    }
+    req.page.landscape = req.body.landscape || req.query.landscape;
+    if ( req.page.landscape && !/^(true|false)$/.test( req.page.landscape ) ) {
+        const error = new Error( 'Landscape parameter is not valid.' );
+        error.status = 400;
+        throw error;
+    }
+    // convert to boolean
+    req.page.landscape = req.page.landscape === 'true';
+    req.page.margin = req.body.margin || req.query.margin;
+    if ( req.page.margin && !/^\d+(\.\d+)?(in|cm|mm)$/.test( req.page.margin ) ) {
+        const error = new Error( 'Margin parameter is not valid.' );
+        error.status = 400;
+        throw error;
+    }
+    /*
+    TODO: scale has not been enabled yet, as it is not supported by Enketo Core's Grid print JS processing function.
+    req.page.scale = req.body.scale || req.query.scale;
+    if ( req.page.scale && !/^\d+$/.test( req.page.scale ) ) {
+        const error = new Error( 'Scale parameter is not valid.' );
+        error.status = 400;
+        throw error;
+    }
+    // convert to number
+    req.page.scale = Number( req.page.scale );
+    */
+    next();
 }
 
 function _setDefaultsQueryParam( req, res, next ) {
@@ -338,6 +386,12 @@ function _generateWebformUrls( id, req ) {
                 url = `${BASEURL}edit/${FSPATH}dn/${dnClosePart}${IFRAMEPATH}${viewId}${queryString}${hash}`;
                 break;
             }
+        case 'pdf':
+            {
+                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, 'print=true' ] );
+                url = `${BASEURL}edit/${idPartOnline}${queryString}`;
+                break;
+            }
         default:
             url = 'Could not generate a webform URL. Unknown webform type.';
 
@@ -361,4 +415,21 @@ function _render( status, body, res ) {
         body.code = status;
         res.status( status ).json( body );
     }
+}
+
+function _renderPdf( status, id, req, res ) {
+    const url = _generateWebformUrls( id, req ).url;
+    return pdf.get( url, req.page )
+        .then( function( pdfBuffer ) {
+            const filename = `${req.body.form_id || req.query.form_id}${req.body.instance_id ? '-'+req.body.instance_id : ''}.pdf`;
+            // TODO: We've already set to json content-type in authCheck. This may be bad.
+            res
+                .set( 'Content-Type', 'application/pdf' )
+                .set( 'Content-disposition', `attachment;filename=${filename}` )
+                .status( status )
+                .end( pdfBuffer, 'binary' );
+        } )
+        .catch( e => {
+            _render( '500', `PDF generation failed: ${e.message}`, res );
+        } );
 }

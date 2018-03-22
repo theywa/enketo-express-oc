@@ -107,6 +107,9 @@ describe( 'api', () => {
                         instance_id: instanceId,
                         complete_button: test.completeButton,
                         return_url: ret,
+                        format: test.format,
+                        margin: test.margin,
+                        landscape: test.landscape,
                         defaults: test.defaults,
                         parent_window_origin: test.parentWindowOrigin
                     } )
@@ -296,6 +299,96 @@ describe( 'api', () => {
                 obj.endpoint = '/instance/edit';
                 return obj;
             } ).forEach( testResponse );
+
+            // /instance/view/pdf
+            [ {
+                endpoint: '/instance/view/pdf',
+                method: 'get',
+                auth: true,
+                id: 'invalidID',
+                instance: true,
+                instanceId: true,
+                status: 405,
+                offline: true
+            }, {
+                endpoint: '/instance/view/pdf',
+                method: 'post',
+                auth: true,
+                instance: true,
+                instanceId: true,
+                margin: '10px',
+                status: 400,
+                offline: true
+            }, {
+                endpoint: '/instance/view/pdf',
+                method: 'post',
+                auth: true,
+                instance: true,
+                instanceId: true,
+                margin: '10',
+                status: 400,
+                offline: true,
+                res: {
+                    property: 'message',
+                    expected: /Margin/
+                }
+            }, {
+                endpoint: '/instance/view/pdf',
+                method: 'post',
+                auth: true,
+                instance: true,
+                instanceId: true,
+                margin: '1in',
+                format: 'fake',
+                status: 400,
+                offline: true,
+                res: {
+                    property: 'message',
+                    expected: /Format/
+                }
+            }, {
+                endpoint: '/instance/view/pdf',
+                method: 'post',
+                auth: true,
+                instance: true,
+                instanceId: true,
+                margin: '1.1cm',
+                format: 'A4',
+                landscape: 'yes',
+                status: 400,
+                offline: true,
+                res: {
+                    property: 'message',
+                    expected: /Landscape/
+                }
+            }, {
+                endpoint: '/instance/view/pdf',
+                method: 'post',
+                auth: true,
+                instance: false,
+                status: 400,
+                offline: true,
+                res: {
+                    property: 'message',
+                    expected: /Survey/
+                }
+            }, {
+                endpoint: '/instance/view/pdf',
+                method: 'post',
+                auth: true,
+                margin: '10px',
+                instance: true,
+                status: 400,
+                offline: true,
+                res: {
+                    property: 'message',
+                    expected: /Margin/
+                }
+            } ].map( obj => {
+                obj.version = version;
+                return obj;
+            } ).forEach( testResponse );
+
 
             [ {
                 // edit with Close button in dn widget
