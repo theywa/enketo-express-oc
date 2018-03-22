@@ -90,6 +90,7 @@ function webform( req, res, next ) {
     const options = {
         manifest: req.manifest,
         iframe: req.iframe,
+        print: req.query.print === 'true'
     };
 
     _renderWebform( req, res, next, options );
@@ -138,7 +139,8 @@ function preview( req, res, next ) {
 function edit( req, res, next ) {
     const options = {
         type: 'edit',
-        iframe: req.iframe
+        iframe: req.iframe,
+        print: req.query.print === 'true'
     };
 
     if ( req.query.instance_id ) {
