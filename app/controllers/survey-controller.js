@@ -111,7 +111,8 @@ function single( req, res, next ) {
 function fieldSubmission( req, res, next ) {
     var options = {
         type: 'fs',
-        iframe: req.iframe
+        iframe: req.iframe,
+        print: req.query.print === 'true'
     };
 
     _renderWebform( req, res, next, options );
