@@ -26,7 +26,7 @@ router
     .post( '*', _setReturnQueryParam )
     .post( '*', _setGoToHash )
     .post( '*', _setParentWindow )
-    .all( '*/pdf', _setPage )
+    .post( '*/pdf', _setPage )
     .post( '/survey/preview*', ( req, res, next ) => {
         req.webformType = 'preview';
         next();
@@ -62,6 +62,7 @@ router
     .delete( '/survey/cache', emptySurveyCache )
     .post( '/survey/preview', getNewOrExistingSurvey )
     .post( '/survey/view', getNewOrExistingSurvey )
+    .post( '/survey/view/pdf', getNewOrExistingSurvey )
     .post( '/survey/collect', getNewOrExistingSurvey )
     .post( '/survey/collect/c', getNewOrExistingSurvey )
     .delete( '/instance/', removeInstance )
@@ -132,7 +133,11 @@ function getNewOrExistingSurvey( req, res, next ) {
             return surveyModel.set( survey )
                 .then( id => {
                     if ( id ) {
-                        _render( status, _generateWebformUrls( id, req ), res );
+                        if ( req.webformType === 'pdf' ) {
+                            _renderPdf( status, id, req, res );
+                        } else {
+                            _render( status, _generateWebformUrls( id, req ), res );
+                        }
                     } else {
                         _render( 404, 'Survey not found.', res );
                     }
@@ -388,8 +393,11 @@ function _generateWebformUrls( id, req ) {
             }
         case 'pdf':
             {
-                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, 'print=true' ] );
-                url = `${BASEURL}edit/${idPartOnline}${queryString}`;
+                // These are not fieldsubmission views so there is no risk for values to get submitted.
+                const queryParts = req.body.instance_id ? [ `instance_id=${req.body.instance_id}` ] : [];
+                queryParts.push( 'print=true' );
+                const queryString = _generateQueryString( queryParts );
+                url = `${BASEURL}${req.body.instance_id ? 'view/'+idPartView : idPartOnline}${queryString}`;
                 break;
             }
         default:

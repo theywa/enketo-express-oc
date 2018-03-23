@@ -47,6 +47,12 @@ Returns a url that points to an iframe-friendly **empty readonly** form.
 
 Use exactly as [POST /survey/view](http://apidocs.enketo.org/v2/#/post-survey-view)
 
+#### POST /survey/view/pdf
+
+Returns a PDF of an empty form or a JSON error response.
+
+Use exactly as [POST /survey/view/pdf](https://apidocs.enketo.org/v2#/post-survey-view-pdf)
+
 ### POST /survey/preview
 
 Returns a url that points to an iframe-friendly **empty** form.
