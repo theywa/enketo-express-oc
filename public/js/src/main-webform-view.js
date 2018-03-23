@@ -107,6 +107,9 @@ function _init( formParts ) {
             if ( formParts.instance ) {
                 oc.addSignedStatus( form );
             }
+            if ( settings.print ) {
+                gui.applyPrintStyle();
+            }
         } );
     } );
 }

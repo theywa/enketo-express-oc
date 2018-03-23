@@ -121,7 +121,8 @@ function fieldSubmission( req, res, next ) {
 function view( req, res, next ) {
     const options = {
         type: 'view',
-        iframe: req.iframe
+        iframe: req.iframe,
+        print: req.query.print === 'true'
     };
 
     _renderWebform( req, res, next, options );
@@ -141,7 +142,6 @@ function edit( req, res, next ) {
     const options = {
         type: 'edit',
         iframe: req.iframe,
-        print: req.query.print === 'true'
     };
 
     if ( req.query.instance_id ) {
