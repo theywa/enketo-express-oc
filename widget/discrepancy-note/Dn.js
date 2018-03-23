@@ -52,6 +52,7 @@ Comment.prototype._init = function() {
         this._setFocusHandler();
         this._setConstraintEvaluationHandler();
         this._setRepeatRemovalReasonChangeHandler();
+        this._setPrintOptimizationHandler();
     }
 };
 
@@ -121,6 +122,10 @@ Comment.prototype._setValidationHandler = function() {
     this.$commentQuestion.on( 'invalidated.enketo', function() {
         that._setCommentButtonState( that.element.value, true );
     } );
+};
+
+Comment.prototype._setPrintOptimizationHandler = function() {
+    this.$commentQuestion.on( 'printify.enketo', this._printify.bind( this ) );
 };
 
 Comment.prototype._setCloseHandler = function() {
@@ -724,6 +729,23 @@ Comment.prototype._parseFullName = function( user ) {
 
     // use unchanged user as fallback if no match is found
     return fullName || user;
+};
+
+// Amend DN question to optimize for printing. Does not have to be undone, as it is not 
+// use during regular data entry.
+Comment.prototype._printify = function() {
+    var that = this;
+    //this._addQuery( Math.random( 10 ), 'closed', '' );
+    //this._addReason( 'Some longer sentence with a looooooooooooooooong comment' );
+
+    this.$commentQuestion
+        .append( '<table>' +
+            this.notes.queries.concat( this.notes.logs ).sort( this._datetimeDesc.bind( this ) ).map( function( item ) {
+                return that._getRows( item, true );
+            } ).join( '' ) +
+            '</table>'
+        )
+        .find( '.question-label.active' ).text( 'History for - ' + this.$linkedQuestion.find( '.question-label.active' )[ 0 ].textNode.textContent );
 };
 
 module.exports = Comment;

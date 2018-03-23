@@ -137,6 +137,7 @@ function _init( formParts ) {
                 oc.addSignedStatus( form );
             }
             if ( settings.print ) {
+                $( '.or-appearance-dn' ).trigger( 'printify.enketo' );
                 gui.applyPrintStyle();
             }
         } );
