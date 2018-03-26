@@ -745,7 +745,7 @@ Comment.prototype._printify = function() {
             } ).join( '' ) +
             '</table>'
         )
-        .find( '.question-label.active' ).text( 'History for - ' + this.$linkedQuestion.find( '.question-label.active' )[ 0 ].textNode.textContent );
+        .find( '.question-label.active' ).text( 'History for - ' + this.$linkedQuestion.find( '.question-label.active' ).text() );
 };
 
 module.exports = Comment;

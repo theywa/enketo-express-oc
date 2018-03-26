@@ -424,6 +424,7 @@ function applyPrintStyle() {
         var paper = { format: settings.format, landscape: settings.landscape, scale: settings.scale, margin: settings.margin };
         printHelper.fixGrid( paper );
     }
+    $( '.or-appearance-dn' ).trigger( 'printify.enketo' );
     // allow some time for repainting
     setTimeout( function() {
         window.printReady = true;
