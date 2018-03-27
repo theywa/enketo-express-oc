@@ -734,7 +734,17 @@ Comment.prototype._parseFullName = function( user ) {
 // Amend DN question to optimize for printing. Does not have to be undone, as it is not 
 // use during regular data entry.
 Comment.prototype._printify = function() {
+    var labelText;
     var that = this;
+
+    if ( this.$linkedQuestion.is( '.or-appearance-analog-scale' ) ) {
+        var $clone = this.$linkedQuestion.find( '.question-label.widget.active' ).clone();
+        $clone.find( 'ul, br' ).remove();
+        labelText = $clone.text();
+    } else {
+        labelText = this.$linkedQuestion.find( '.question-label.active' ).text();
+    }
+
     //this._addQuery( Math.random( 10 ), 'closed', '' );
     //this._addReason( 'Some longer sentence with a looooooooooooooooong comment' );
 
@@ -745,7 +755,7 @@ Comment.prototype._printify = function() {
             } ).join( '' ) +
             '</table>'
         )
-        .find( '.question-label.active' ).text( 'History for - ' + this.$linkedQuestion.find( '.question-label.active' ).text() );
+        .find( '.question-label.active' ).text( 'History for - ' + labelText );
 };
 
 module.exports = Comment;
