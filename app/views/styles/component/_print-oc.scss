@@ -1,0 +1,9 @@
+.or-appearance-dn {
+    width: 100% !important;
+    &.hide {
+        display: block !important; //inherit !important;
+        input {
+            display: none;
+        }
+    }
+}

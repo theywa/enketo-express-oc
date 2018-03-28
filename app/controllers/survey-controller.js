@@ -1,18 +1,16 @@
-'use strict';
-
-var utils = require( '../lib/utils' );
-var TError = require( '../lib/custom-error' ).TranslatedError;
-var communicator = require( '../lib/communicator' );
-var surveyModel = require( '../models/survey-model' );
-var userModel = require( '../models/user-model' );
-var config = require( '../models/config-model' ).server;
-var express = require( 'express' );
-var router = express.Router();
-var routerUtils = require( '../lib/router-utils' );
+const utils = require( '../lib/utils' );
+const TError = require( '../lib/custom-error' ).TranslatedError;
+const communicator = require( '../lib/communicator' );
+const surveyModel = require( '../models/survey-model' );
+const userModel = require( '../models/user-model' );
+const config = require( '../models/config-model' ).server;
+const express = require( 'express' );
+const router = express.Router();
+const routerUtils = require( '../lib/router-utils' );
 // var debug = require( 'debug' )( 'survey-controller' );
 
-module.exports = function( app ) {
-    app.use( app.get( 'base path' ) + '/', router );
+module.exports = app => {
+    app.use( `${app.get( 'base path' )}/`, router );
 };
 
 router.param( 'enketo_id', routerUtils.enketoId );
@@ -21,8 +19,10 @@ router.param( 'encrypted_enketo_id_view', routerUtils.encryptedEnketoIdView );
 router.param( 'encrypted_enketo_id_view_dn', routerUtils.encryptedEnketoIdViewDn );
 router.param( 'encrypted_enketo_id_view_dnc', routerUtils.encryptedEnketoIdViewDnc );
 router.param( 'encrypted_enketo_id_fs_c', routerUtils.encryptedEnketoIdFsC );
+router.param( 'encrypted_enketo_id_rfc', routerUtils.encryptedEnketoIdEditRfc );
+router.param( 'encrypted_enketo_id_rfc_c', routerUtils.encryptedEnketoIdEditRfcC );
 
-router.param( 'mod', function( req, rex, next, mod ) {
+router.param( 'mod', ( req, rex, next, mod ) => {
     if ( mod === 'i' ) {
         req.iframe = true;
         next();
@@ -52,6 +52,8 @@ router
     .get( '/view/:mod/:encrypted_enketo_id_view', view )
     .get( '/edit/:enketo_id', edit )
     .get( '/edit/:mod/:enketo_id', edit )
+    .get( '/edit/fs/rfc/:mod/:encrypted_enketo_id_rfc', fieldSubmission )
+    .get( '/edit/fs/rfc/c/:mod/:encrypted_enketo_id_rfc_c', fieldSubmission )
     .get( '/edit/fs/:mod/:enketo_id', fieldSubmission )
     .get( '/edit/fs/c/:mod/:encrypted_enketo_id_fs_c', fieldSubmission )
     .get( '/edit/fs/dn/:mod/:encrypted_enketo_id_view_dn', fieldSubmission )
@@ -62,9 +64,9 @@ router
     .get( '/xform/:encrypted_enketo_id_view_dn', xform )
     .get( '/xform/:encrypted_enketo_id_view_dnc', xform )
     .get( '/xform/:encrypted_enketo_id_fs_c', xform )
-    .get( '/connection', function( req, res ) {
+    .get( '/connection', ( req, res ) => {
         res.status = 200;
-        res.send( 'connected ' + Math.random() );
+        res.send( `connected ${Math.random()}` );
     } );
 
 // TODO: I suspect this check is no longer used and can be removed
@@ -74,34 +76,33 @@ router
 //}
 
 function offlineWebform( req, res, next ) {
-    var error;
-
     if ( !req.app.get( 'offline enabled' ) ) {
-        error = new Error( 'Offline functionality has not been enabled for this application.' );
+        const error = new Error( 'Offline functionality has not been enabled for this application.' );
         error.status = 405;
         next( error );
     } else {
-        req.manifest = req.app.get( 'base path' ) + '/x/manifest.appcache';
+        req.manifest = `${req.app.get( 'base path' )}/x/manifest.appcache`;
         webform( req, res, next );
     }
 }
 
 function webform( req, res, next ) {
-    var options = {
+    const options = {
         manifest: req.manifest,
         iframe: req.iframe,
+        print: req.query.print === 'true'
     };
 
     _renderWebform( req, res, next, options );
 }
 
 function single( req, res, next ) {
-    var options = {
+    const options = {
         type: 'single',
         iframe: req.iframe
     };
     if ( req.encryptedEnketoId && req.cookies[ req.encryptedEnketoId ] ) {
-        res.redirect( '/thanks?taken=' + req.cookies[ req.encryptedEnketoId ] );
+        res.redirect( `/thanks?taken=${req.cookies[ req.encryptedEnketoId ]}` );
     } else {
         _renderWebform( req, res, next, options );
     }
@@ -110,23 +111,25 @@ function single( req, res, next ) {
 function fieldSubmission( req, res, next ) {
     var options = {
         type: 'fs',
-        iframe: req.iframe
+        iframe: req.iframe,
+        print: req.query.print === 'true'
     };
 
     _renderWebform( req, res, next, options );
 }
 
 function view( req, res, next ) {
-    var options = {
+    const options = {
         type: 'view',
-        iframe: req.iframe
+        iframe: req.iframe,
+        print: req.query.print === 'true'
     };
 
     _renderWebform( req, res, next, options );
 }
 
 function preview( req, res, next ) {
-    var options = {
+    const options = {
         type: 'preview',
         iframe: req.iframe || !!req.query.iframe,
         notification: utils.pickRandomItemFromArray( config.notifications )
@@ -136,23 +139,22 @@ function preview( req, res, next ) {
 }
 
 function edit( req, res, next ) {
-    var error,
-        options = {
-            type: 'edit',
-            iframe: req.iframe
-        };
+    const options = {
+        type: 'edit',
+        iframe: req.iframe,
+    };
 
     if ( req.query.instance_id ) {
         _renderWebform( req, res, next, options );
     } else {
-        error = new TError( 'error.invalidediturl' );
+        const error = new TError( 'error.invalidediturl' );
         error.status = 400;
         next( error );
     }
 }
 
 function _renderWebform( req, res, next, options ) {
-    var deviceId = req.signedCookies[ '__enketo_meta_deviceid' ] || req.hostname + ':' + utils.randomString( 16 ),
+    const deviceId = req.signedCookies[ '__enketo_meta_deviceid' ] || `${req.hostname}:${utils.randomString( 16 )}`,
         cookieOptions = {
             signed: true,
             maxAge: 10 * 365 * 24 * 60 * 60 * 1000
@@ -172,13 +174,13 @@ function _renderWebform( req, res, next, options ) {
  */
 function xform( req, res, next ) {
     return surveyModel.get( req.enketoId )
-        .then( function( survey ) {
+        .then( survey => {
             survey.credentials = userModel.getCredentials( req );
             return survey;
         } )
         .then( communicator.getXFormInfo )
         .then( communicator.getXForm )
-        .then( function( survey ) {
+        .then( survey => {
             res
                 .set( 'Content-Type', 'text/xml' )
                 .send( survey.xform );

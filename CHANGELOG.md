@@ -4,8 +4,38 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]
 ---------------------
+##### Added
+- Ability to directly obtain PDF of empty form or form with a record. See [apidocs.enketo.org](https://apidocs.enketo.org) (3 new endpoints).
+
+##### Fixed
+- Print view of Grid Theme form in Pages mode doesn't properly stretch cells in the current page.
+- Markdown headers in Grid Theme are overlapping in print view.
+- Print view of Grid Theme doesn't correct width of last question in form.
+- If the form starts with a lengthy group, the print view shows only the form title on the first page.
+
+[1.61.5] - 2018-03-21
+---------------------
+##### Changed
+- In Markdown, make a distinction between paragraphs (2+ subsequent new lines) and simple new lines.
+- Positioning of comment widget icon next to question label.
+- Center media inside labels.
+
+##### Fixed:
+- Repeats with images become exponentially slower to load for each new repeat that is added.
+- In offline-capable views, the Image Map widget inside a repeat shows 'SVG image cannot be loaded' message when all is okay.
+- In Markdown, newline characters are not converted if they follow a heading.
+
+[1.61.4] - 2018-03-09
+---------------------
+##### Fixed:
+- When radiobutton or checkbox is cleared programmatically the `data-checked` attribute is not updated.
+- Filenames of signature, annotation and drawing inputs are set to undefined-xx.png.
+
+[1.61.3] - 2018-03-05
+---------------------
 ##### Fixed:
 - If existing drawing/signature/annotion is loaded from a http URL (editing submitted record), an exception occurs.
+- Submissions not being made in offline-capable webform views.
 
 [1.61.2] - 2018-03-02
 ---------------------

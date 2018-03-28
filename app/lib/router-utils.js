@@ -1,13 +1,13 @@
-'use strict';
-
-var utils = require( './utils' );
-var config = require( '../models/config-model' ).server;
-var keys = {
+const utils = require( './utils' );
+const config = require( '../models/config-model' ).server;
+const keys = {
     singleOnce: config[ 'less secure encryption key' ],
-    view: config[ 'less secure encryption key' ] + 'view',
-    viewDn: config[ 'less secure encryption key' ] + 'view-dn',
-    viewDnc: config[ 'less secure encryption key' ] + 'view-dnc',
-    fsC: config[ 'less secure encryption key' ] + 'fs-c',
+    view: `${config[ 'less secure encryption key' ]}view`,
+    viewDn: `${config[ 'less secure encryption key' ]}view-dn`,
+    viewDnc: `${config[ 'less secure encryption key' ]}view-dnc`,
+    fsC: `${config[ 'less secure encryption key' ]}fs-c`,
+    editRfc: `${config[ 'less secure encryption key' ]}edit-rfc`,
+    editRfcC: `${config[ 'less secure encryption key' ]}edit-rfc-c`,
 };
 
 function enketoIdParam( req, res, next, id ) {
@@ -39,6 +39,14 @@ function encryptedEnketoIdParamFsC( req, res, next, id ) {
     _encryptedEnketoIdParam( req, res, next, id, keys.fsC );
 }
 
+function encryptedEnketoIdParamEditRfc( req, res, next, id ) {
+    _encryptedEnketoIdParam( req, res, next, id, keys.editRfc );
+}
+
+function encryptedEnketoIdParamEditRfcC( req, res, next, id ) {
+    _encryptedEnketoIdParam( req, res, next, id, keys.editRfcC );
+}
+
 function _encryptedEnketoIdParam( req, res, next, id, key ) {
     // either 32 or 64 hexadecimal characters
     if ( /^::([0-9a-fA-F]{32}$|[0-9a-fA-F]{64})$/.test( id ) ) {
@@ -55,7 +63,7 @@ function _encryptedEnketoIdParam( req, res, next, id, key ) {
                 req.enketoId = decrypted;
                 next();
             } else {
-                console.error( 'decryption with' + key + 'worked but result is not alphanumeric, ignoring result:', decrypted );
+                console.error( `decryption with${key}worked but result is not alphanumeric, ignoring result:`, decrypted );
                 next( 'route' );
             }
         } catch ( e ) {
@@ -75,4 +83,6 @@ module.exports = {
     encryptedEnketoIdViewDn: encryptedEnketoIdParamViewDn,
     encryptedEnketoIdViewDnc: encryptedEnketoIdParamViewDnc,
     encryptedEnketoIdFsC: encryptedEnketoIdParamFsC,
+    encryptedEnketoIdEditRfc: encryptedEnketoIdParamEditRfc,
+    encryptedEnketoIdEditRfcC: encryptedEnketoIdParamEditRfcC,
 };
