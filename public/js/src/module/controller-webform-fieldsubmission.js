@@ -381,6 +381,7 @@ function _complete( bypassConfirmation ) {
         } );
 }
 
+// TODO: Move all of this to server?
 function _removeCompleteButtonIfNeccessary() {
     // for readonly and note-only views
     if ( settings.type === 'view' || /\/fs\/dnc?\//.test( window.location.pathname ) ) {
