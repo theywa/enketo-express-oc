@@ -12,8 +12,8 @@ var settings = require( './module/settings' );
 var connection = require( './module/connection' );
 var translator = require( './module/translator' );
 var t = translator.t;
-var $loader = $( '.form__loader' );
-var $buttons = $( '.form-header__button--print, button#close-form, button#finish-form' );
+var $loader = $( 'body > .main-loader' );
+var $formheader = $( '.main > .paper > .form-header' );
 var oc = require( './module/custom' );
 var $footer = $( '.form-footer' );
 var survey = {
@@ -118,7 +118,7 @@ function _readonlify( formParts ) {
 }
 
 function _init( formParts ) {
-    $loader.replaceWith( formParts.form );
+    $formheader.after( formParts.form );
     $( document ).ready( function() {
         translator.localize( document.querySelector( 'form.or' ) );
         controller.init( 'form.or:eq(0)', {
@@ -127,10 +127,10 @@ function _init( formParts ) {
             external: formParts.externalData,
             instanceAttachments: formParts.instanceAttachments
         } ).then( function( form ) {
+            $loader.remove();
             // Note: be careful, "form" param returned by controller.init is undefined if there were loadErrors (in fs view).
             var $title = $( '#form-title' );
             var title = ( settings.pid ) ? settings.pid + ': ' + $title.text() : $title.text();
-            $buttons.removeClass( 'hide' );
             $title.text( title );
             $( 'head>title' ).text( title );
             if ( formParts.instance ) {
