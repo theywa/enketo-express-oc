@@ -11,9 +11,10 @@ var settings = require( './module/settings' );
 var connection = require( './module/connection' );
 var translator = require( './module/translator' );
 var t = translator.t;
-var $loader = $( '.form__loader' );
-var $buttons = $( '.form-header__button--print, button#close-form' );
 var oc = require( './module/custom' );
+
+var $loader = $( 'body > .main-loader' );
+var $formheader = $( '.main > .paper > .form-header' );
 var survey = {
     enketoId: settings.enketoId,
     instanceId: settings.instanceId
@@ -85,7 +86,7 @@ function _convertToReadonly( formParts ) {
 }
 
 function _init( formParts ) {
-    $loader.replaceWith( formParts.form );
+    $formheader.after( formParts.form );
     translator.localize( document.querySelector( 'form.or' ) );
     $( document ).ready( function() {
         controller.init( 'form.or:eq(0)', {
@@ -94,13 +95,13 @@ function _init( formParts ) {
             external: formParts.externalData,
             instanceAttachments: formParts.instanceAttachments,
         } ).then( function( form ) {
+            $loader.remove();
             var $title = $( '#form-title' );
             var title = ( settings.pid ) ? settings.pid + ': ' + $title.text() : $title.text();
             // Add OC readonly message
             $( '<div class="fieldsubmission-status readonly"/>' ).prependTo( '.form-header' )
                 .add( $( '<div class="form-footer__feedback fieldsubmission-status readonly"/>' ).prependTo( '.form-footer' ) )
                 .text( t( 'fieldsubmission.readonly.msg' ) );
-            form.view.$.add( $buttons ).removeClass( 'hide' );
             // Updated OC-amended title and copy to head>title
             $title.text( title );
             $( 'head>title' ).text( title );
