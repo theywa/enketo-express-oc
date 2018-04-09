@@ -66,9 +66,7 @@ function setEventHandlers() {
         $( 'body' ).removeClass( 'show-side-slider' );
     } );
 
-    $( '.form-header__button--print' ).on( 'click', function() {
-        printHelper.printForm( promptPrintSettings, formTheme );
-    } );
+    $( '.form-header__button--print' ).on( 'click', printForm );
 
     $( '.side-slider__toggle, .offline-enabled__queue-length' ).on( 'click', function() {
         var $body = $( 'body' );
@@ -109,22 +107,23 @@ function setEventHandlers() {
 }
 
 function swapTheme( formParts ) {
-    var theme = formParts.theme;
+    var requestedTheme = formParts.theme;
     var $styleSheets = $( 'link[rel=stylesheet][href*=theme-]' );
     var matches = /\/theme-([A-z]+)(\.print)?\.css/.exec( $styleSheets.eq( 0 ).attr( 'href' ) );
-    var currentTheme = matches !== null ? matches[ 1 ] : null;
+
+    formTheme = matches !== null ? matches[ 1 ] : null;
 
     return new Promise( function( resolve ) {
-        if ( theme && theme !== currentTheme && settings.themesSupported.some( function( supportedTheme ) {
-                return theme === supportedTheme;
+        if ( requestedTheme && requestedTheme !== formTheme && settings.themesSupported.some( function( supportedTheme ) {
+                return requestedTheme === supportedTheme;
             } ) ) {
             var $replacementSheets = [];
             $styleSheets.each( function() {
-                $replacementSheets.push( $( this.outerHTML.replace( /(href=.*\/theme-)[A-z]+((\.print)?\.css)/, '$1' + theme + '$2' ) ) );
+                $replacementSheets.push( $( this.outerHTML.replace( /(href=.*\/theme-)[A-z]+((\.print)?\.css)/, '$1' + requestedTheme + '$2' ) ) );
             } );
-
+            console.log( 'Swapping theme to', requestedTheme );
             $replacementSheets[ 0 ].on( 'load', function() {
-                formTheme = theme;
+                formTheme = requestedTheme;
                 resolve( formParts );
             } );
 
@@ -133,7 +132,7 @@ function swapTheme( formParts ) {
             } );
 
         } else {
-            console.log( 'Theme "' + theme + '" is not supported. Keeping default theme.' );
+            console.log( 'Keeping default theme.' );
             delete formParts.theme;
             resolve( formParts );
         }
@@ -393,22 +392,32 @@ function _getHomeScreenGuidanceObj( imageClass1, imageClass2 ) {
 }
 
 /**
- * Prompts for print settings
- *
- * @param  {*} ignore This is here for historic reasons but is ignored
- * @param  {{posAction: Function, negAction: Function, afterAction: Function}} actions Object with actions
+ * Prompts for print settings (for Grid Theme) and prints from the regular view of the form.
  */
-function promptPrintSettings( ignore, actions ) {
+function printForm() {
     var texts = {
         heading: t( 'confirm.print.heading' ),
         msg: t( 'confirm.print.msg' )
     };
     var options = {
         posButton: t( 'confirm.print.posButton' ),
-        posAction: actions.posAction,
+        posAction: function( format ) {
+            var swapped = printHelper.styleToAll();
+            printHelper.fixGrid( format )
+                .then( window.print )
+                .catch( console.error )
+                .then( function() {
+                    if ( swapped ) {
+                        return new Promise( function( resolve ) {
+                            setTimeout( function() {
+                                printHelper.styleReset();
+                                resolve();
+                            }, 500 );
+                        } );
+                    }
+                } );
+        },
         negButton: t( 'alert.default.button' ),
-        negAction: actions.negAction,
-        afterAction: actions.afterAction
     };
     var inputs = '<fieldset><legend>' + t( 'confirm.print.psize' ) + '</legend>' +
         '<label><input name="format" type="radio" value="A4" required checked/><span>' + t( 'confirm.print.a4' ) + '</span></label>' +
@@ -420,9 +429,20 @@ function promptPrintSettings( ignore, actions ) {
         '</fieldset>' +
         '<p class="alert-box info" >' + t( 'confirm.print.reminder' ) + '</p>';
 
-    prompt( texts, options, inputs );
+    return new Promise( function( resolve ) {
+        if ( formTheme === 'grid' || ( !formTheme && printHelper.isGrid() ) ) {
+            options.afterAction = resolve;
+            prompt( texts, options, inputs );
+        } else {
+            window.print();
+            resolve();
+        }
+    } );
 }
 
+/**
+ * This is function is used by PDF creation functionality from a special print view of the form..
+ */
 function applyPrintStyle() {
 
     $( '.or-appearance-dn' ).trigger( 'printify.enketo' );
