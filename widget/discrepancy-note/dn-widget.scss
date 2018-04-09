@@ -35,7 +35,7 @@ $padding: 30px;
             white-space: nowrap;
             justify-content: flex-end;
 
-            .btn + .btn {
+            .btn+.btn {
                 margin-left: 20px;
             }
         }
@@ -49,7 +49,6 @@ $padding: 30px;
             &.btn-default {
                 // override .question .btn-default
                 //padding: 10px 20px;
-           
             }
         }
 
@@ -69,7 +68,7 @@ $padding: 30px;
                 select {
                     display: inline-block;
                     margin-left: 10px;
-                    margin-right: 10px;
+                    margin-right: 20px;
                     width: 200px;
                 }
             }
@@ -91,7 +90,7 @@ $padding: 30px;
                     @extend .icon-chevron-down;
                 }
 
-                tr + tr + tr + tr:not(:last-of-type) {
+                tr+tr+tr+tr:not(:last-of-type) {
                     display: none;
                 }
 
@@ -174,7 +173,7 @@ $padding: 30px;
             outline: 0;
         }
 
-        .tooltip{
+        .tooltip {
             &[data-title]:hover::after {
                 @include font-normal;
                 content: attr(data-title);
@@ -189,7 +188,7 @@ $padding: 30px;
                 border: 1px solid $state-info-border;
                 background-color: $state-info-bg;
             }
-            &.username[data-title]:hover::after{
+            &.username[data-title]:hover::after {
                 margin-left: -200px;
             }
         }
@@ -206,7 +205,10 @@ $padding: 30px;
         @extend .fa-comment-o;
     }
 
-    &.new, &.updated, &.closed, &.closed-modified {
+    &.new,
+    &.updated,
+    &.closed,
+    &.closed-modified {
         .icon {
             @extend .fa-comment;
         }
@@ -289,7 +291,7 @@ $padding: 30px;
     .or-comment-widget {
         &__content {
             &__query-btns {
-                .btn + .btn {
+                .btn+.btn {
                     margin-left: auto;
                     margin-right: 20px;
                 }
@@ -302,9 +304,10 @@ $padding: 30px;
             }
 
             &__user {
-                &__dn-notify {
-                    .option-label {
-                        margin-left: 0;
+                &__dn-assignee {
+                    select {
+                        margin-left: 20px;
+                        margin-right: 10px;
                     }
                 }
             }
