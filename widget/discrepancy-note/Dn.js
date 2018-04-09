@@ -125,7 +125,9 @@ Comment.prototype._setValidationHandler = function() {
 };
 
 Comment.prototype._setPrintOptimizationHandler = function() {
-    this.$commentQuestion.on( 'printify.enketo', this._printify.bind( this ) );
+    this.$commentQuestion
+        .on( 'printify.enketo', this._printify.bind( this ) )
+        .on( 'deprintify.enketo', this._deprintify.bind( this ) );
 };
 
 Comment.prototype._setCloseHandler = function() {
@@ -745,17 +747,30 @@ Comment.prototype._printify = function() {
         labelText = this.$linkedQuestion.find( '.question-label.active' ).text();
     }
 
-    //this._addQuery( Math.random( 10 ), 'closed', '' );
-    //this._addReason( 'Some longer sentence with a looooooooooooooooong comment' );
+    this._addQuery( Math.random( 10 ), 'closed', '' );
+    this._addReason( 'Some longer sentence with a looooooooooooooooong comment' );
 
     this.$commentQuestion
-        .append( '<table>' +
+        .append( '<table class="temp-print">' +
             this.notes.queries.concat( this.notes.logs ).sort( this._datetimeDesc.bind( this ) ).map( function( item ) {
                 return that._getRows( item, true );
             } ).join( '' ) +
             '</table>'
-        )
-        .find( '.question-label.active' ).text( 'History for - ' + labelText );
+        );
+
+    var $existingLabel = this.$commentQuestion.find( '.question-label.active' );
+
+    $existingLabel.attr( 'data-original', $existingLabel.text() );
+    $existingLabel.text( 'History for - ' + labelText );
+};
+
+Comment.prototype._deprintify = function() {
+    this.$commentQuestion
+        .find( 'table.temp-print' ).remove();
+
+    var $existingLabel = this.$commentQuestion.find( '.question-label.active' );
+    $existingLabel.text( $existingLabel.attr( 'data-original' ) );
+
 };
 
 module.exports = Comment;

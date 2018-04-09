@@ -429,6 +429,7 @@ function printForm() {
         '</fieldset>' +
         '<p class="alert-box info" >' + t( 'confirm.print.reminder' ) + '</p>';
 
+    var $dn = $( '.or-appearance-dn' ).trigger( 'printify.enketo' );
     return new Promise( function( resolve ) {
         if ( formTheme === 'grid' || ( !formTheme && printHelper.isGrid() ) ) {
             options.afterAction = resolve;
@@ -437,6 +438,13 @@ function printForm() {
             window.print();
             resolve();
         }
+    } ).then( function() {
+        return new Promise( function( resolve ) {
+            setTimeout( function() {
+                $dn.trigger( 'deprintify.enketo' );
+                resolve();
+            }, 1000 );
+        } );
     } );
 }
 
