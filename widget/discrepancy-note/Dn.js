@@ -747,9 +747,6 @@ Comment.prototype._printify = function() {
         labelText = this.$linkedQuestion.find( '.question-label.active' ).text();
     }
 
-    this._addQuery( Math.random( 10 ), 'closed', '' );
-    this._addReason( 'Some longer sentence with a looooooooooooooooong comment' );
-
     this.$commentQuestion
         .append( '<table class="temp-print">' +
             this.notes.queries.concat( this.notes.logs ).sort( this._datetimeDesc.bind( this ) ).map( function( item ) {
