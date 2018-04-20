@@ -137,7 +137,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/single\/fs\/i\/::[A-z0-9]{4}$/,
+                expected: /\/single\/fs\/i\/::[A-z0-9]{8,10}$/,
             } );
             // GET /survey/collect
             testResponse( {
@@ -157,7 +157,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/single\/fs\/i\/::[A-z0-9]{4}\?parentWindowOrigin=http%3A%2F%2Fexample\.com$/,
+                expected: /\/single\/fs\/i\/::[A-z0-9]{8,10}\?parentWindowOrigin=http%3A%2F%2Fexample\.com$/,
             } );
             // POST /survey/collect/c
             testResponse( {
@@ -199,7 +199,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/preview\/i\/::[A-z0-9]{4}$/,
+                expected: /\/preview\/i\/::[A-z0-9]{8,10}$/,
             } );
         } );
 
@@ -213,7 +213,7 @@ describe( 'api', () => {
                     instance: true,
                     status: 201,
                     // includes proper enketoID and not e.g. ::null 
-                    expected: /::YYY/
+                    expected: /::[A-z0-9]{8,10}/
                 },
                 // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
                 {
@@ -224,7 +224,7 @@ describe( 'api', () => {
                     instance: true,
                     status: 201,
                     // includes proper enketoID and not e.g. ::null 
-                    expected: /::YYY/
+                    expected: /::[A-z0-9]{8,10}/
                 },
                 // already being edited
                 {

@@ -127,7 +127,6 @@ function _init( formParts ) {
             external: formParts.externalData,
             instanceAttachments: formParts.instanceAttachments
         } ).then( function( form ) {
-            $loader.remove();
             // Note: be careful, "form" param returned by controller.init is undefined if there were loadErrors (in fs view).
             var $title = $( '#form-title' );
             var title = ( settings.pid ) ? settings.pid + ': ' + $title.text() : $title.text();

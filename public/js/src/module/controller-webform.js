@@ -19,7 +19,7 @@ var formSelector;
 var formData;
 var $formprogress;
 var formOptions = {
-    clearIrrelevantImmediately: false,
+    clearIrrelevantImmediately: true,
     printRelevantOnly: settings.printRelevantOnly
 };
 
