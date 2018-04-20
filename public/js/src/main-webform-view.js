@@ -95,7 +95,6 @@ function _init( formParts ) {
             external: formParts.externalData,
             instanceAttachments: formParts.instanceAttachments,
         } ).then( function( form ) {
-            $loader.remove();
             var $title = $( '#form-title' );
             var title = ( settings.pid ) ? settings.pid + ': ' + $title.text() : $title.text();
             // Add OC readonly message

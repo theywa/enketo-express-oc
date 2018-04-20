@@ -19,8 +19,7 @@ var formSelector;
 var formData;
 var $formprogress;
 var formOptions = {
-    clearIrrelevantImmediately: true,
-    goTo: settings.goTo,
+    clearIrrelevantImmediately: false,
     printRelevantOnly: settings.printRelevantOnly
 };
 
@@ -48,6 +47,16 @@ function init( selector, data ) {
 
             form = new Form( formSelector, data, formOptions );
             loadErrors = form.init();
+
+            // Remove loader. This will make the form visible.
+            // In order to aggregate regular loadErrors and GoTo loaderrors,
+            // this is placed in between form.init() and form.goTo().
+            $( 'body > .main-loader' ).remove();
+
+            if ( settings.goTo && location.hash ) {
+                console.log( 'going to ', location.hash.substring( 1 ) );
+                loadErrors = loadErrors.concat( form.goTo( location.hash.substring( 1 ) ) );
+            }
 
             if ( form.encryptionKey ) {
                 loadErrors.unshift( '<strong>' + t( 'error.encryptionnotsupported' ) + '</strong>' );
