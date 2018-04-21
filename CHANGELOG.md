@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+---------------------
+##### Changed
+- Increased linespacing for labels of "select" questions.
+
+##### Fixed
+- GoTo functionality no longer working (regression in 1.62.1)
+- Modal dialogs called from widget (e.g. file input reset) no longer working.
+- Min() and max() ignore non-last arguments/nodes with value 0.
+- Goto functionality throws exception if target is a comment question that is not inside a group and the form is in Pages Mode.
+
 [1.63.0] - 2018-04-14
 ---------------------
 ##### Added
