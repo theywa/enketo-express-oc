@@ -34,6 +34,7 @@ Comment.prototype._init = function() {
         this.$commentQuestion = $( this.element ).closest( '.question' );
         this.ordinal = 0;
         this.readOnly = this.element.readOnly;
+
         this.linkedQuestionReadonly = this.$linkedQuestion[ 0 ]
             .querySelector( 'input:not(.ignore), textarea:not(.ignore), select:not(.ignore)' ).readOnly;
         this.notes = this._parseModelFromString( this.element.value );
@@ -44,6 +45,7 @@ Comment.prototype._init = function() {
         this.$commentButton = $( '<a class="btn-icon-only btn-comment btn-dn" tabindex="-1" type="button" href="#"><i class="icon"> </i></a>' );
         this._setCommentButtonState( this.element.value, '', this._getCurrentStatus( this.notes ) );
         this.$linkedQuestion.find( '.question-label' ).last().after( this.$commentButton );
+        this._setUserOptions( this.readOnly );
         this._setCommentButtonHandler();
         this._setValidationHandler();
         this._setDisabledHandler();
@@ -357,7 +359,7 @@ Comment.prototype._showCommentModal = function( linkedQuestionErrorMsg ) {
 
     $overlay = $( '<div class="or-comment-widget__overlay"></div>' );
     $assignee = $( '<label class="or-comment-widget__content__user__dn-assignee"><span>' + assignText +
-        '</span><select name="dn-assignee" class="ignore" >' + this._getUserOptions( this.readOnly ) + '</select>' );
+        '</span><select name="dn-assignee" class="ignore" >' + usersOptionsHtml + '</select>' );
     $notify = $( '<div class="or-comment-widget__content__user__dn-notify option-wrapper"><label><input name="dn-notify" ' +
         'class="ignore" value="true" type="checkbox" ' + readOnlyAttr + '/><span class="option-label">' + notifyText + '</span></label></div>' );
     this.$history = $( '<div class="or-comment-widget__content__history closed"><p></p><table></table></div>' );
@@ -420,15 +422,17 @@ Comment.prototype._hideCommentModal = function( $linkedQuestion ) {
         .prev( '.or-comment-widget__overlay' ).remove();
 };
 
-Comment.prototype._getUserOptions = function( readOnly ) {
-    var userNodes;
-    var currentUsernameNode;
-    var defaultAssignee = this.defaultAssignee;
-    var disabled = readOnly ? 'disabled' : '';
-
+/**
+ * Sets users, currentUser, and usersOptionsHtml global variables (once for all dn widgets);
+ * 
+ * @param {boolean=} readOnly 
+ */
+Comment.prototype._setUserOptions = function( readOnly ) {
     if ( !usersOptionsHtml ) {
+        var disabled = readOnly ? 'disabled' : '';
+        var defaultAssignee = this.defaultAssignee;
         try {
-            userNodes = this.options.helpers.evaluate( 'instance("_users")/root/item', 'nodes', null, null, true );
+            var userNodes = this.options.helpers.evaluate( 'instance("_users")/root/item', 'nodes', null, null, true );
 
             // doing this in 2 steps as it is likely useful later on to store the users array separately.
             users = userNodes.map( function( item ) {
@@ -445,15 +449,13 @@ Comment.prototype._getUserOptions = function( readOnly ) {
                     return '<option value="' + user.userName + '"' + selected + disabled + '>' + readableName + '</option>';
                 } );
 
-            currentUsernameNode = this.options.helpers.evaluate( 'instance("_users")/root/item[@current]/user_name', 'node', null, null, true );
+            var currentUsernameNode = this.options.helpers.evaluate( 'instance("_users")/root/item[@current]/user_name', 'node', null, null, true );
             currentUser = currentUsernameNode ? currentUsernameNode.textContent : null;
         } catch ( e ) {
             //users = [];
             console.error( e );
         }
     }
-
-    return usersOptionsHtml;
 };
 
 Comment.prototype._getCurrentErrorMsg = function() {
