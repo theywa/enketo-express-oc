@@ -3,7 +3,11 @@
 'use strict';
 
 var Model = require( 'enketo-core/src/js/Form-model' );
+var XPathJS = require( 'enketo-xpathjs' );
 var $ = require( 'jquery' );
+
+// Add OC custom XPath functions
+require( 'enketo-xpath-extensions-oc' )( XPathJS );
 
 Model.prototype.getUpdateEventData = function( el, type ) {
     var fullPath;
