@@ -4,12 +4,18 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]
 ---------------------
+##### Fixed
+- Appearance "horizontal" enlarges the last option if the remainder of the options modulo 3 is 1.
+
+[1.65.1] - 2018-05-02
+---------------------
 ##### Changed
 - Hide disabled reset button in draw widget.
 
 ##### Fixed
 - Comment icon overlaps long label in simple select/select1 questions.
 - Pasted incorrect date value converts to today's date.
+- When a record is loaded with an empty value for a node that has a default value in the XForm, all secondary instance values are emptied. 
 
 [1.65.0] - 2018-04-25
 ---------------------
