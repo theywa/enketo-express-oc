@@ -30,7 +30,7 @@ var survey = {
 translator.init( survey )
     .then( connection.getFormParts )
     .then( function( formParts ) {
-        if ( location.pathname.indexOf( '/edit/' ) > -1 ) {
+        if ( location.pathname.indexOf( '/edit/' ) > -1 || location.pathname.indexOf( '/view/' ) > -1 ) {
             if ( survey.instanceId ) {
                 return connection.getExistingInstance( survey )
                     .then( function( response ) {
@@ -39,12 +39,11 @@ translator.init( survey )
                         // TODO: this will fail massively if instanceID is not populated (will use POST instead of PUT). Maybe do a check?
                         return formParts;
                     } );
-            } else {
+            } else if ( location.pathname.indexOf( '/edit/' ) > -1 ) {
                 throw new Error( 'This URL is invalid' );
             }
-        } else {
-            return formParts;
         }
+        return formParts;
     } )
     .then( function( formParts ) {
         if ( formParts.form && formParts.model ) {
@@ -55,7 +54,9 @@ translator.init( survey )
     } )
     .then( function( formParts ) {
         if ( /\/fs\/dnc?\//.test( window.location.pathname ) ) {
-            return _readonlify( formParts );
+            return _readonlify( formParts, true );
+        } else if ( /\/view\//.test( window.location.pathname ) ) {
+            return _readonlify( formParts, false );
         }
         return formParts;
     } )
@@ -82,13 +83,13 @@ function _showErrorOrAuthenticate( error ) {
 }
 
 /**
- * Converts non-comment-type questions to readonly
- * Disables calculations, deprecatedID mechanim and preload items.
+ * Converts questions to readonly
+ * Disables calculations, deprecatedID mechanism and preload items.
  * 
  * @param  {[type]} formParts [description]
  * @return {[type]}           [description]
  */
-function _readonlify( formParts ) {
+function _readonlify( formParts, notesEnabled ) {
     // Styling changes
     $( 'body' ).addClass( 'oc-view' );
 
@@ -103,14 +104,14 @@ function _readonlify( formParts ) {
     // change status message
     $( '<div class="fieldsubmission-status readonly"/>' ).prependTo( '.form-header' )
         .add( $( '<div class="form-footer__feedback fieldsubmission-status readonly"/>' ).prependTo( $footer ) )
-        .text( t( 'fieldsubmission.noteonly.msg' ) );
+        .text( notesEnabled ? t( 'fieldsubmission.noteonly.msg' ) : t( 'fieldsubmission.readonly.msg' ) );
 
     formParts.form = $( formParts.form );
     // Note: Enketo made a syntax error by adding the readonly attribute on a <select>
     // Hence, we cannot use .prop('readonly', true). We'll continue the syntax error.
     formParts.form.find( 'input, textarea, select' )
         .filter( function() {
-            return $( this ).parent( '.or-appearance-dn' ).length === 0;
+            return notesEnabled ? $( this ).parent( '.or-appearance-dn' ).length === 0 : true;
         } )
         .attr( 'readonly', 'readonly' );
     // Properly make native selects readonly (for touchscreens)

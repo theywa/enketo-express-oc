@@ -188,7 +188,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/view\/i\/::[A-z0-9]{32}$/,
+                expected: /\/view\/fs\/i\/::[A-z0-9]{32}$/,
 
             } );
             // POST /survey/preview
@@ -540,7 +540,7 @@ describe( 'api', () => {
                     instance: true,
                     status: 201,
                     // includes proper enketoID and not e.g. ::null 
-                    expected: /\/view\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
+                    expected: /\/view\/fs\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
                 },
                 // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
                 {
@@ -551,7 +551,7 @@ describe( 'api', () => {
                     instance: true,
                     status: 201,
                     // includes proper enketoID and not e.g. ::null 
-                    expected: /\/view\/i\/::[A-z0-9]{32}\?instance_id/
+                    expected: /\/view\/fs\/i\/::[A-z0-9]{32}\?instance_id/
                 },
                 // already being edited
                 {
@@ -591,7 +591,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /\/view\/i\/::[A-z0-9]{32}\?instance_id/
+                    expected: /\/view\/fs\/i\/::[A-z0-9]{32}\?instance_id/
                 },
                 // invalid parameters
                 {

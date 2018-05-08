@@ -15,17 +15,12 @@ var settings = require( './module/settings' );
 var connection = require( './module/connection' );
 var translator = require( './module/translator' );
 var t = translator.t;
-var oc = require( './module/custom' );
-
 var $loader = $( 'body > .main-loader' );
 var $formheader = $( '.main > .paper > .form-header' );
 var survey = {
     enketoId: settings.enketoId,
     instanceId: settings.instanceId
 };
-
-// OC style customizations for "views"
-$( 'body' ).addClass( 'oc-view' );
 
 // Completely disable calculations in Enketo Core
 require( 'enketo-core/src/js/calculation' ).update = function() {
@@ -98,19 +93,8 @@ function _init( formParts ) {
             instanceStr: formParts.instance,
             external: formParts.externalData,
             instanceAttachments: formParts.instanceAttachments,
-        } ).then( function( form ) {
-            var $title = $( '#form-title' );
-            var title = ( settings.pid ) ? settings.pid + ': ' + $title.text() : $title.text();
-            // Add OC readonly message
-            $( '<div class="fieldsubmission-status readonly"/>' ).prependTo( '.form-header' )
-                .add( $( '<div class="form-footer__feedback fieldsubmission-status readonly"/>' ).prependTo( '.form-footer' ) )
-                .text( t( 'fieldsubmission.readonly.msg' ) );
-            // Updated OC-amended title and copy to head>title
-            $title.text( title );
-            $( 'head>title' ).text( title );
-            if ( formParts.instance ) {
-                oc.addSignedStatus( form );
-            }
+        } ).then( function() {
+            $( 'head>title' ).text( $( '#form-title' ).text() );
             if ( settings.print ) {
                 gui.applyPrintStyle();
             }

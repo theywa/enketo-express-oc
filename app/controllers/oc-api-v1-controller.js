@@ -380,7 +380,7 @@ function _generateWebformUrls( id, req ) {
                     queryParts.unshift( `instance_id=${req.body.instance_id}` );
                 }
                 const queryString = _generateQueryString( queryParts );
-                url = `${BASEURL}view/${IFRAMEPATH}${idPartView}${queryString}${hash}`;
+                url = `${BASEURL}view/${FSPATH}${IFRAMEPATH}${idPartView}${queryString}${hash}`;
                 break;
             }
         case 'view-instance-dn':
