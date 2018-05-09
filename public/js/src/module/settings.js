@@ -12,7 +12,7 @@ var settingsMap = [
     { q: 'form', s: 'xformUrl' }, { q: 'id', s: 'xformId' },
     'instanceId', { q: 'instance_id', s: 'instanceId' },
     'parentWindowOrigin', 'print', 'format', 'landscape', 'margin', 'touch',
-    { q: 'PID', s: 'pid' }, 'completeButton',
+    { q: 'PID', s: 'pid' }, 'completeButton', 'loadWarning'
 ];
 
 // rename query string parameters to settings, but only if they do not exist already

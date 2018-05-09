@@ -26,6 +26,7 @@ router
     .post( '*', _setReturnQueryParam )
     .post( '*', _setGoToHash )
     .post( '*', _setParentWindow )
+    .post( /\/(view|note)/, _setLoadWarning )
     .post( '*/pdf', _setPage )
     .post( '/survey/preview*', ( req, res, next ) => {
         req.webformType = 'preview';
@@ -291,6 +292,13 @@ function _setGoToHash( req, res, next ) {
     next();
 }
 
+
+function _setLoadWarning( req, res, next ) {
+    const warning = req.body.load_warning;
+    req.loadWarning = ( warning ) ? `loadWarning=${encodeURIComponent(warning)}` : '';
+    next();
+}
+
 function _setParentWindow( req, res, next ) {
     const parentWindowOrigin = req.body.parent_window_origin;
 
@@ -375,7 +383,7 @@ function _generateWebformUrls( id, req ) {
         case 'view':
         case 'view-instance':
             {
-                const queryParts = [ req.parentWindowOriginParam, req.returnQueryParam ];
+                const queryParts = [ req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning ];
                 if ( req.webformType === 'view-instance' ) {
                     queryParts.unshift( `instance_id=${req.body.instance_id}` );
                 }
@@ -387,7 +395,7 @@ function _generateWebformUrls( id, req ) {
             // inside {block} to properly scope for new variables (eslint)
             {
                 const viewId = dnClosePart ? idPartViewDnc : idPartViewDn;
-                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.completeButtonParam, req.parentWindowOriginParam, req.returnQueryParam ] );
+                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.completeButtonParam, req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning ] );
                 url = `${BASEURL}edit/${FSPATH}dn/${dnClosePart}${IFRAMEPATH}${viewId}${queryString}${hash}`;
                 break;
             }

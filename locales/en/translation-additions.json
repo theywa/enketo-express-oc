@@ -103,10 +103,10 @@
             "editadvice": "",
             "entryadvice": "",
             "heading": "Hold on a second...",
-            "msg1": "Please contact your support team with the link to this page and the error message below if you need further help.",
+            "msg1": "Please contact your support team with the link to this page and the message below if you need further help.",
             "msg2": "",
             "heading_plural": "Hold on a second...",
-            "msg1_plural": "Please contact your support team with the link to this page and the error messages below if you need further help.",
+            "msg1_plural": "Please contact your support team with the link to this page and the messages below if you need further help.",
             "msg2_plural": ""
         }
     }

@@ -111,6 +111,7 @@ describe( 'api', () => {
                         margin: test.margin,
                         landscape: test.landscape,
                         defaults: test.defaults,
+                        load_warning: test.warning,
                         parent_window_origin: test.parentWindowOrigin
                     } )
                     .expect( test.status )
@@ -190,6 +191,17 @@ describe( 'api', () => {
                 status: 200,
                 expected: /\/view\/fs\/i\/::[A-z0-9]{32}$/,
 
+            } );
+            // POST /survey/view with load warning
+            testResponse( {
+                version,
+                endpoint: '/survey/view',
+                method: 'post',
+                ret: false,
+                warning: 'hey you',
+                auth: true,
+                status: 200,
+                expected: /\/view\/fs\/i\/::[A-z0-9]{32}\?loadWarning=hey%20you$/,
             } );
             // POST /survey/preview
             testResponse( {
@@ -560,6 +572,16 @@ describe( 'api', () => {
                     instanceId: beingEdited,
                     instance: true,
                     status: 405
+                },
+                // test load warning in response
+                {
+                    method: 'post',
+                    auth: true,
+                    warning: 'A warning',
+                    instanceId: true,
+                    instance: true,
+                    status: 201,
+                    expected: /.+\?.*loadWarning=A%20warning/
                 },
                 // test return url in response
                 {

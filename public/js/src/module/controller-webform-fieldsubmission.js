@@ -31,9 +31,9 @@ var formOptions = {
 require( './Form' );
 
 
-function init( selector, data ) {
+function init( selector, data, loadWarnings ) {
     var advice;
-    var loadErrors = [];
+    var loadErrors = [].concat( loadWarnings );
 
     formSelector = selector;
     $formprogress = $( '.form-progress' );

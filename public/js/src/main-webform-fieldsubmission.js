@@ -26,6 +26,7 @@ var survey = {
     xformUrl: settings.xformUrl,
     instanceId: settings.instanceId
 };
+var loadWarnings = [];
 
 translator.init( survey )
     .then( connection.getFormParts )
@@ -118,6 +119,11 @@ function _readonlify( formParts, notesEnabled ) {
     formParts.form.find( 'option' ).prop( 'disabled', true );
     // Prevent adding an Add/Remove UI on repeats
     formParts.form.find( '.or-repeat-info' ).attr( 'data-repeat-fixed', 'fixed' );
+    // Record load warning but keep loading
+    if ( settings.loadWarning ) {
+        loadWarnings.push( settings.loadWarning );
+    }
+
     return formParts;
 }
 
@@ -130,7 +136,7 @@ function _init( formParts ) {
             instanceStr: formParts.instance,
             external: formParts.externalData,
             instanceAttachments: formParts.instanceAttachments
-        } ).then( function( form ) {
+        }, loadWarnings ).then( function( form ) {
             // Note: be careful, "form" param returned by controller.init is undefined if there were loadErrors (in fs view).
             var $title = $( '#form-title' );
             var title = ( settings.pid ) ? settings.pid + ': ' + $title.text() : $title.text();

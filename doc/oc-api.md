@@ -45,7 +45,9 @@ Same as POST /survey/collect except this view has a **Close button** in the Disc
 
 Returns a url that points to an iframe-friendly **empty readonly** form.
 
-Use exactly as [POST /survey/view](http://apidocs.enketo.org/v2/#/post-survey-view)
+Has an optional `load_warning` parameter for a string value to be displayed in a modal dialog upon load.
+
+Otherwise exactly as [POST /survey/view](http://apidocs.enketo.org/v2/#/post-survey-view)
 
 ### POST /survey/view/pdf
 
@@ -93,7 +95,9 @@ Same as POST /instance/edit/rfc except that this view has a **Close button** in 
 
 Returns a url that points to a **readonly** form with a record loaded into it.
 
-Use exactly as [POST /instance/view](https://apidocs.enketo.org/v2#/post-instance-view)
+Has an optional `load_warning` parameter for a string value to be displayed in a modal dialog upon load.
+
+Otherwise exactly as [POST /instance/view](https://apidocs.enketo.org/v2#/post-instance-view)
 
 ### POST /instance/view/pdf
 
@@ -108,12 +112,13 @@ Returns a url that points to a readonly view of an existing record where **only 
 Has an optional `complete_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"false"`. This parameter determines 
 whether a _Complete_ button is present below the form in addition to the always-present _Close_ button. \[**THIS WILL BE REMOVED**\]
 
+Has an optional `load_warning` parameter for a string value to be displayed in a modal dialog upon load.
+
 Otherwise, use exactly as [POST /instance/view](https://apidocs.enketo.org/v2#/post-instance-view)
 
 ### POST /instance/note/c
 
 Same as POST /instance/note except that this view has a **Close button** in the Discrepancy Note Widget.
-
 
 ### DELETE /instance
 
