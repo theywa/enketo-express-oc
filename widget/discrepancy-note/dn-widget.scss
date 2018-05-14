@@ -120,12 +120,14 @@ $padding: 30px;
             }
 
             thead td {
-                padding-left: 25px;
-                width: 100px;
+                padding: 0 5px;
+                width: 95px;
+                text-align: center;
 
                 &:first-of-type {
                     padding-left: 0;
                     width: auto;
+                    text-align: left;
                 }
 
                 &:nth-of-type(2) {
@@ -145,6 +147,10 @@ $padding: 30px;
                     white-space: normal;
                     overflow: auto;
                     text-overflow: initial;
+                }
+
+                &:last-of-type {
+                    padding-right: 0;
                 }
             }
 
