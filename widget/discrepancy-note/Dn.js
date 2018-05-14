@@ -515,6 +515,18 @@ Comment.prototype._getParsedElapsedTime = function( datetimeStr ) {
     return this._parseElapsedTime( new Date() - dt );
 };
 
+Comment.prototype._getReadableDateTime = function( datetimeStr ) {
+    var dt = new Date( this._getIsoDatetimeStr( datetimeStr ) );
+    if ( typeof datetimeStr !== 'string' || dt.toString() === 'Invalid Date' ) {
+        console.error( 'Could not convert datetime string "' + datetimeStr + '" to a Date object.' );
+        return 'error';
+    }
+    // 13-Jun-2018 13:58 UTC-04:00
+    return dt.getDay() + '-' + dt.toLocaleDateString( 'en', { month: 'short' } ) + '-' + dt.getFullYear() +
+        ' ' + dt.getHours() + ':' + dt.getMinutes() + ' UTC' + dt.getTimezoneOffsetAsTime();
+    // Date.getTimezoneOffsetAsTime is an extension in enketo-xpathjs
+};
+
 Comment.prototype._parseElapsedTime = function( elapsedMilliseconds ) {
     var months;
     var days;
@@ -679,7 +691,7 @@ Comment.prototype._renderHistory = function() {
         .append( '<thead><tr><td colspan="2"><strong>' + historyText + '</strong></td><td>' + user + '</td><td>' + clock + '</td></tr></thead>' )
         .append( '<tbody>' +
             ( this.notes.queries.concat( this.notes.logs ).sort( this._datetimeDesc.bind( this ) ).map( function( item ) {
-                    return that._getRows( item, true );
+                    return that._getRows( item );
                 } )
                 .join( '' ) || '<tr><td colspan="2">' + emptyText + '</td><td></td><td></td></tr>' ) +
             '</tbody>'
@@ -697,10 +709,7 @@ Comment.prototype._renderHistory = function() {
     } );
 };
 
-Comment.prototype._getRows = function( item ) {
-    var msg;
-    var elapsed;
-    var fullName;
+Comment.prototype._getRows = function( item, options ) {
     var types = {
         comment: '<span class="icon tooltip fa-comment-o" data-title="Query/Comment"> </span>',
         audit: '<span class="icon tooltip fa-edit" data-title="Audit Event"> </span>',
@@ -709,12 +718,18 @@ Comment.prototype._getRows = function( item ) {
     if ( typeof item.user === 'undefined' ) {
         item.user = currentUser;
     }
-    msg = item.comment || item.message;
-    elapsed = this._getParsedElapsedTime( item.date_time );
-    fullName = this._parseFullName( item.user ) || t( 'widget.dn.me' );
+    if ( typeof options !== 'object' ) {
+        options = {};
+    }
+    var msg = item.comment || item.message;
+    var rdDatetime = this._getReadableDateTime( item.date_time );
+    var time = ( options.timestamp === 'datetime' ) ? rdDatetime : this._getParsedElapsedTime( item.date_time );
+
+    var fullName = this._parseFullName( item.user ) || t( 'widget.dn.me' );
 
     return '<tr><td>' + ( types[ item.type ] || '' ) + '</td><td>' + msg + '</td><td>' +
-        '<span class="username tooltip" data-title="' + fullName + ' (' + item.user + ')">' + fullName + '</span></td><td>' + elapsed + '</td></tr>';
+        '<span class="username tooltip" data-title="' + fullName + ' (' + item.user + ')">' + fullName + '</span></td>' +
+        '<td class="datetime tooltip" data-title="' + rdDatetime + '">' + time + '</td></tr>';
 };
 
 Comment.prototype._parseFullName = function( user ) {
@@ -753,7 +768,7 @@ Comment.prototype._printify = function() {
         .addClass( 'printified' )
         .append( '<table class="temp-print">' +
             this.notes.queries.concat( this.notes.logs ).sort( this._datetimeDesc.bind( this ) ).map( function( item ) {
-                return that._getRows( item, true );
+                return that._getRows( item, { timestamp: 'datetime' } );
             } ).join( '' ) +
             '</table>'
         );
