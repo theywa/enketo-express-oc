@@ -89,6 +89,13 @@
             "questionmsg": "Please enter a reason for change at bottom of page."
         }
     },
+    "confirm": {
+        "print": {
+            "queries": "Discrepancy Notes",
+            "queryShow": "show",
+            "queryHide": "hide"
+        }
+    },
     "constraint": {
         "relevant": "Response(s) in related field(s) make this data invalid. This must be corrected to mark the form complete."
     },

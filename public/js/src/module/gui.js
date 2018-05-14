@@ -67,7 +67,7 @@ function setEventHandlers() {
         $( 'body' ).removeClass( 'show-side-slider' );
     } );
 
-    $( '.form-header__button--print' ).on( 'click', printForm );
+    $( '.form-header__button--print' ).on( 'click', printOcForm );
 
     $( '.side-slider__toggle, .offline-enabled__queue-length' ).on( 'click', function() {
         var $body = $( 'body' );
@@ -419,6 +419,60 @@ function printForm() {
             resolve();
         }
     } );
+}
+
+function printOcForm() {
+    var components = getPrintDialogComponents();
+    var texts = {
+        heading: components.heading,
+        msg: components.msg
+    };
+    var options = {
+        posButton: components.posButton,
+        posAction: components.posAction,
+        negButton: components.negButton,
+    };
+    var inputDn = '<fieldset><legend>' + t( 'confirm.print.queries' ) + '</legend>' +
+        '<label><input name="queries" type="radio" value="yes" required checked/><span>' + t( 'confirm.print.queryShow' ) + '</span></label>' +
+        '<label><input name="queries" type="radio" value="no" required/><span>' + t( 'confirm.print.queryHide' ) + '</span></label>' +
+        '</fieldset>';
+    var gridInputs = inputDn + components.gridInputs + components.gridWarning;
+    var regularInputs = inputDn;
+
+    var $dn = $( '.or-appearance-dn' );
+    var printified;
+    return new Promise( function( resolve ) {
+            options.afterAction = resolve;
+            if ( formTheme === 'grid' || ( !formTheme && printHelper.isGrid() ) ) {
+                options.posAction = function( format ) {
+                    if ( format.queries === 'yes' ) {
+                        printified = $dn.trigger( 'printify.enketo' );
+                    }
+                    components.posAction.call( this, format );
+                };
+                prompt( texts, options, gridInputs );
+            } else {
+                options.posAction = function( format ) {
+                    if ( format.queries === 'yes' ) {
+                        printified = $dn.trigger( 'printify.enketo' );
+                    }
+                    setTimeout( window.print, 100 );
+                    resolve();
+                };
+                prompt( texts, options, regularInputs );
+            }
+        } )
+        .then( function() {
+            if ( !printified ) {
+                return;
+            }
+            return new Promise( function( resolve ) {
+                setTimeout( function() {
+                    $dn.trigger( 'deprintify.enketo' );
+                    resolve();
+                }, 1000 );
+            } );
+        } );
 }
 
 /**

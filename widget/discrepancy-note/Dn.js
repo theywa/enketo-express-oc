@@ -750,6 +750,7 @@ Comment.prototype._printify = function() {
     }
 
     this.$commentQuestion
+        .addClass( 'printified' )
         .append( '<table class="temp-print">' +
             this.notes.queries.concat( this.notes.logs ).sort( this._datetimeDesc.bind( this ) ).map( function( item ) {
                 return that._getRows( item, true );
@@ -765,6 +766,7 @@ Comment.prototype._printify = function() {
 
 Comment.prototype._deprintify = function() {
     this.$commentQuestion
+        .removeClass( 'printified' )
         .find( 'table.temp-print' ).remove();
 
     var $existingLabel = this.$commentQuestion.find( '.question-label.active' );
