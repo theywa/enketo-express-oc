@@ -1,7 +1,8 @@
 .or-appearance-dn {
     width: 100% !important;
+    flex: 100% !important;
     &.printified {
-        display: block !important; //inherit !important;
+        display: inherit !important;
         input {
             display: none;
         }
