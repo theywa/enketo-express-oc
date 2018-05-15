@@ -4,7 +4,6 @@
 global.Promise = require( 'lie' );
 
 var Dn = require( '../../widget/discrepancy-note/Dn' );
-var jquery = require( 'jquery' );
 Dn.prototype._init = function() {};
 
 describe( 'DN object', function() {
@@ -24,7 +23,6 @@ describe( 'DN object', function() {
                 var parse = function() {
                     dn._parseModelFromString( test );
                 };
-                expect( parse ).to.throw( Error );
                 expect( parse ).to.throw( /Failed to parse discrepancy/ );
             } );
         } );
