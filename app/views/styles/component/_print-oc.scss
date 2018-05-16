@@ -6,6 +6,12 @@
         input {
             display: none;
         }
+        table.temp-print {
+            order: 5;
+        }
+        &::after {
+            content: none;
+        }
     }
 }
 
