@@ -91,9 +91,8 @@
     },
     "confirm": {
         "print": {
-            "queries": "Discrepancy Notes",
-            "queryShow": "show",
-            "queryHide": "hide"
+            "queries": "Show History",
+            "queryShow": "show"
         }
     },
     "constraint": {

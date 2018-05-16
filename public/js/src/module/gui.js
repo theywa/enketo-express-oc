@@ -433,8 +433,7 @@ function printOcForm() {
         negButton: components.negButton,
     };
     var inputDn = '<fieldset><legend>' + t( 'confirm.print.queries' ) + '</legend>' +
-        '<label><input name="queries" type="radio" value="yes" required checked/><span>' + t( 'confirm.print.queryShow' ) + '</span></label>' +
-        '<label><input name="queries" type="radio" value="no" required/><span>' + t( 'confirm.print.queryHide' ) + '</span></label>' +
+        '<label><input name="queries" style="margin-left: 10px;" type="checkbox" value="yes" checked/><span>' + t( 'confirm.print.queryShow' ) + '</span></label>' +
         '</fieldset>';
     var gridInputs = inputDn + components.gridInputs + components.gridWarning;
     var regularInputs = inputDn;
