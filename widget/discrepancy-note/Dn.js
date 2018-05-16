@@ -699,9 +699,13 @@ Comment.prototype._renderHistory = function() {
         .find( 'tbody' )
         .append( $more );
 
-    this.$history.on( 'click', 'tbody td', function() {
-        $( this ).toggleClass( 'wrap' );
-    } );
+    this.$history
+        .on( 'click', 'tbody td', function() {
+            $( this ).toggleClass( 'wrapping', this.scrollWidth > this.clientWidth );
+        } )
+        .on( 'mouseenter', 'tbody td', function() {
+            $( this ).toggleClass( 'overflowing', this.scrollWidth > this.clientWidth );
+        } );
 
     $more.find( '.btn-more-history' ).on( 'click', function() {
         that.$history.toggleClass( 'closed' );

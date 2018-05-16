@@ -143,7 +143,12 @@ $padding: 30px;
                 text-overflow: ellipsis;
                 word-break: break-word;
 
-                &.wrap {
+                &.overflowing {
+                    cursor: pointer;
+                }
+
+                &.wrapping {
+                    cursor: pointer;
                     white-space: normal;
                     overflow: auto;
                     text-overflow: initial;
