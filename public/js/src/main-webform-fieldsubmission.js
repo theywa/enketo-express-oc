@@ -110,13 +110,13 @@ function _readonlify( formParts, notesEnabled ) {
     formParts.form = $( formParts.form );
     // Note: Enketo made a syntax error by adding the readonly attribute on a <select>
     // Hence, we cannot use .prop('readonly', true). We'll continue the syntax error.
-    formParts.form.find( 'input, textarea, select' )
+    formParts.form.find( 'input, textarea, select:not(#form-languages)' )
         .filter( function() {
             return notesEnabled ? $( this ).parent( '.or-appearance-dn' ).length === 0 : true;
         } )
         .attr( 'readonly', 'readonly' );
     // Properly make native selects readonly (for touchscreens)
-    formParts.form.find( 'option' ).prop( 'disabled', true );
+    formParts.form.find( 'select:not(#form-languages) option' ).prop( 'disabled', true );
     // Prevent adding an Add/Remove UI on repeats
     formParts.form.find( '.or-repeat-info' ).attr( 'data-repeat-fixed', 'fixed' );
     // Record load warning but keep loading
