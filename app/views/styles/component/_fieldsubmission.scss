@@ -9,8 +9,13 @@
     overflow: hidden;
     text-overflow: ellipsis;
 
-    &.error, &.fail {
+    &.error,
+    &.fail {
         color: $state-danger-text;
+    }
+
+    &.readonly {
+        font-weight: bold;
     }
 }
 
@@ -27,7 +32,8 @@
 
 // regular non-pages-mode webform
 .form-footer .form-footer__content__main-controls {
-    #finish-form, #close-form {
+    #finish-form,
+    #close-form {
         display: block;
         margin-left: auto;
         margin-right: auto;
@@ -42,36 +48,36 @@
         padding: 10px 10px 0 10px;
         border-left: $b;
         border-right: $b;
-        border-bottom: 1px solid transparent; 
+        border-bottom: 1px solid transparent;
         background-color: #f1f1f1;
-        &:first-of-type{
+        &:first-of-type {
             border-top: $b;
         }
-        &:last-of-type{
+        &:last-of-type {
             border-bottom: $b;
             padding-bottom: 10px;
         }
-        &__repeat-number{
+        &__repeat-number {
             padding: 0 5px;
         }
         &.added:not(.edited) {
-            input[type=text]{
+            input[type=text] {
                 opacity: 0.5;
             }
         }
         &.invalid {
-            input[type=text]{
-                @extend .invalid-required; 
+            input[type=text] {
+                @extend .invalid-required;
                 border: 1px solid $state-danger-border;
                 margin: inherit !important;
                 padding: inherit !important;
                 border-radius: 0;
             }
         }
-        &:not(.added){
+        &:not(.added) {
             .reason-for-change__item__label,
-            .reason-for-change__item__repeat-number{
-                &:last-of-type::after{
+            .reason-for-change__item__repeat-number {
+                &:last-of-type::after {
                     content: '*';
                     color: $brand-primary-color;
                     padding: 0 3px;
@@ -91,7 +97,7 @@
         h5 {
             margin-bottom: 5px;
         }
-        &__apply-to-all.question{
+        &__apply-to-all.question {
             display: flex;
             flex-direction: row;
             border: $b;
@@ -101,12 +107,12 @@
             &.question:not(.note):not(.focus):hover {
                 background: none;
             }
-            .option-wrapper{
+            .option-wrapper {
                 flex-direction: row;
                 align-items: center;
                 margin-left: 10px;
             }
-            input[type=text]{
+            input[type=text] {
                 @include form-control;
                 flex: 1;
                 width: auto;
@@ -116,9 +122,8 @@
                 border: 1px solid #ccc;
                 margin: 0;
             }
-            
-        }
-        // do not show heading if there is no following sibling
+
+        } // do not show heading if there is no following sibling
         &:last-child {
             display: none
         }
@@ -129,13 +134,13 @@
     background: white;
 }
 
-.oc-reason-msg{
+.oc-reason-msg {
     @extend .or-required-msg;
     color: #4f89bd !important;
     display: block !important;
 }
 
-.pages ~ .form-footer {
+.pages~.form-footer {
     .form-footer {
         &__content {
             &__main-controls {
@@ -155,17 +160,21 @@
                     }
                 }
 
-                .previous-page, #close-form, .next-page {
+                .previous-page,
+                #close-form,
+                .next-page {
                     margin-left: $marg;
                     margin-right: $marg;
                     max-width: calc(33% - (2 * #{$marg}));
                 }
 
-                #finish-form, #close-form {
+                #finish-form,
+                #close-form {
                     min-width: 140px;
                 }
 
-                .previous-page, .next-page {
+                .previous-page,
+                .next-page {
                     position: static;
                     min-width: 90px;
                 }
@@ -179,7 +188,9 @@
                     }
                 }
 
-                #close-form, #submit-form, #validate-form {
+                #close-form,
+                #submit-form,
+                #validate-form {
                     order: 2;
                 }
 
@@ -214,7 +225,9 @@
     }
 
     &.end {
-        #finish-form, #submit-form, #validate-form {
+        #finish-form,
+        #submit-form,
+        #validate-form {
             visibility: visible;
         }
     }
@@ -228,11 +241,12 @@
         margin-top: 16px;
     }
 
-    .pages ~ .form-footer {
+    .pages~.form-footer {
         .form-footer {
             &__content {
                 &__main-controls {
-                    .previous-page, .next-page {
+                    .previous-page,
+                    .next-page {
                         margin-left: 5px;
                         margin-right: 5px;
                         min-width: 40px;
@@ -246,4 +260,3 @@
         }
     }
 }
-
