@@ -688,7 +688,8 @@ Comment.prototype._renderHistory = function() {
     var $colGroup = this.notes.queries.concat( this.notes.logs ).length > 0 ? $( '<colgroup><col style="width: 31px;"><col style="width: auto;"></colgroup>' ) : $();
     this.$history.find( 'table' ).empty()
         .append( $colGroup )
-        .append( '<thead><tr><td colspan="2"><strong>' + historyText + '</strong></td><td>' + user + '</td><td>' + clock + '</td></tr></thead>' )
+        .append( '<thead><tr><th colspan="2" scope="col"><strong>' + historyText +
+            '</strong></th><th scope="col">' + user + '</th><th scope="col">' + clock + '</th></tr></thead>' )
         .append( '<tbody>' +
             ( this.notes.queries.concat( this.notes.logs ).sort( this._datetimeDesc.bind( this ) ).map( function( item ) {
                     return that._getRows( item );
