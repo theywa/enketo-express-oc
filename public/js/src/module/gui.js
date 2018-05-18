@@ -335,6 +335,7 @@ function confirmLogin( msg /*, serverURL*/ ) {
  * @param  {Array.<string>} loadErrors  load error messagesg
  * @param  {string=}        advice  a string with advice
  */
+/*
 function alertLoadErrors( loadErrors, advice ) {
     var errorStringHTML = '<ul class="error-list"><li>' + loadErrors.join( '</li><li>' ) + '</li></ul>';
     var errorStringEmail = '* ' + loadErrors.join( '\n* ' );
@@ -357,6 +358,12 @@ function alertLoadErrors( loadErrors, advice ) {
         t( 'alert.loaderror.msg2', params ) +
         '</p>' + errorStringHTML, t( 'alert.loaderror.heading', params )
     );
+}
+*/
+
+function alertLoadErrorsOc( loadErrors ) {
+    var errorStringHTML = loadErrors.map( function( error ) { return '<p>' + error + '</p>'; } ).join( '' );
+    alert( errorStringHTML, t( 'alert.loaderror.heading' ) );
 }
 
 function alertHomeScreenGuidance() {
@@ -397,6 +404,7 @@ function _getHomeScreenGuidanceObj( imageClass1, imageClass2 ) {
 /**
  * Prompts for print settings (for Grid Theme) and prints from the regular view of the form.
  */
+/*
 function printForm() {
     var components = getPrintDialogComponents();
     var texts = {
@@ -420,6 +428,7 @@ function printForm() {
         }
     } );
 }
+*/
 
 function printOcForm() {
     var components = getPrintDialogComponents();
@@ -637,10 +646,9 @@ module.exports = {
     pages: pages,
     swapTheme: swapTheme,
     confirmLogin: confirmLogin,
-    alertLoadErrors: alertLoadErrors,
+    alertLoadErrors: alertLoadErrorsOc,
     alertCacheUnsupported: alertCacheUnsupported,
     getErrorResponseMsg: getErrorResponseMsg,
     applyPrintStyle: applyPrintStyle,
     getPrintDialogComponents: getPrintDialogComponents,
-    printForm: printForm,
 };
