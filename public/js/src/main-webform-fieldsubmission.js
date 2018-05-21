@@ -56,7 +56,7 @@ translator.init( survey )
     .then( function( formParts ) {
         if ( /\/fs\/dnc?\//.test( window.location.pathname ) ) {
             return _readonlify( formParts, true );
-        } else if ( /\/view\//.test( window.location.pathname ) ) {
+        } else if ( settings.type === 'view' ) {
             return _readonlify( formParts, false );
         }
         return formParts;
@@ -147,6 +147,9 @@ function _init( formParts ) {
             $( 'head>title' ).text( title );
             if ( formParts.instance ) {
                 oc.addSignedStatus( form );
+            }
+            if ( settings.print ) {
+                gui.applyPrintStyle();
             }
         } );
     } );

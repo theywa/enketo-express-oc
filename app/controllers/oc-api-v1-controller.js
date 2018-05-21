@@ -392,7 +392,6 @@ function _generateWebformUrls( id, req ) {
                 break;
             }
         case 'view-instance-dn':
-            // inside {block} to properly scope for new variables (eslint)
             {
                 const viewId = dnClosePart ? idPartViewDnc : idPartViewDn;
                 const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.completeButtonParam, req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning ] );
@@ -401,11 +400,14 @@ function _generateWebformUrls( id, req ) {
             }
         case 'pdf':
             {
-                // These are not fieldsubmission views so there is no risk for values to get submitted.
+                // We use the view-instance view because it is:
+                // - has optional instance support
+                // - has protection against accidental fieldsubmissions (extra layer of security)
+                // - for now OC is planning to not add DN questions to the XForm if it doesn't want those printed
                 const queryParts = req.body.instance_id ? [ `instance_id=${req.body.instance_id}` ] : [];
                 queryParts.push( 'print=true' );
                 const queryString = _generateQueryString( queryParts );
-                url = `${BASEURL}${req.body.instance_id ? 'view/'+idPartView : idPartOnline}${queryString}`;
+                url = `${BASEURL}view/${FSPATH}${idPartView}${queryString}`;
                 break;
             }
         default:

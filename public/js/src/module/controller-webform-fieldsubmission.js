@@ -45,7 +45,18 @@ function init( selector, data, loadWarnings ) {
             }
 
             form = new Form( formSelector, data, formOptions );
-            fieldSubmissionQueue = new FieldSubmissionQueue();
+
+            // Additional layer of security to disable submissions in readonly views.
+            // Should not be necessary to do this.
+            if ( settings.type !== 'view' ) {
+                fieldSubmissionQueue = new FieldSubmissionQueue();
+            } else {
+                console.log( 'Fieldsubmissions disabled' );
+                fieldSubmissionQueue = {
+                    submitAll: function() { return Promise.resolve(); },
+                    get: function() { return {}; }
+                };
+            }
 
             // remove submit button before event handlers are set
             _removeCompleteButtonIfNeccessary();
