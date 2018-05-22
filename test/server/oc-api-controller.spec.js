@@ -98,7 +98,6 @@ describe( 'api', () => {
 
         it( `${test.method.toUpperCase()} /oc/api/v${version}${endpoint} with ${authDesc} authentication and ${server}, ${id}, ${ret}, ${instance}, ${instanceId}, ${test.theme}, completeButton: ${test.completeButton}, parentWindowOrigin: ${test.parentWindowOrigin}, defaults: ${JSON.stringify( test.defaults )} responds with ${test.status}`,
             done => {
-
                 request( app )[ test.method ]( `/oc/api/v${version}${endpoint}` )
                     .set( auth )[ dataSendMethod ]( {
                         server_url: server,
@@ -107,6 +106,8 @@ describe( 'api', () => {
                         instance_id: instanceId,
                         complete_button: test.completeButton,
                         return_url: ret,
+                        go_to: test.goTo,
+                        go_to_error_url: test.goToErrorUrl,
                         format: test.format,
                         margin: test.margin,
                         landscape: test.landscape,
@@ -190,7 +191,40 @@ describe( 'api', () => {
                 auth: true,
                 status: 200,
                 expected: /\/view\/fs\/i\/::[A-z0-9]{32}$/,
-
+            } );
+            // POST /survey/view with go_to
+            testResponse( {
+                version,
+                endpoint: '/survey/view',
+                method: 'post',
+                goTo: '//myquestion',
+                ret: false,
+                auth: true,
+                status: 200,
+                expected: /\/view\/fs\/i\/::[A-z0-9]{32}#\/\/myquestion$/,
+            } );
+            // POST /survey/view with go_to and go_to_error_url
+            testResponse( {
+                version,
+                endpoint: '/survey/view',
+                method: 'post',
+                goTo: '//myquestion',
+                goToErrorUrl: 'http://example.com/miniform',
+                ret: false,
+                auth: true,
+                status: 200,
+                expected: /\/view\/fs\/i\/::[A-z0-9]{32}\?goToErrorUrl=http%3A%2F%2Fexample\.com%2Fminiform#\/\/myquestion$/,
+            } );
+            // POST /survey/view without go_to and with (ignored) go_to_error_url
+            testResponse( {
+                version,
+                endpoint: '/survey/view',
+                method: 'post',
+                goToErrorUrl: 'https://example.com/miniform',
+                ret: false,
+                auth: true,
+                status: 200,
+                expected: /\/view\/fs\/i\/::[A-z0-9]{32}$/,
             } );
             // POST /survey/view with load warning
             testResponse( {
@@ -401,7 +435,6 @@ describe( 'api', () => {
                 return obj;
             } ).forEach( testResponse );
 
-
             [ {
                 // edit with Close button in dn widget
                 method: 'post',
@@ -435,7 +468,6 @@ describe( 'api', () => {
                 obj.version = version;
                 return obj;
             } ).forEach( testResponse );
-
 
             const noteOnlyInstanceTests = [
                 // valid token
@@ -499,6 +531,18 @@ describe( 'api', () => {
                     instance: true,
                     status: 201,
                     expected: /.+\?.*completeButton=true/
+                },
+                // test go_to stuff in response
+                {
+                    method: 'post',
+                    auth: true,
+                    ret: 'https://enke.to',
+                    goTo: '//hell',
+                    goToErrorUrl: 'http://example.com/error',
+                    instanceId: true,
+                    instance: true,
+                    status: 201,
+                    expected: /.+&goToErrorUrl=http%3A%2F%2Fexample\.com%2Ferror#\/\/hell$/
                 },
                 // invalid parameters
                 {

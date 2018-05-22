@@ -39,6 +39,7 @@ function init( selector, data, loadWarnings ) {
     $formprogress = $( '.form-progress' );
 
     return new Promise( function( resolve ) {
+            var goToErrorLink = settings.goToErrorUrl ? '<a href="' + settings.goToErrorUrl + '">' + settings.goToErrorUrl + '</a>' : '';
 
             if ( data.instanceAttachments ) {
                 fileManager.setInstanceAttachments( data.instanceAttachments );
@@ -69,9 +70,15 @@ function init( selector, data, loadWarnings ) {
                 // In OC hidden go_to fields should show loadError except if go_to field is a disrepancy_note
                 // as those are always hidden upon load.
                 if ( !e.target.classList.contains( 'or-appearance-dn' ) ) {
-                    loadErrors.push( t( 'alert.gotohidden.msg', {
-                        path: location.hash.substring( 1 )
-                    } ) );
+                    var err = t( 'alert.goto.hidden' ) + ' ';
+                    err = goToErrorLink ? [ err + t( 'alert.goto.msg2', {
+                        miniform: goToErrorLink,
+                        // switch off escaping
+                        interpolation: {
+                            escapeValue: false
+                        }
+                    } ) ] : [ err + t( 'alert.goto.msg1' ) ];
+                    loadErrors.push( err );
                 }
             } );
 
@@ -83,7 +90,20 @@ function init( selector, data, loadWarnings ) {
             $( 'body > .main-loader' ).remove();
 
             if ( settings.goTo && location.hash ) {
-                loadErrors = loadErrors.concat( form.goTo( location.hash.substring( 1 ) ) );
+                // form.goTo returns an array of 1 error if it has error. We're using our special
+                // knowledge of Enketo Core to replace this error
+                var goToErrors = form.goTo( location.hash.substring( 1 ) );
+                if ( goToErrors.length ) {
+                    var replErr = t( 'alert.goto.notfound' ) + ' ';
+                    goToErrors = goToErrorLink ? [ replErr + t( 'alert.goto.msg2', {
+                        miniform: goToErrorLink,
+                        // switch off escaping
+                        interpolation: {
+                            escapeValue: false
+                        }
+                    } ) ] : [ replErr + t( 'alert.goto.msg1' ) ];
+                }
+                loadErrors = loadErrors.concat( goToErrors );
             }
 
             if ( form.encryptionKey ) {

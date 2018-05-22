@@ -29,8 +29,6 @@ describe( 'OC Account manager API', function() {
     var validServer2 = 'https://octestserver2.com';
     var invalidServer = 'octestserver1.com';
     var validApiKey1 = 'abcde';
-    var validApiKey2 = '12345';
-    var invalidApiKey = 'bad';
 
     beforeEach( function( done ) {
         // add survey if it doesn't exist in the db

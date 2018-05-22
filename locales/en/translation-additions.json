@@ -99,11 +99,12 @@
         "relevant": "Response(s) in related field(s) make this data invalid. This must be corrected to mark the form complete."
     },
     "alert": {
-        "gotohidden": {
-            "msg": "The item you are trying to access is currently hidden. Please use the View Query Only icon instead of the View Query Within Record icon to see it."
-        },
-        "gotonotfound": {
-            "msg": "The item you are trying to access has been removed from this form. Please use the View Query Only icon instead of the View Query Within Record icon to see it."
+        "goto": {
+            "hidden": "The item you are trying to access is currently hidden.",
+            "notfound": "The item you are trying to access has been removed from this form.",
+            "msg1": "Please use the View Query Only icon instead of the View Query Within Record icon to see it.",
+            "msg2": "Please visit __miniform__ to see it.",
+            "form": "this form"
         },
         "loaderror": {
             "editadvice": "",
