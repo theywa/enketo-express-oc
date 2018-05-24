@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.65.5] - 2018-05-24
+---------------------
+##### Changed
+- Improved accessibility of buttons and links.
+
+##### Fixed
+- Styling interference occurs when an appearance is added to a question type that doesn't support it.
+
 [1.65.4] - 2018-05-18
 ---------------------
 ##### Changed
