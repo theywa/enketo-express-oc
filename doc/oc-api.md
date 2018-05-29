@@ -46,6 +46,7 @@ Same as POST /survey/collect except this view has a **Close button** in the Disc
 Returns a url that points to an iframe-friendly **empty readonly** form.
 
 Has an optional `load_warning` parameter for a string value to be displayed in a modal dialog upon load.
+Has an optional `go_to_error_url` parameter that in conjunction with `go_to` will prompt the user to redirect to a _mini form_ if the go_to target is not available or hidden.
 
 Otherwise exactly as [POST /survey/view](http://apidocs.enketo.org/v2/#/post-survey-view)
 
@@ -59,7 +60,9 @@ Use exactly as [POST /survey/view/pdf](https://apidocs.enketo.org/v2#/post-surve
 
 Returns a url that points to an iframe-friendly **empty** form.
 
-Use exactly as [POST /survey/preview](http://apidocs.enketo.org/v2/#/post-survey-preview)
+Has an optional `go_to_error_url` parameter that in conjunction with `go_to` will prompt the user to redirect to a _mini form_ if the go_to target is not available or hidden.
+
+Otherwise exactly as [POST /survey/preview](http://apidocs.enketo.org/v2/#/post-survey-preview)
 
 ### DELETE /survey/cache
 
@@ -71,6 +74,8 @@ Use exactly as [DELETE /survey/cache](https://apidocs.enketo.org/v2#/delete-surv
 
 Returns a url that points to a regular webform fieldsubmission view with an **existing record**. No Close button present in the Discrepancy Note Widget.
 
+Has an optional `go_to_error_url` parameter that in conjunction with `go_to` will prompt the user to redirect to a _mini form_ if the go_to target is not available or hidden.
+
 Has an optional `complete_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"false"`. This parameter determines 
 whether a _Complete_ button is present below the form in addition to the always-present _Close_ button. \[**THIS WILL BE REMOVED**\]
 
@@ -80,9 +85,13 @@ Otherwise, use exactly as [POST /instance](http://apidocs.enketo.org/v2/#/post-i
 
 Same as POST /instance/edit except that this view has a **Close button** in the Discrepancy Note Widget.
 
+Has an optional `go_to_error_url` parameter that in conjunction with `go_to` will prompt the user to redirect to a _mini form_ if the go_to target is not available or hidden.
+
 ### POST /instance/edit/rfc 
 
 Returns a url that points to webform fieldsubmission view with an existing record **and a reason-for-change UI**. No Close button present in the Discrepancy Note widget.
+
+Has an optional `go_to_error_url` parameter that in conjunction with `go_to` will prompt the user to redirect to a _mini form_ if the go_to target is not available or hidden.
 
 Use exactly as [POST /instance](http://apidocs.enketo.org/v2/#/post-instance)
 
@@ -90,12 +99,13 @@ Use exactly as [POST /instance](http://apidocs.enketo.org/v2/#/post-instance)
 
 Same as POST /instance/edit/rfc except that this view has a **Close button** in the Discrepancy Note Widget.
 
-
 ### POST /instance/view
 
 Returns a url that points to a **readonly** form with a record loaded into it.
 
 Has an optional `load_warning` parameter for a string value to be displayed in a modal dialog upon load.
+
+Has an optional `go_to_error_url` parameter that in conjunction with `go_to` will prompt the user to redirect to a _mini form_ if the go_to target is not available or hidden.
 
 Otherwise exactly as [POST /instance/view](https://apidocs.enketo.org/v2#/post-instance-view)
 
@@ -113,6 +123,8 @@ Has an optional `complete_button` parameter which is either `"true"` or `"false"
 whether a _Complete_ button is present below the form in addition to the always-present _Close_ button. \[**THIS WILL BE REMOVED**\]
 
 Has an optional `load_warning` parameter for a string value to be displayed in a modal dialog upon load.
+
+Has an optional `go_to_error_url` parameter that in conjunction with `go_to` will prompt the user to redirect to a _mini form_ if the go_to target is not available or hidden.
 
 Otherwise, use exactly as [POST /instance/view](https://apidocs.enketo.org/v2#/post-instance-view)
 

@@ -24,7 +24,7 @@ router
     .post( '*', _setQuotaUsed )
     .post( '*', _setDefaultsQueryParam )
     .post( '*', _setReturnQueryParam )
-    .post( '*', _setGoToHash )
+    .post( '*', _setGoTo )
     .post( '*', _setParentWindow )
     .post( /\/(view|note)/, _setLoadWarning )
     .post( '*/pdf', _setPage )
@@ -276,7 +276,7 @@ function _setDefaultsQueryParam( req, res, next ) {
     if ( map ) {
         for ( const prop in map ) {
             if ( map.hasOwnProperty( prop ) ) {
-                queryParam += `d[${encodeURIComponent( decodeURIComponent( prop ) )}]=${encodeURIComponent( decodeURIComponent( map[ prop ] ) )}&`;
+                queryParam += `d[${encodeURIComponent( prop )}]=${encodeURIComponent( map[ prop ] )}&`;
             }
         }
         req.defaultsQueryParam = queryParam.substring( 0, queryParam.length - 1 );
@@ -285,17 +285,18 @@ function _setDefaultsQueryParam( req, res, next ) {
     next();
 }
 
-function _setGoToHash( req, res, next ) {
+function _setGoTo( req, res, next ) {
     const goTo = req.body.go_to;
-    req.goTo = ( goTo ) ? `#${goTo}` : '';
-
+    req.goTo = goTo ? `#${goTo}` : '';
+    const goToErrorUrl = req.body.go_to_error_url;
+    req.goToErrorUrl = goTo && goToErrorUrl ? `goToErrorUrl=${encodeURIComponent( goToErrorUrl )}` : '';
     next();
 }
 
 
 function _setLoadWarning( req, res, next ) {
     const warning = req.body.load_warning;
-    req.loadWarning = ( warning ) ? `loadWarning=${encodeURIComponent(warning)}` : '';
+    req.loadWarning = ( warning ) ? `loadWarning=${encodeURIComponent( warning )}` : '';
     next();
 }
 
@@ -303,7 +304,7 @@ function _setParentWindow( req, res, next ) {
     const parentWindowOrigin = req.body.parent_window_origin;
 
     if ( parentWindowOrigin ) {
-        req.parentWindowOriginParam = `parentWindowOrigin=${encodeURIComponent( decodeURIComponent( parentWindowOrigin ) )}`;
+        req.parentWindowOriginParam = `parentWindowOrigin=${encodeURIComponent( parentWindowOrigin )}`;
     }
     next();
 }
@@ -312,7 +313,7 @@ function _setReturnQueryParam( req, res, next ) {
     const returnUrl = req.body.return_url;
 
     if ( returnUrl ) {
-        req.returnQueryParam = `returnUrl=${encodeURIComponent( decodeURIComponent( returnUrl ) )}`;
+        req.returnQueryParam = `returnUrl=${encodeURIComponent( returnUrl )}`;
     }
     next();
 }
@@ -356,21 +357,21 @@ function _generateWebformUrls( id, req ) {
     switch ( req.webformType ) {
         case 'preview':
             {
-                const queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam ] );
+                const queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam, req.goToErrorUrl ] );
                 url = `${BASEURL}preview/${IFRAMEPATH}${idPartOnline}${queryString}${hash}`;
                 break;
             }
         case 'edit':
             {
                 const editId = dnClosePart ? idPartFsC : idPartOnline;
-                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.completeButtonParam ] );
+                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.completeButtonParam, req.goToErrorUrl ] );
                 url = `${BASEURL}edit/${FSPATH}${dnClosePart}${IFRAMEPATH}${editId}${queryString}${hash}`;
                 break;
             }
         case 'rfc':
             {
                 const rfcId = dnClosePart ? idPartEditRfcC : idPartEditRfc;
-                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam ] );
+                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.goToErrorUrl ] );
                 url = `${BASEURL}edit/${FSPATH}rfc/${dnClosePart}${IFRAMEPATH}${rfcId}${queryString}${hash}`;
                 break;
             }
@@ -383,7 +384,7 @@ function _generateWebformUrls( id, req ) {
         case 'view':
         case 'view-instance':
             {
-                const queryParts = [ req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning ];
+                const queryParts = [ req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning, req.goToErrorUrl ];
                 if ( req.webformType === 'view-instance' ) {
                     queryParts.unshift( `instance_id=${req.body.instance_id}` );
                 }
@@ -392,20 +393,22 @@ function _generateWebformUrls( id, req ) {
                 break;
             }
         case 'view-instance-dn':
-            // inside {block} to properly scope for new variables (eslint)
             {
                 const viewId = dnClosePart ? idPartViewDnc : idPartViewDn;
-                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.completeButtonParam, req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning ] );
+                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.completeButtonParam, req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning, req.goToErrorUrl ] );
                 url = `${BASEURL}edit/${FSPATH}dn/${dnClosePart}${IFRAMEPATH}${viewId}${queryString}${hash}`;
                 break;
             }
         case 'pdf':
             {
-                // These are not fieldsubmission views so there is no risk for values to get submitted.
+                // We use the view-instance view because it is:
+                // - has optional instance support
+                // - has protection against accidental fieldsubmissions (extra layer of security)
+                // - for now OC is planning to not add DN questions to the XForm if it doesn't want those printed
                 const queryParts = req.body.instance_id ? [ `instance_id=${req.body.instance_id}` ] : [];
                 queryParts.push( 'print=true' );
                 const queryString = _generateQueryString( queryParts );
-                url = `${BASEURL}${req.body.instance_id ? 'view/'+idPartView : idPartOnline}${queryString}`;
+                url = `${BASEURL}view/${FSPATH}${idPartView}${queryString}`;
                 break;
             }
         default:

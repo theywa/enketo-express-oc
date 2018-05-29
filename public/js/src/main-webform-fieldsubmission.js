@@ -56,7 +56,7 @@ translator.init( survey )
     .then( function( formParts ) {
         if ( /\/fs\/dnc?\//.test( window.location.pathname ) ) {
             return _readonlify( formParts, true );
-        } else if ( /\/view\//.test( window.location.pathname ) ) {
+        } else if ( settings.type === 'view' ) {
             return _readonlify( formParts, false );
         }
         return formParts;
@@ -94,14 +94,17 @@ function _readonlify( formParts, notesEnabled ) {
     // Styling changes
     $( 'body' ).addClass( 'oc-view' );
 
-    // Completely disable calculations in Enketo Core
-    require( 'enketo-core/src/js/calculation' ).update = function() {
-        console.log( 'Calculations disabled.' );
+    // Partially disable calculations in Enketo Core
+    console.log( 'Calculations restricted to clinicaldata only.' );
+    var calculationModule = require( 'enketo-core/src/js/calculation' );
+    calculationModule.originalUpdate = calculationModule.update;
+    calculationModule.update = function( updated ) {
+        return calculationModule.originalUpdate.call( this, updated, '[oc-external="clinicaldata"]' );
     };
+
     // Completely disable preload items
-    require( 'enketo-core/src/js/preload' ).init = function() {
-        console.log( 'Preloaders disabled.' );
-    };
+    console.log( 'Preloaders disabled.' );
+    require( 'enketo-core/src/js/preload' ).init = function() {};
     // change status message
     $( '<div class="fieldsubmission-status readonly"/>' ).prependTo( '.form-header' )
         .add( $( '<div class="form-footer__feedback fieldsubmission-status readonly"/>' ).prependTo( $footer ) )
@@ -144,6 +147,9 @@ function _init( formParts ) {
             $( 'head>title' ).text( title );
             if ( formParts.instance ) {
                 oc.addSignedStatus( form );
+            }
+            if ( settings.print ) {
+                gui.applyPrintStyle();
             }
         } );
     } );
