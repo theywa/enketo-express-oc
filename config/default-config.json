@@ -45,6 +45,10 @@
             "site id": ""
         }
     },
+    "jini": {
+        "style url": "",
+        "script url": ""
+    },
     "maps": [ {
         "name": "streets",
         "tiles": [ "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" ],

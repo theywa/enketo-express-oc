@@ -36,6 +36,7 @@ router
     //.get( '*', loggedInCheck )
     .get( '/x/', offlineWebform )
     .get( '/_/', offlineWebform )
+    .get( /\/(single|edit)\/fs(\/c)?\/i/, _setJini )
     .get( '/:enketo_id', webform )
     .get( '/:mod/:enketo_id', webform )
     .get( '/single/fs/:mod/:enketo_id', fieldSubmission )
@@ -110,11 +111,17 @@ function single( req, res, next ) {
     }
 }
 
+function _setJini( req, res, next ) {
+    req.jini = req.query.jini === 'true' && config.jini[ 'style url' ] && config.jini[ 'script url' ] ? config.jini : null;
+    next();
+}
+
 function fieldSubmission( req, res, next ) {
     var options = {
         type: 'fs',
         iframe: req.iframe,
-        print: req.query.print === 'true'
+        print: req.query.print === 'true',
+        jini: req.jini,
     };
 
     _renderWebform( req, res, next, options );

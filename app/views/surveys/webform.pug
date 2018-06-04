@@ -20,7 +20,18 @@ block script
     script(src=`${basePath}/js/enketo-webform${suffix}-bundle.min.js`)
   else
     script(src=`${basePath}/js/enketo-webform${suffix}-dev-bundle.js`)
- 
+  
+  -// load jini stuff asynchronously (OC)
+  if jini
+    script(async, src=`${jini['script url']}`)
+    script.
+      var jiniSheet = document.createElement('link');
+      jiniSheet.rel = 'stylesheet';
+      jiniSheet.href = '#{jini["style url"]}';
+      jiniSheet.type = 'text/css';
+      jiniSheet.media = 'all';
+      document.head.appendChild(jiniSheet);
+
 block content
   include component/_notification
   .main-loader
