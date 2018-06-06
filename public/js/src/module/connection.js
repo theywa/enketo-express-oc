@@ -15,7 +15,7 @@ var TRANSFORM_URL = settings.basePath + '/transform/xform' +
 var TRANSFORM_HASH_URL = settings.basePath + '/transform/xform/hash/' + settings.enketoIdPrefix + settings.enketoId;
 var EXPORT_URL = settings.basePath + '/export/get-url';
 var INSTANCE_URL = ( settings.enketoId ) ? settings.basePath + '/submission/' + settings.enketoIdPrefix + settings.enketoId : null;
-var MAX_SIZE_URL = ( settings.enketoId ) ? settings.basePath + '/submission/max-size/' + settings.enketoIdPrefix + settings.enketoId : null;
+var MAX_SIZE_URL = ( settings.enketoId ) ? settings.basePath + '/submission/max-size/' + settings.enketoIdPrefix + settings.enketoId : settings.basePath + '/submission/max-size/?xformUrl=' + settings.xformUrl;
 var ABSOLUTE_MAX_SIZE = 100 * 1024 * 1024;
 
 /**
@@ -297,7 +297,7 @@ function getMaximumSubmissionSize() {
 
     return new Promise( function( resolve ) {
 
-        if ( MAX_SIZE_URL && settings.type !== 'preview' && settings.type !== 'app' ) {
+        if ( MAX_SIZE_URL ) {
             $.ajax( MAX_SIZE_URL, {
                     type: 'GET',
                     timeout: 5 * 1000,

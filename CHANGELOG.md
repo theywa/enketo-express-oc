@@ -2,10 +2,26 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased]
+[1.66.2] - 2018-06-06
+----------------------
+##### Fixed
+- Likert widget not instantiating (regression in 1.66.0)
+- The print dialog for Grid forms does not show radiobuttons in IE11.
+- The button text of offline-capable form sometimes gets stuck on 'Save as Draft' when it should be 'Submit'.
+- Full previews (with Enketo ID) do not show correct maximum submission size in file upload questions.
+- Previews without Enketo ID do not show correct maximum submission size in file upload questions. **Note: make sure that a `HEAD` request to the form URL responds with the correct `X-Openrosa-Accept-Content-Length` header.**
+- Coordinates around the international dateline (longitude < -180 degrees) are considered invalid in geo widgets. Sorry, data collectors in Taveuni!
+
+[1.66.1] - 2018-06-04
+---------------------
+##### Fixed
+- Range widget turns geo coordinate inputs into range inputs.
+
+[1.66.0] - 2018-06-04
 --------------------
 ##### Added
 - Support for `<sup>` and `<sub>` (superscript and subscript).
+- Support for range widget (basic). **Warning: You may need to update your config.json to activate**.
 
 ##### Changed
 - Performance-optimized itemsets. Cutting-edge browsers can now deal well with 16,500 item documents.
