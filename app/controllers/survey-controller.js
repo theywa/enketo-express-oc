@@ -36,6 +36,7 @@ router
     //.get( '*', loggedInCheck )
     .get( '/x/', offlineWebform )
     .get( '/_/', offlineWebform )
+    .get( '/preview*', _setJini )
     .get( /\/(single|edit)\/fs(\/c)?\/i/, _setJini )
     .get( '/:enketo_id', webform )
     .get( '/:mod/:enketo_id', webform )
@@ -140,6 +141,7 @@ function view( req, res, next ) {
 function preview( req, res, next ) {
     const options = {
         type: 'preview',
+        jini: req.jini,
         iframe: req.iframe || !!req.query.iframe,
         notification: utils.pickRandomItemFromArray( config.notifications )
     };
