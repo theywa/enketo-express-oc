@@ -37,7 +37,7 @@ router
     .get( '/x/', offlineWebform )
     .get( '/_/', offlineWebform )
     .get( '/preview*', _setJini )
-    .get( /\/(single|edit)\/fs(\/c)?\/i/, _setJini )
+    .get( /\/(single|edit)\/fs(\/rfc)?(\/c)?\/i/, _setJini )
     .get( '/:enketo_id', webform )
     .get( '/:mod/:enketo_id', webform )
     .get( '/single/fs/:mod/:enketo_id', fieldSubmission )
