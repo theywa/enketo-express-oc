@@ -1,8 +1,6 @@
 'use strict';
 
-require( './module/promise-by-Q' );
-require( './module/Array-from' );
-require( './module/Array-includes' );
+require( 'enketo-core/src/js/polyfills-ie11' );
 // Workaround for https://github.com/kobotoolbox/enketo-express/issues/990
 // This can probably be removed in the future. Test modal dialogs called from file input widget (when resetting).
 require( './module/dialog' );
@@ -12,7 +10,6 @@ var gui = require( './module/gui' );
 var controller = require( './module/controller-webform' );
 var settings = require( './module/settings' );
 var connection = require( './module/connection' );
-var Promise = require( 'lie' );
 var FormModel = require( 'enketo-core/src/js/Form-model' );
 var translator = require( './module/translator' );
 var t = translator.t;
@@ -164,7 +161,6 @@ function _prepareInstance( modelStr, defaults ) {
 
     for ( var path in defaults ) {
         if ( defaults.hasOwnProperty( path ) ) {
-            // TODO full:false support still needs to be added to FormModel.js
             model = model || new FormModel( modelStr, {
                 full: false
             } );
@@ -174,6 +170,7 @@ function _prepareInstance( modelStr, defaults ) {
                 model.node( path ).setVal( defaults[ path ] );
             }
             // TODO would be good to not include nodes that weren't in the defaults parameter
+            // HOWEVER, that would also set number of repeats to 0, which may be undesired
             // TODO would be good to just pass model along instead of converting to string first
             existingInstance = model.getStr();
         }

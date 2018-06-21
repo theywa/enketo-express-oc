@@ -280,11 +280,9 @@ function _getSurveyParams( req ) {
             error.status = 400;
             throw error;
         }
-        // The previews using the xform parameter are less strictly checked.
-        // If an account with the domain is active, the check will pass.
-        const domain = `${urlObj.protocol}//${urlObj.host}`;
+        const xUrl = `${urlObj.protocol}//${urlObj.host}${urlObj.pathname}`;
         return account.check( {
-                openRosaServer: domain
+                openRosaServer: xUrl
             } )
             .then( survey => // no need to check quota
                 Promise.resolve( {
