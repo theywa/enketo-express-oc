@@ -10,6 +10,10 @@ var users;
 var SYSTEM_USER = 'root';
 var reasons = require( '../../public/js/src/module/reasons' );
 
+var pad2 = function( x ) {
+    return ( x < 10 ) ? '0' + x : x;
+};
+
 /**
  * Visually transforms a question into a comment modal that can be shown on its linked question.
  *
@@ -523,7 +527,7 @@ Comment.prototype._getReadableDateTime = function( datetimeStr ) {
     }
     // 13-Jun-2018 13:58 UTC-04:00
     return dt.getDate() + '-' + dt.toLocaleDateString( 'en', { month: 'short' } ) + '-' + dt.getFullYear() +
-        ' ' + dt.getHours() + ':' + dt.getMinutes() + ' UTC' + dt.getTimezoneOffsetAsTime();
+        ' ' + pad2( dt.getHours() ) + ':' + pad2( dt.getMinutes() ) + ' UTC' + dt.getTimezoneOffsetAsTime();
     // Date.getTimezoneOffsetAsTime is an extension in enketo-xpathjs
 };
 
@@ -652,9 +656,6 @@ Comment.prototype._getCurrentStatus = function( notes ) {
 Comment.prototype._getFormattedCurrentDatetimeStr = function() {
     var now = new Date();
     var offset = {};
-    var pad2 = function( x ) {
-        return ( x < 10 ) ? '0' + x : x;
-    };
 
     offset.minstotal = now.getTimezoneOffset();
     offset.direction = ( offset.minstotal < 0 ) ? '+' : '-';
