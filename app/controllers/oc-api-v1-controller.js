@@ -19,6 +19,8 @@ router
     .get( '/', ( req, res ) => {
         res.redirect( 'https://github.com/OpenClinica/enketo-express-oc/blob/master/doc/oc-api.md' );
     } )
+    .get( '/version', getVersion )
+    .post( '/version', getVersion )
     .post( '*', authCheck )
     .delete( '*', authCheck )
     .post( '*', _setQuotaUsed )
@@ -82,6 +84,10 @@ router
         next( error );
     } );
 
+function getVersion( req, res, next ) {
+    const version = req.app.get( 'version' );
+    _render( 200, { version }, res );
+}
 
 // API uses Basic authentication with just the username
 function authCheck( req, res, next ) {
