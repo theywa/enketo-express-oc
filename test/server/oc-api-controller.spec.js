@@ -129,6 +129,30 @@ describe( 'api', () => {
         const version = '1';
 
         describe( '', () => {
+            // GET /version
+            testResponse( {
+                version,
+                endpoint: '/version',
+                method: 'get',
+                auth: false,
+                status: 200,
+                res: {
+                    property: 'version',
+                    expected: /.{6,20}/
+                }
+            } );
+            // POST /version
+            testResponse( {
+                version,
+                endpoint: '/version',
+                method: 'post',
+                auth: false,
+                status: 200,
+                res: {
+                    property: 'version',
+                    expected: /.{6,20}/
+                }
+            } );
             // POST /survey/collect
             testResponse( {
                 version,

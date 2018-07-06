@@ -2,6 +2,44 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+---------------------
+##### Added
+- api/v2/version endpoint to obtain current Enketo Express version.
+
+[1.67.1] - 2018-06-27
+---------------------
+##### Changed
+- Updated Lao and Spanish translations.
+
+##### Fixed
+- In a form containing a group with a single child repeat (and no other repeat sibling questions), fails to load a record where that group is empty. When creating the first repeat after load an exception occurs.
+- Output inside a group that is irrelevant upon loading does not get evaluated when the group becomes relevant.
+- Autocomplete question inside a non-first repeat shows list from first repeat.
+- Dates are now considered local to fix constraints such as ". < today()"
+
+
+[1.67.0] - 2018-06-18
+----------------------
+##### Added
+- Ranking widget. **Warning: You may need to update your config.json to activate.**
+- URL widget. **Warning: You may need to update your config.json to activate.**
+
+##### Fixed
+- Range widget loading error if relevant is used.
+- When unfolding collapsed groups, the draw widgets are not functional until the window is resized.
+- Various styling degradations of geo widgets.
+- Dynamic defaults do not work with encoded square brackets.
+
+[1.66.3] - 2018-06-11
+----------------------
+##### Changed
+- Show latest commit as version on front page.
+
+##### Fixed
+- Readonly text inputs with a default value are hidden.
+- Certain XPath function calls without parameters cause an infinite loop.
+
 [1.66.2] - 2018-06-06
 ----------------------
 ##### Fixed
@@ -21,7 +59,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 --------------------
 ##### Added
 - Support for `<sup>` and `<sub>` (superscript and subscript).
-- Support for range widget (basic). **Warning: You may need to update your config.json to activate**.
+- Support for range widget (basic). **Warning: You may need to update your config.json to activate.**
 
 ##### Changed
 - Performance-optimized itemsets. Cutting-edge browsers can now deal well with 16,500 item documents.

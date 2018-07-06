@@ -16,11 +16,13 @@
     "draw": "../../node_modules/enketo-core/src/widget/draw/draw-widget",
     "likert": "../../node_modules/enketo-core/src/widget/select-likert/likertitem",
     "range": "../../node_modules/enketo-core/src/widget/range/range-widget",
+    "rank": "../../node_modules/enketo-core/src/widget/rank/rank-widget",
     "horizontal": "../../node_modules/enketo-core/src/widget/horizontal-choices/horizontalchoices",
     "analog-scale": "../../node_modules/enketo-core/src/widget/analog-scale/analog-scalepicker",
     "image-view": "../../node_modules/enketo-core/src/widget/big-image/image-viewer",
     "comment": "../../node_modules/enketo-core/src/widget/comment/commentwidget",
     "image-map": "../../node_modules/enketo-core/src/widget/image-map/image-map",
     "date-native": "../../node_modules/enketo-core/src/widget/date-native/datepicker-native",
-    "date-mobile": "../../node_modules/enketo-core/src/widget/date-mobile/datepicker-mobile"
+    "date-mobile": "../../node_modules/enketo-core/src/widget/date-mobile/datepicker-mobile",
+    "url": "../../node_modules/enketo-core/src/widget/url/url-widget"
 }

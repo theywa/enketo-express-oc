@@ -31,6 +31,10 @@ Explanation of all statuscodes:
 * 405: Request not allowed. This endpoint may be disabled or not implemented.
 * 410: This API endpoint is deprecated in this version.
 
+### POST|GET /version
+
+Returns a JSON object with a version property. No authentication required. No parameters supported.
+
 ### POST /survey/collect
 
 Returns a url that points to an iframe-friendly regular fieldsubmission view. No close button present in the Discrepancy Note Widget.

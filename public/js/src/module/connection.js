@@ -8,14 +8,14 @@ var settings = require( './settings' );
 var t = require( './translator' ).t;
 var utils = require( './utils' );
 var $ = require( 'jquery' );
-var Promise = require( 'lie' );
 var CONNECTION_URL = settings.basePath + '/connection';
 var TRANSFORM_URL = settings.basePath + '/transform/xform' +
     ( settings.enketoId ? '/' + settings.enketoIdPrefix + settings.enketoId : '' );
 var TRANSFORM_HASH_URL = settings.basePath + '/transform/xform/hash/' + settings.enketoIdPrefix + settings.enketoId;
 var EXPORT_URL = settings.basePath + '/export/get-url';
 var INSTANCE_URL = ( settings.enketoId ) ? settings.basePath + '/submission/' + settings.enketoIdPrefix + settings.enketoId : null;
-var MAX_SIZE_URL = ( settings.enketoId ) ? settings.basePath + '/submission/max-size/' + settings.enketoIdPrefix + settings.enketoId : settings.basePath + '/submission/max-size/?xformUrl=' + settings.xformUrl;
+var MAX_SIZE_URL = ( settings.enketoId ) ? settings.basePath + '/submission/max-size/' + settings.enketoIdPrefix + settings.enketoId :
+    settings.basePath + '/submission/max-size/?xformUrl=' + encodeURIComponent( settings.xformUrl );
 var ABSOLUTE_MAX_SIZE = 100 * 1024 * 1024;
 
 /**
@@ -122,7 +122,8 @@ function _uploadBatch( recordBatch ) {
                 headers: {
                     'X-OpenRosa-Version': '1.0',
                     'X-OpenRosa-Deprecated-Id': recordBatch.deprecatedId,
-                    'X-OpenRosa-Instance-Id': recordBatch.instanceId
+                    'X-OpenRosa-Instance-Id': recordBatch.instanceId,
+                    'Date': new Date().toUTCString()
                 },
                 timeout: settings.timeout
             } )
