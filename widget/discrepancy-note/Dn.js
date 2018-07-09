@@ -526,7 +526,7 @@ Comment.prototype._getReadableDateTime = function( datetimeStr ) {
         return 'error';
     }
     // 13-Jun-2018 13:58 UTC-04:00
-    return dt.getDate() + '-' + dt.toLocaleDateString( 'en', { month: 'short' } ) + '-' + dt.getFullYear() +
+    return pad2( dt.getDate() ) + '-' + dt.toLocaleDateString( 'en', { month: 'short' } ) + '-' + dt.getFullYear() +
         ' ' + pad2( dt.getHours() ) + ':' + pad2( dt.getMinutes() ) + ' UTC' + dt.getTimezoneOffsetAsTime();
     // Date.getTimezoneOffsetAsTime is an extension in enketo-xpathjs
 };
