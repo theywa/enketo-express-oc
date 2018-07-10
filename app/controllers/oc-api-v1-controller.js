@@ -24,12 +24,6 @@ router
     .post( '*', authCheck )
     .delete( '*', authCheck )
     .post( '*', _setQuotaUsed )
-    .post( '*', _setDefaultsQueryParam )
-    .post( '*', _setReturnQueryParam )
-    .post( '*', _setGoTo )
-    .post( '*', _setParentWindow )
-    .post( /\/(view|note)/, _setLoadWarning )
-    .post( '*/pdf', _setPage )
     .post( '/survey/preview*', ( req, res, next ) => {
         req.webformType = 'preview';
         next();
@@ -63,12 +57,22 @@ router
         next();
     } )
     .delete( '/survey/cache', emptySurveyCache )
+    .delete( '/instance/', removeInstance )
+    // check and set parameters, return error if required parameter is missing
+    .post( '*', _setDefaultsQueryParam )
+    .post( '*', _setReturnQueryParam ) // is this actually used by OC?
+    .post( '*', _setGoTo )
+    .post( '*', _setParentWindow )
+    .post( '*', _setEcid )
+    .post( /\/(survey|instance)\/(collect|edit|preview)/, _setJini )
+    .post( '/instance/*', _setPid )
+    .post( /\/(view|note)/, _setLoadWarning )
+    .post( '*/pdf', _setPage )
     .post( '/survey/preview', getNewOrExistingSurvey )
     .post( '/survey/view', getNewOrExistingSurvey )
     .post( '/survey/view/pdf', getNewOrExistingSurvey )
     .post( '/survey/collect', getNewOrExistingSurvey )
     .post( '/survey/collect/c', getNewOrExistingSurvey )
-    .delete( '/instance/', removeInstance )
     .post( '/instance/*', _setCompleteButtonParam )
     .post( '/instance/view', cacheInstance )
     .post( '/instance/view/pdf', cacheInstance )
@@ -300,6 +304,39 @@ function _setGoTo( req, res, next ) {
     next();
 }
 
+function _setEcid( req, res, next ) {
+    const ecid = req.body.ecid;
+    if ( !ecid ) {
+        const error = new Error( 'Bad request. Ecid parameter required' );
+        error.status = 400;
+        next( error );
+    } else {
+        req.ecid = `ecid=${encodeURIComponent( ecid )}`;
+        next();
+    }
+}
+
+function _setPid( req, res, next ) {
+    const pid = req.body.pid;
+    if ( !pid ) {
+        const error = new Error( 'Bad request. Pid parameter required' );
+        error.status = 400;
+        next( error );
+    } else {
+        req.pid = `PID=${encodeURIComponent( pid )}`;
+        next();
+    }
+}
+
+function _setJini( req, res, next ) {
+    if ( req.app.get( 'jini' )[ 'style url' ] && req.app.get( 'jini' )[ 'script url' ] ) {
+        const jini = req.body.jini;
+        if ( jini ) {
+            req.jini = `jini=${encodeURIComponent( jini )}`;
+        }
+    }
+    next();
+}
 
 function _setLoadWarning( req, res, next ) {
     const warning = req.body.load_warning;
@@ -364,34 +401,34 @@ function _generateWebformUrls( id, req ) {
     switch ( req.webformType ) {
         case 'preview':
             {
-                const queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam, req.goToErrorUrl ] );
+                const queryString = _generateQueryString( [ req.ecid, req.defaultsQueryParam, req.parentWindowOriginParam, req.goToErrorUrl, req.jini ] );
                 url = `${BASEURL}preview/${IFRAMEPATH}${idPartOnline}${queryString}${hash}`;
                 break;
             }
         case 'edit':
             {
                 const editId = dnClosePart ? idPartFsC : idPartOnline;
-                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.completeButtonParam, req.goToErrorUrl ] );
+                const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.completeButtonParam, req.goToErrorUrl, req.jini ] );
                 url = `${BASEURL}edit/${FSPATH}${dnClosePart}${IFRAMEPATH}${editId}${queryString}${hash}`;
                 break;
             }
         case 'rfc':
             {
                 const rfcId = dnClosePart ? idPartEditRfcC : idPartEditRfc;
-                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.goToErrorUrl ] );
+                const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.goToErrorUrl, req.jini ] );
                 url = `${BASEURL}edit/${FSPATH}rfc/${dnClosePart}${IFRAMEPATH}${rfcId}${queryString}${hash}`;
                 break;
             }
         case 'single':
             {
-                const queryString = _generateQueryString( [ req.defaultsQueryParam, req.returnQueryParam, req.parentWindowOriginParam ] );
+                const queryString = _generateQueryString( [ req.ecid, req.defaultsQueryParam, req.returnQueryParam, req.parentWindowOriginParam, req.jini ] );
                 url = `${BASEURL}single/${FSPATH}${dnClosePart}${IFRAMEPATH}${dnClosePart ? idPartFsC : idPartOnline}${queryString}`;
                 break;
             }
         case 'view':
         case 'view-instance':
             {
-                const queryParts = [ req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning, req.goToErrorUrl ];
+                const queryParts = [ req.ecid, req.pid, req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning, req.goToErrorUrl ];
                 if ( req.webformType === 'view-instance' ) {
                     queryParts.unshift( `instance_id=${req.body.instance_id}` );
                 }
@@ -402,7 +439,7 @@ function _generateWebformUrls( id, req ) {
         case 'view-instance-dn':
             {
                 const viewId = dnClosePart ? idPartViewDnc : idPartViewDn;
-                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.completeButtonParam, req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning, req.goToErrorUrl ] );
+                const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.completeButtonParam, req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning, req.goToErrorUrl ] );
                 url = `${BASEURL}edit/${FSPATH}dn/${dnClosePart}${IFRAMEPATH}${viewId}${queryString}${hash}`;
                 break;
             }
@@ -412,8 +449,10 @@ function _generateWebformUrls( id, req ) {
                 // - has optional instance support
                 // - has protection against accidental fieldsubmissions (extra layer of security)
                 // - for now OC is planning to not add DN questions to the XForm if it doesn't want those printed
-                const queryParts = req.body.instance_id ? [ `instance_id=${req.body.instance_id}` ] : [];
-                queryParts.push( 'print=true' );
+                const queryParts = [ req.ecid, req.pid, 'print=true' ];
+                if ( req.body.instance_id ) {
+                    queryParts.push( `instance_id=${req.body.instance_id}` );
+                }
                 const queryString = _generateQueryString( queryParts );
                 url = `${BASEURL}view/${FSPATH}${idPartView}${queryString}`;
                 break;

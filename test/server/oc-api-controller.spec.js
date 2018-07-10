@@ -10,6 +10,10 @@ const request = require( 'supertest' );
 const config = require( '../../app/models/config-model' ).server;
 config[ 'base path' ] = '';
 const app = require( '../../config/express' );
+app.set( 'jini', {
+    'style url': 'http://example.com/style.css',
+    'script url': 'http://example.com/script.css'
+} );
 const surveyModel = require( '../../app/models/survey-model' );
 const instanceModel = require( '../../app/models/instance-model' );
 const redis = require( 'redis' );
@@ -95,19 +99,24 @@ describe( 'api', () => {
         const instanceId = test.instanceId === true ? `UUID:${Math.random()}` : test.instanceId;
         const endpoint = test.endpoint;
         const dataSendMethod = ( test.method === 'get' ) ? 'query' : 'send';
+        const ecid = typeof test.ecid === 'undefined' ? 'a1b1' : test.ecid;
+        const pid = typeof test.pid === 'undefined' ? 'qwe' : test.pid;
 
-        it( `${test.method.toUpperCase()} /oc/api/v${version}${endpoint} with ${authDesc} authentication and ${server}, ${id}, ${ret}, ${instance}, ${instanceId}, ${test.theme}, completeButton: ${test.completeButton}, parentWindowOrigin: ${test.parentWindowOrigin}, defaults: ${JSON.stringify( test.defaults )} responds with ${test.status}`,
+        it( `${test.method.toUpperCase()} /oc/api/v${version}${endpoint} with ${authDesc} authentication and ${server}, ${id}, ${ret}, ${instance}, ${instanceId}, ${test.theme}, completeButton: ${test.completeButton}, parentWindowOrigin: ${test.parentWindowOrigin}, defaults: ${JSON.stringify( test.defaults )}, pid:${pid}, ecid:${ecid}, jini:${test.jini} responds with ${test.status}`,
             done => {
                 request( app )[ test.method ]( `/oc/api/v${version}${endpoint}` )
                     .set( auth )[ dataSendMethod ]( {
                         server_url: server,
                         form_id: id,
+                        ecid,
+                        pid,
                         instance,
                         instance_id: instanceId,
                         complete_button: test.completeButton,
                         return_url: ret,
                         go_to: test.goTo,
                         go_to_error_url: test.goToErrorUrl,
+                        jini: test.jini,
                         format: test.format,
                         margin: test.margin,
                         landscape: test.landscape,
@@ -128,6 +137,7 @@ describe( 'api', () => {
     describe( 'oc/api/v1 endpoints', () => {
         const version = '1';
 
+        // /survey*
         describe( '', () => {
             // GET /version
             testResponse( {
@@ -163,7 +173,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/single\/fs\/i\/::[A-z0-9]{8,10}$/,
+                expected: /\/single\/fs\/i\/::[A-z0-9]{8,10}/,
             } );
             // GET /survey/collect
             testResponse( {
@@ -183,7 +193,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/single\/fs\/i\/::[A-z0-9]{8,10}\?parentWindowOrigin=http%3A%2F%2Fexample\.com$/,
+                expected: /\/single\/fs\/i\/::[A-z0-9]{8,10}.*(\?|&)parentWindowOrigin=http%3A%2F%2Fexample\.com/,
             } );
             // POST /survey/collect/c
             testResponse( {
@@ -193,7 +203,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/single\/fs\/c\/i\/::[A-z0-9]{32}$/,
+                expected: /\/single\/fs\/c\/i\/::[A-z0-9]{32}/,
             } );
             // with parent_window_origin
             testResponse( {
@@ -204,7 +214,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/single\/fs\/c\/i\/::[A-z0-9]{32}\?parentWindowOrigin=http%3A%2F%2Fexample\.com$/,
+                expected: /\/single\/fs\/c\/i\/::[A-z0-9]{32}.*(\?|&)parentWindowOrigin=http%3A%2F%2Fexample\.com/,
             } );
             // POST /survey/view
             testResponse( {
@@ -214,7 +224,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/view\/fs\/i\/::[A-z0-9]{32}$/,
+                expected: /\/view\/fs\/i\/::[A-z0-9]{32}/,
             } );
             // POST /survey/view with go_to
             testResponse( {
@@ -225,7 +235,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/view\/fs\/i\/::[A-z0-9]{32}#\/\/myquestion$/,
+                expected: /\/view\/fs\/i\/::[A-z0-9]{32}.*#\/\/myquestion$/,
             } );
             // POST /survey/view with go_to and go_to_error_url
             testResponse( {
@@ -237,7 +247,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/view\/fs\/i\/::[A-z0-9]{32}\?goToErrorUrl=http%3A%2F%2Fexample\.com%2Fminiform#\/\/myquestion$/,
+                expected: /\/view\/fs\/i\/::[A-z0-9]{32}.*(\?|&)goToErrorUrl=http%3A%2F%2Fexample\.com%2Fminiform#\/\/myquestion/,
             } );
             // POST /survey/view without go_to and with (ignored) go_to_error_url
             testResponse( {
@@ -248,7 +258,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/view\/fs\/i\/::[A-z0-9]{32}$/,
+                expected: /\/view\/fs\/i\/::[A-z0-9]{32}/,
             } );
             // POST /survey/view with load warning
             testResponse( {
@@ -259,7 +269,7 @@ describe( 'api', () => {
                 warning: 'hey you',
                 auth: true,
                 status: 200,
-                expected: /\/view\/fs\/i\/::[A-z0-9]{32}\?loadWarning=hey%20you$/,
+                expected: /\/view\/fs\/i\/::[A-z0-9]{32}.*(\?|&)loadWarning=hey%20you/,
             } );
             // POST /survey/preview
             testResponse( {
@@ -269,10 +279,11 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/preview\/i\/::[A-z0-9]{8,10}$/,
+                expected: /\/preview\/i\/::[A-z0-9]{8,10}/,
             } );
         } );
 
+        // /instance/*
         describe( '', () => {
             [
                 // valid token
@@ -312,7 +323,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /.+\?.*returnUrl=https%3A%2F%2Fenke.to/,
+                    expected: /.+(\?|&)returnUrl=https%3A%2F%2Fenke.to/,
                 },
                 // test completeButton in response
                 {
@@ -323,7 +334,7 @@ describe( 'api', () => {
                     instance: true,
                     completeButton: 'true',
                     status: 201,
-                    expected: /.+\?.*completeButton=true/
+                    expected: /.+(\?|&)completeButton=true/
                 },
                 // test completeButton in response
                 {
@@ -334,7 +345,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /.+\?.*completeButton=false/
+                    expected: /.+(\?|&)completeButton=false/
                 },
                 // invalid parameters
                 {
@@ -467,7 +478,7 @@ describe( 'api', () => {
                 instanceId: 'AAA',
                 instance: true,
                 status: 201,
-                expected: /\/edit\/fs\/c\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
+                expected: /\/edit\/fs\/c\/i\/::[A-z0-9]{32}.*(\?|&)instance_id=AAA/
             }, {
                 // edit with RFC UI
                 method: 'post',
@@ -477,7 +488,7 @@ describe( 'api', () => {
                 instance: true,
                 status: 201,
                 // includes proper enketoID and not e.g. ::null 
-                expected: /\/edit\/fs\/rfc\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
+                expected: /\/edit\/fs\/rfc\/i\/::[A-z0-9]{32}.*(\?|&)instance_id=AAA/
             }, {
                 // edit with RFC UI and with Close button in dn widget
                 method: 'post',
@@ -487,7 +498,7 @@ describe( 'api', () => {
                 instance: true,
                 status: 201,
                 // includes proper enketoID and not e.g. ::null 
-                expected: /\/edit\/fs\/rfc\/c\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
+                expected: /\/edit\/fs\/rfc\/c\/i\/::[A-z0-9]{32}.*(\?|&)instance_id=AAA/
             } ].map( obj => {
                 obj.version = version;
                 return obj;
@@ -502,7 +513,7 @@ describe( 'api', () => {
                     instance: true,
                     status: 201,
                     // includes proper enketoID and not e.g. ::null 
-                    expected: /\/edit\/fs\/dn(\/c)?\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
+                    expected: /\/edit\/fs\/dn(\/c)?\/i\/::[A-z0-9]{32}.*(\?|&)instance_id=AAA/
                 },
                 // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
                 {
@@ -513,7 +524,7 @@ describe( 'api', () => {
                     instance: true,
                     status: 201,
                     // includes proper enketoID and not e.g. ::null 
-                    expected: /\/edit\/fs\/dn(\/c)?\/i\/::[A-z0-9]{32}\?instance_id/
+                    expected: /\/edit\/fs\/dn(\/c)?\/i\/::[A-z0-9]{32}.*(\?|&)instance_id/
                 },
                 // already being edited
                 {
@@ -531,7 +542,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /.+\?.*returnUrl=https%3A%2F%2Fenke.to/
+                    expected: /.+(\?|&)returnUrl=https%3A%2F%2Fenke.to/
                 },
                 // test parentWindowOrigin
                 {
@@ -542,8 +553,6 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /.+\?.*parentWindowOrigin=http%3A%2F%2Fexample\.com$/,
-
                 },
                 // test completeButton in response
                 {
@@ -554,7 +563,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /.+\?.*completeButton=true/
+                    expected: /.+(\?|&)completeButton=true/
                 },
                 // test go_to stuff in response
                 {
@@ -620,7 +629,7 @@ describe( 'api', () => {
                     instance: true,
                     status: 201,
                     // includes proper enketoID and not e.g. ::null 
-                    expected: /\/view\/fs\/i\/::[A-z0-9]{32}\?instance_id=AAA$/
+                    expected: /\/view\/fs\/i\/::[A-z0-9]{32}.*(\?|&)instance_id=AAA/
                 },
                 // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
                 {
@@ -631,7 +640,7 @@ describe( 'api', () => {
                     instance: true,
                     status: 201,
                     // includes proper enketoID and not e.g. ::null 
-                    expected: /\/view\/fs\/i\/::[A-z0-9]{32}\?instance_id/
+                    expected: /\/view\/fs\/i\/::[A-z0-9]{32}.*(\?|&)instance_id/
                 },
                 // already being edited
                 {
@@ -649,7 +658,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /.+\?.*loadWarning=A%20warning/
+                    expected: /.+(\?|&)loadWarning=A%20warning/
                 },
                 // test return url in response
                 {
@@ -659,7 +668,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /.+\?.*returnUrl=https%3A%2F%2Fenke.to/
+                    expected: /.+(\?|&)returnUrl=https%3A%2F%2Fenke.to/
                 },
                 // test parentWindowOrigin
                 {
@@ -670,7 +679,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /.+\?.*parentWindowOrigin=http%3A%2F%2Fexample\.com$/,
+                    expected: /.+(\?|&)parentWindowOrigin=http%3A%2F%2Fexample\.com/,
                 },
                 // test ignoring completeButton in response
                 {
@@ -681,7 +690,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /\/view\/fs\/i\/::[A-z0-9]{32}\?instance_id/
+                    expected: /\/view\/fs\/i\/::[A-z0-9]{32}.*(\?|&)instance_id/
                 },
                 // invalid parameters
                 {
@@ -716,6 +725,128 @@ describe( 'api', () => {
                 obj.endpoint = '/instance/view';
                 return obj;
             } ).forEach( testResponse );
+
         } );
+
+        // Test common parameters
+        // Some of tests are duplicates of earlier tests
+        // Those earlier tests could be removed
+        describe( 'common parameters', () => {
+
+            const surveyEndpoints = [
+                '/survey/collect',
+                '/survey/collect/c',
+                '/survey/view',
+                '/survey/preview'
+            ];
+            const instanceEndpoints = [
+                '/instance/edit',
+                '/instance/edit/c',
+                '/instance/edit/rfc',
+                '/instance/edit/rfc/c',
+                '/instance/view',
+                '/instance/note',
+                '/instance/note/c'
+            ];
+
+            // parentWindowOrigin
+            surveyEndpoints.concat( instanceEndpoints ).forEach( endpoint => {
+                const obj = {
+                    version,
+                    auth: true,
+                    method: 'post',
+                    endpoint,
+                    instanceId: true,
+                    instance: true,
+                    status: endpoint.startsWith( '/instance' ) ? 201 : 200,
+                };
+                obj.parentWindowOrigin = 'http://example.com';
+                obj.expected = /.+(\?|&)parentWindowOrigin=http%3A%2F%2Fexample\.com/;
+                testResponse( obj );
+            } );
+
+            // ecid
+            surveyEndpoints.concat( instanceEndpoints ).forEach( endpoint => {
+                const obj = {
+                    version,
+                    auth: true,
+                    method: 'post',
+                    endpoint,
+                    instanceId: true,
+                    instance: true,
+                    status: endpoint.startsWith( '/instance' ) ? 201 : 200,
+                };
+                obj.ecid = 'abcd';
+                obj.expected = /.+(\?|&)ecid=abcd/;
+                testResponse( obj );
+            } );
+            surveyEndpoints.concat( instanceEndpoints ).forEach( endpoint => {
+                const obj = {
+                    version,
+                    auth: true,
+                    method: 'post',
+                    endpoint,
+                    instanceId: true,
+                    instance: true,
+                    status: 400,
+                };
+                obj.ecid = '';
+                testResponse( obj );
+            } );
+
+            // pid
+            instanceEndpoints.forEach( endpoint => {
+                const obj = {
+                    version,
+                    auth: true,
+                    method: 'post',
+                    endpoint,
+                    instanceId: true,
+                    instance: true,
+                    status: endpoint.startsWith( '/instance' ) ? 201 : 200,
+                };
+                obj.pid = '123';
+                obj.expected = /.+(\?|&)PID=123/;
+                testResponse( obj );
+            } );
+            instanceEndpoints.forEach( endpoint => {
+                const obj = {
+                    version: 1,
+                    auth: true,
+                    method: 'post',
+                    endpoint,
+                    instanceId: true,
+                    instance: true,
+                    status: 400
+                };
+                obj.pid = '';
+                testResponse( obj );
+            } );
+
+            // jini
+            [
+                '/survey/collect',
+                '/survey/collect/c',
+                '/survey/preview',
+                '/instance/edit',
+                '/instance/edit/c',
+                '/instance/edit/rfc',
+                '/instance/edit/rfc/c'
+            ].forEach( endpoint => {
+                const obj = {
+                    version: 1,
+                    auth: true,
+                    method: 'post',
+                    endpoint,
+                    instanceId: true,
+                    instance: true,
+                    status: endpoint.startsWith( '/instance' ) ? 201 : 200
+                };
+                obj.jini = 'true';
+                obj.expected = /.+(\?|&)jini=true/;
+                testResponse( obj );
+            } );
+        } );
+
     } );
 } );
