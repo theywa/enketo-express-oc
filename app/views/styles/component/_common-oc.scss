@@ -102,6 +102,9 @@ $secondary-color: #eeeeee;
                 // so responsiveness can be broken.
                 width: 80%;
             }
+            &__query-btns {
+                min-width: 200px;
+            }
         }
     }
 }

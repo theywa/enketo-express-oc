@@ -34,7 +34,10 @@ $padding: 30px;
 
             white-space: nowrap;
             justify-content: flex-end;
-
+            align-items: center;
+            .btn {
+                height: 40px;
+            }
             .btn+.btn {
                 margin-left: 20px;
             }
