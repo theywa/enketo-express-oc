@@ -31,6 +31,7 @@ module.exports = grunt => {
         },
         sass: {
             options: {
+                implementation: nodeSass,
                 functions: {
                     'base64-url($mimeType, $data)': function( mimeType, data ) {
                         const base64 = new Buffer( data.getValue() ).toString( 'base64' );
@@ -161,7 +162,7 @@ module.exports = grunt => {
                 },
             },
             options: {
-                // ensure that enketo-config and widgets are overridden in **enketo-core**
+                // ensure that several placeholder modules in **enketo-core** are overridden 
                 transform: [
                     [ 'aliasify', {
                         aliases: pkg.aliasify.aliases,
