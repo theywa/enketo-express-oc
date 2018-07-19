@@ -143,12 +143,10 @@ function init( selector, data, loadWarnings ) {
 
     if ( !confirmed && form.editStatus ) {
         message = t( 'confirm.save.msg' );
-        choices = {
-            posAction: function() {
+        gui.confirm( message, choices )
+            .then(function(confirmed){
                 _resetForm( true );
-            }
-        };
-        gui.confirm( message, choices );
+            });
     } else {
         //_setDraftStatus( false );
         form.resetView();
@@ -180,23 +178,20 @@ function _close( bypassAutoQuery ) {
 
     // First check if any constraints have been violated and prompt option to generate automatic queries
     if ( !bypassAutoQuery && $violated.length ) {
-        return new Promise( function( resolve ) {
-            gui.confirm( {
+        return gui.confirm( {
                 heading: t( 'alert.default.heading' ),
                 errorMsg: t( 'fieldsubmission.confirm.autoquery.msg1' ),
                 msg: t( 'fieldsubmission.confirm.autoquery.msg2' )
             }, {
                 posButton: t( 'fieldsubmission.confirm.autoquery.automatic' ),
                 negButton: t( 'fieldsubmission.confirm.autoquery.manual' ),
-                posAction: function() {
+            } )
+            .then( function( confirmed ) {
+                if ( confirmed ) {
                     _autoAddQueries( $violated );
-                    resolve( true );
-                },
-                negAction: function() {
-                    resolve( false );
                 }
+                return confirmed;
             } );
-        } );
     }
 
     // Start with actually closing, but only proceed once the queue is emptied.
@@ -229,18 +224,19 @@ function _close( bypassAutoQuery ) {
             } else {
                 errorMsg = error.message || gui.getErrorResponseMsg( error.status );
                 gui.confirm( {
-                    heading: t( 'alert.default.heading' ),
-                    errorMsg: errorMsg,
-                    msg: t( 'fieldsubmission.confirm.leaveanyway.msg' )
-                }, {
-                    posButton: t( 'confirm.default.negButton' ),
-                    negButton: t( 'fieldsubmission.confirm.leaveanyway.button' ),
-                    posAction: function() {},
-                    negAction: function() {
-                        $( document ).trigger( 'close' );
-                        _redirect( 100 );
-                    }
-                } );
+                        heading: t( 'alert.default.heading' ),
+                        errorMsg: errorMsg,
+                        msg: t( 'fieldsubmission.confirm.leaveanyway.msg' )
+                    }, {
+                        posButton: t( 'confirm.default.negButton' ),
+                        negButton: t( 'fieldsubmission.confirm.leaveanyway.button' )
+                    } )
+                    .then( function( confirmed ) {
+                        if ( !confirmed ) {
+                            $( document ).trigger( 'close' );
+                            _redirect( 100 );
+                        }
+                    } );
             }
 
         } );
@@ -282,18 +278,19 @@ function _closeSimple() {
             } else {
                 errorMsg = error.message || gui.getErrorResponseMsg( error.status );
                 gui.confirm( {
-                    heading: t( 'alert.default.heading' ),
-                    errorMsg: errorMsg,
-                    msg: t( 'fieldsubmission.confirm.leaveanyway.msg' )
-                }, {
-                    posButton: t( 'confirm.default.negButton' ),
-                    negButton: t( 'fieldsubmission.confirm.leaveanyway.button' ),
-                    posAction: function() {},
-                    negAction: function() {
-                        $( document ).trigger( 'close' );
-                        _redirect( 100 );
-                    }
-                } );
+                        heading: t( 'alert.default.heading' ),
+                        errorMsg: errorMsg,
+                        msg: t( 'fieldsubmission.confirm.leaveanyway.msg' )
+                    }, {
+                        posButton: t( 'confirm.default.negButton' ),
+                        negButton: t( 'fieldsubmission.confirm.leaveanyway.button' )
+                    } )
+                    .then( function( confirmed ) {
+                        if ( !confirmed ) {
+                            $( document ).trigger( 'close' );
+                            _redirect( 100 );
+                        }
+                    } );
             }
         } );
 }
@@ -323,21 +320,21 @@ function _closeCompletedRecord() {
             } else {
                 $violated = form.view.$.find( '.invalid-constraint, .invalid-required' );
                 // Note that unlike _close this also looks at .invalid-required.
-                gui.confirm( {
-                    heading: t( 'alert.default.heading' ),
-                    errorMsg: t( 'fieldsubmission.confirm.autoquery.msg1' ),
-                    msg: t( 'fieldsubmission.confirm.autoquery.msg2' )
-                }, {
-                    posButton: t( 'fieldsubmission.confirm.autoquery.automatic' ),
-                    negButton: t( 'fieldsubmission.confirm.autoquery.manual' ),
-                    posAction: function() {
+                return gui.confirm( {
+                        heading: t( 'alert.default.heading' ),
+                        errorMsg: t( 'fieldsubmission.confirm.autoquery.msg1' ),
+                        msg: t( 'fieldsubmission.confirm.autoquery.msg2' )
+                    }, {
+                        posButton: t( 'fieldsubmission.confirm.autoquery.automatic' ),
+                        negButton: t( 'fieldsubmission.confirm.autoquery.manual' )
+                    } )
+                    .then( function( confirmed ) {
+                        if ( !confirmed ) {
+                            return false;
+                        }
                         _autoAddQueries( $violated );
                         return _closeCompletedRecord();
-                    },
-                    negAction: function() {
-                        return false;
-                    }
-                } );
+                    } );
             }
         } );
 }
@@ -365,18 +362,9 @@ function _complete( bypassConfirmation ) {
 
     // First check if any constraints have been violated and prompt option to generate automatic queries
     if ( !bypassConfirmation ) {
-        return new Promise( function( resolve ) {
-            gui.confirm( {
-                heading: t( 'fieldsubmission.confirm.complete.heading' ),
-                msg: t( 'fieldsubmission.confirm.complete.msg' )
-            }, {
-                posAction: function() {
-                    resolve( true );
-                },
-                negAction: function() {
-                    resolve( false );
-                }
-            } );
+        return gui.confirm( {
+            heading: t( 'fieldsubmission.confirm.complete.heading' ),
+            msg: t( 'fieldsubmission.confirm.complete.msg' )
         } );
     }
 
@@ -521,10 +509,14 @@ function _setEventHandlers( selector ) {
                 msg: t( 'fieldsubmission.prompt.repeatdelete.msg' ) + ' ' + t( 'fieldsubmission.prompt.reason.msg' )
             };
             var inputs = '<p><label><input name="reason" type="text"/></label></p>';
-            var options = {
-                posAction: function( values ) {
-                    if ( !values.reason || !values.reason.trim() ) {
+
+            gui.prompt( texts, {}, inputs )
+                .then( function( values ) {
+                    if ( !values ) {
+                        return;
+                    } else if ( !values.reason || !values.reason.trim() ) {
                         // TODO: something
+                        return;
                     } else {
                         $questions.trigger( 'reasonchange.enketo', values );
                         // Propagate to repeat.js
@@ -533,9 +525,7 @@ function _setEventHandlers( selector ) {
                         } );
                         reasons.updateNumbering();
                     }
-                }
-            };
-            gui.prompt( texts, options, inputs );
+                } );
 
             return false;
         } );
@@ -561,15 +551,15 @@ function _setEventHandlers( selector ) {
                 heading: t( 'fieldsubmission.prompt.repeatdelete.heading' ),
                 msg: t( 'fieldsubmission.prompt.repeatdelete.msg' )
             };
-            var options = {
-                posAction: function() {
-                    // Propagate to repeat.js
-                    $( evt.currentTarget ).trigger( 'click', {
-                        propagate: true
-                    } );
-                }
-            };
-            gui.confirm( texts, options );
+            gui.confirm( texts )
+                .then( function( confirmed ) {
+                    if ( confirmed ) {
+                        // Propagate to repeat.js
+                        $( evt.currentTarget ).trigger( 'click', {
+                            propagate: true
+                        } );
+                    }
+                } );
 
             return false;
         } );

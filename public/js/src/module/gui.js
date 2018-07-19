@@ -432,7 +432,6 @@ function printOcForm() {
     };
     var options = {
         posButton: components.posButton,
-        posAction: components.posAction,
         negButton: components.negButton,
     };
     var inputDn = '<fieldset><legend>' + t( 'confirm.print.queries' ) + '</legend>' +
@@ -443,25 +442,32 @@ function printOcForm() {
 
     var $dn = $( '.or-appearance-dn' );
     var printified;
+
     return new Promise( function( resolve ) {
-            options.afterAction = resolve;
             if ( formTheme === 'grid' || ( !formTheme && printHelper.isGrid() ) ) {
-                options.posAction = function( format ) {
-                    if ( format.queries === 'yes' ) {
-                        printified = $dn.trigger( 'printify.enketo' );
-                    }
-                    components.posAction.call( this, format );
-                };
-                prompt( texts, options, gridInputs );
+                return prompt( texts, options, gridInputs )
+                    .then( function( format ) {
+                        if ( !format ) {
+                            return;
+                        }
+                        if ( format.queries === 'yes' ) {
+                            printified = $dn.trigger( 'printify.enketo' );
+                        }
+                        return printGrid( format )
+                            .then( resolve );
+                    } );
             } else {
-                options.posAction = function( format ) {
-                    if ( format.queries === 'yes' ) {
-                        printified = $dn.trigger( 'printify.enketo' );
-                    }
-                    setTimeout( window.print, 100 );
-                    resolve();
-                };
-                prompt( texts, options, regularInputs );
+                return prompt( texts, options, regularInputs )
+                    .then( function( format ) {
+                        if ( !format ) {
+                            return;
+                        }
+                        if ( format.queries === 'yes' ) {
+                            printified = $dn.trigger( 'printify.enketo' );
+                        }
+                        setTimeout( window.print, 100 );
+                        resolve();
+                    } );
             }
         } )
         .then( function() {
