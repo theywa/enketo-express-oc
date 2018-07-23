@@ -63,9 +63,9 @@ router
     .post( '*', _setReturnQueryParam ) // is this actually used by OC?
     .post( '*', _setGoTo )
     .post( '*', _setParentWindow )
-    .post( '*', _setEcid )
-    .post( /\/(survey|instance)\/(collect|edit|preview)/, _setJini )
-    .post( '/instance/*', _setPid )
+    .post( /\/(survey|instance)\/(collect|edit|view|note)/, _setEcid ) // excl preview
+    .post( /\/(survey|instance)\/(collect|edit|preview)/, _setJini ) // excl view and note
+    .post( /\/(survey|instance)\/(collect|edit|view|note)/, _setPid ) // excl preview
     .post( /\/(view|note)/, _setLoadWarning )
     .post( '*/pdf', _setPage )
     .post( '/survey/preview', getNewOrExistingSurvey )
@@ -318,14 +318,10 @@ function _setEcid( req, res, next ) {
 
 function _setPid( req, res, next ) {
     const pid = req.body.pid;
-    if ( !pid ) {
-        const error = new Error( 'Bad request. Pid parameter required' );
-        error.status = 400;
-        next( error );
-    } else {
+    if ( pid ) {
         req.pid = `PID=${encodeURIComponent( pid )}`;
-        next();
     }
+    next();
 }
 
 function _setJini( req, res, next ) {
@@ -401,7 +397,7 @@ function _generateWebformUrls( id, req ) {
     switch ( req.webformType ) {
         case 'preview':
             {
-                const queryString = _generateQueryString( [ req.ecid, req.defaultsQueryParam, req.parentWindowOriginParam, req.goToErrorUrl, req.jini ] );
+                const queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam, req.goToErrorUrl, req.jini ] );
                 url = `${BASEURL}preview/${IFRAMEPATH}${idPartOnline}${queryString}${hash}`;
                 break;
             }
@@ -421,7 +417,7 @@ function _generateWebformUrls( id, req ) {
             }
         case 'single':
             {
-                const queryString = _generateQueryString( [ req.ecid, req.defaultsQueryParam, req.returnQueryParam, req.parentWindowOriginParam, req.jini ] );
+                const queryString = _generateQueryString( [ req.ecid, req.pid, req.defaultsQueryParam, req.returnQueryParam, req.parentWindowOriginParam, req.jini ] );
                 url = `${BASEURL}single/${FSPATH}${dnClosePart}${IFRAMEPATH}${dnClosePart ? idPartFsC : idPartOnline}${queryString}`;
                 break;
             }

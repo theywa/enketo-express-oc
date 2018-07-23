@@ -733,13 +733,10 @@ describe( 'api', () => {
         // Those earlier tests could be removed
         describe( 'common parameters', () => {
 
-            const surveyEndpoints = [
+            const endpoints = [
                 '/survey/collect',
                 '/survey/collect/c',
                 '/survey/view',
-                '/survey/preview'
-            ];
-            const instanceEndpoints = [
                 '/instance/edit',
                 '/instance/edit/c',
                 '/instance/edit/rfc',
@@ -750,7 +747,7 @@ describe( 'api', () => {
             ];
 
             // parentWindowOrigin
-            surveyEndpoints.concat( instanceEndpoints ).forEach( endpoint => {
+            endpoints.concat( [ '/survey/preview' ] ).forEach( endpoint => {
                 const obj = {
                     version,
                     auth: true,
@@ -766,7 +763,7 @@ describe( 'api', () => {
             } );
 
             // ecid
-            surveyEndpoints.concat( instanceEndpoints ).forEach( endpoint => {
+            endpoints.forEach( endpoint => {
                 const obj = {
                     version,
                     auth: true,
@@ -780,7 +777,7 @@ describe( 'api', () => {
                 obj.expected = /.+(\?|&)ecid=abcd/;
                 testResponse( obj );
             } );
-            surveyEndpoints.concat( instanceEndpoints ).forEach( endpoint => {
+            endpoints.forEach( endpoint => {
                 const obj = {
                     version,
                     auth: true,
@@ -795,7 +792,7 @@ describe( 'api', () => {
             } );
 
             // pid
-            instanceEndpoints.forEach( endpoint => {
+            endpoints.forEach( endpoint => {
                 const obj = {
                     version,
                     auth: true,
@@ -809,7 +806,7 @@ describe( 'api', () => {
                 obj.expected = /.+(\?|&)PID=123/;
                 testResponse( obj );
             } );
-            instanceEndpoints.forEach( endpoint => {
+            endpoints.forEach( endpoint => {
                 const obj = {
                     version: 1,
                     auth: true,
@@ -817,10 +814,22 @@ describe( 'api', () => {
                     endpoint,
                     instanceId: true,
                     instance: true,
-                    status: 400
+                    status: endpoint.startsWith( '/instance' ) ? 201 : 200,
                 };
-                obj.pid = '';
+                obj.pid = ''; // is optional
                 testResponse( obj );
+            } );
+
+            // previews, ignoring ecid and pid
+            testResponse( {
+                version,
+                auth: true,
+                method: 'post',
+                endpoint: '/survey/preview',
+                pid: 'a',
+                ecid: 'b',
+                status: 200,
+                expected: /::[A-z0-9]+$/
             } );
 
             // jini

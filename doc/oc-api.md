@@ -40,6 +40,7 @@ Returns a JSON object with a version property. No authentication **required**. N
 Returns a url that points to an iframe-friendly regular fieldsubmission view. No close button present in the Discrepancy Note Widget.
 
 - Has a **required** `ecid` parameter with string value.
+- Has an optional `pid` parameter.
 - Has an optional `jini` parameter with string value `"true"` or `"false"`. Defaults to `"false"`. Only works if jini was configured in config.json.
 
 Otherwise, use exactly as [POST /survey/single/iframe](https://apidocs.enketo.org/v2#/post-survey-single-iframe)
@@ -47,6 +48,7 @@ Otherwise, use exactly as [POST /survey/single/iframe](https://apidocs.enketo.or
 ### POST /survey/collect/c
 
 - Has a **required** `ecid` parameter with string value.
+- Has an optional `pid` parameter.
 - Has an optional `jini` parameter with string value `"true"` or `"false"`. Defaults to `"false"`. Only works if jini was configured in config.json.
 
 Same as POST /survey/collect except this view has a **Close button** in the Discrepancy Note Widget.
@@ -56,6 +58,7 @@ Same as POST /survey/collect except this view has a **Close button** in the Disc
 Returns a url that points to an iframe-friendly **empty readonly** form.
 
 - Has a **required** `ecid` parameter with string value.
+- Has an optional `pid` parameter.
 - Has an optional `load_warning` parameter for a string value to be displayed in a modal dialog upon load.
 - Has an optional `go_to_error_url` parameter that in conjunction with `go_to` will prompt the user to redirect to a _mini form_ if the go_to target is not available or hidden.
 
@@ -65,7 +68,8 @@ Otherwise exactly as [POST /survey/view/iframe](http://apidocs.enketo.org/v2/#/p
 
 Returns a PDF of an empty form or a JSON error response.
 
-- Has a **required** `ecid` parameter with string value..
+- Has a **required** `ecid` parameter with string value.
+- Has an optional `pid` parameter.
 
 Otherwise, use exactly as [POST /survey/view/pdf](https://apidocs.enketo.org/v2#/post-survey-view-pdf)
 
@@ -73,7 +77,6 @@ Otherwise, use exactly as [POST /survey/view/pdf](https://apidocs.enketo.org/v2#
 
 Returns a url that points to an iframe-friendly **empty** form.
 
-- Has a **required** `ecid` parameter with string value.
 - Has an optional `jini` parameter with string value `"true"` or `"false"`. Defaults to `"false"`. Only works if jini was configured in config.json.
 - Has an optional `go_to_error_url` parameter that in conjunction with `go_to` will prompt the user to redirect to a _mini form_ if the go_to target is not available or hidden.
 
@@ -90,7 +93,7 @@ Use exactly as [DELETE /survey/cache](https://apidocs.enketo.org/v2#/delete-surv
 Returns a url that points to a regular webform fieldsubmission view with an **existing record**. No Close button present in the Discrepancy Note Widget.
 
 - Has a **required** `ecid` parameter with string value.
-- Has a **required** `pid` parameter.
+- Has an optional `pid` parameter.
 - Has an optional `jini` parameter with string value `"true"` or `"false"`. Defaults to `"false"`. Only works if jini was configured in config.json.
 - Has an optional `go_to_error_url` parameter that in conjunction with `go_to` will prompt the user to redirect to a _mini form_ if the go_to target is not available or hidden.
 - Has an optional `complete_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"false"`. This parameter determines 
@@ -107,7 +110,7 @@ Same as POST /instance/edit except that this view has a **Close button** in the 
 Returns a url that points to webform fieldsubmission view with an existing record **and a reason-for-change UI**. No Close button present in the Discrepancy Note widget.
 
 - Has a **required** `ecid` parameter with string value..
-- Has a **required** `pid` parameter.
+- Has an optional `pid` parameter.
 - Has an optional `jini` parameter with string value `"true"` or `"false"`. Defaults to `"false"`. Only works if jini was configured in config.json.
 - Has an optional `go_to_error_url` parameter that in conjunction with `go_to` will prompt the user to redirect to a _mini form_ if the go_to target is not available or hidden.
 
@@ -122,7 +125,7 @@ Same as POST /instance/edit/rfc except that this view has a **Close button** in 
 Returns a url that points to a **readonly** form with a record loaded into it.
 
 - Has a **required** `ecid` parameter with string value.
-- Has a **required** `pid` parameter.
+- Has an optional `pid` parameter.
 - Has an optional `load_warning` parameter for a string value to be displayed in a modal dialog upon load.
 - Has an optional `go_to_error_url` parameter that in conjunction with `go_to` will prompt the user to redirect to a _mini form_ if the go_to target is not available or hidden.
 
@@ -133,7 +136,7 @@ Otherwise, use exactly as [POST /instance/view/iframe](https://apidocs.enketo.or
 Returns a PDF of a form with a record loaded into it or a JSON error response.
 
 - Has a **required** `ecid` parameter with string value.
-- Has a **required** `pid` parameter.
+- Has an optional `pid` parameter.
 
 Otherwise, use exactly as [POST /instance/view/pdf](https://apidocs.enketo.org/v2#/post-instance-view-pdf)
 
@@ -142,7 +145,7 @@ Otherwise, use exactly as [POST /instance/view/pdf](https://apidocs.enketo.org/v
 Returns a url that points to a readonly view of an existing record where **only the discrepancy notes widgets are enabled**, and the discrepancy notes widgets **do not have** a Close button.
 
 - Has a **required** `ecid` parameter with string value.
-- Has a **required** `pid` parameter.
+- Has an optional `pid` parameter.
 - Has an optional `complete_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"false"`. This parameter determines 
 whether a _Complete_ button is present below the form in addition to the always-present _Close_ button. \[**THIS WILL BE REMOVED**\]
 - Has an optional `load_warning` parameter for a string value to be displayed in a modal dialog upon load.
