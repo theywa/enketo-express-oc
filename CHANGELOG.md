@@ -3,12 +3,20 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]
+--------------------
+##### Fixed
+- Download links in file input and draw widgets not working in IE11.
+
+[1.69.1] - 2018-07-25
 ---------------------
 ##### Changed
 - In Grid Theme readonly questions with value now have the same whole-cell background color as readonly questions without a value.
 
 ##### Fixed
 - Form previews using the `form` query parameter with a URL value that contains ":" in the path, get stuck in an infinite loop (!).
+- If an loading error occurs when the form is reset, no message is output to the user.
+- After the first record is created, external data does not get populated for subsequent records.
+- Failing to load external data into an offline-capable webform.
 
 [1.69.0] - 2018-07-19
 ---------------------
