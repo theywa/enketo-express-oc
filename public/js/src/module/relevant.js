@@ -2,7 +2,7 @@
 
 'use strict';
 
-var branchModule = require( 'enketo-core/src/js/branch' );
+var branchModule = require( 'enketo-core/src/js/relevant' );
 var $ = require( 'jquery' );
 
 /**

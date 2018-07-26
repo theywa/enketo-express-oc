@@ -91,7 +91,7 @@ function _readonlify( formParts, notesEnabled ) {
 
     // Partially disable calculations in Enketo Core
     console.log( 'Calculations restricted to clinicaldata only.' );
-    var calculationModule = require( 'enketo-core/src/js/calculation' );
+    var calculationModule = require( 'enketo-core/src/js/calculate' );
     calculationModule.originalUpdate = calculationModule.update;
     calculationModule.update = function( updated ) {
         return calculationModule.originalUpdate.call( this, updated, '[oc-external="clinicaldata"]' );

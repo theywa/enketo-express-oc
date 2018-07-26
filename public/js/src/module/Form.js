@@ -6,7 +6,7 @@ var Form = require( 'enketo-core/src/js/Form' );
 var $ = require( 'jquery' );
 
 require( './Form-model' );
-require( './branch' );
+require( './relevant' );
 require( './page' );
 
 /**
@@ -63,27 +63,13 @@ var relevantErrorUpdate = function( updated ) {
             return $( this ).is( '[data-relevant]' ) ? this : this.querySelector( '[data-relevant]' );
         } );
 
-    this.branch.updateNodes( $nodes );
+    this.relevant.updateNodes( $nodes );
 };
 
 var originalInit = Form.prototype.init;
 var originalValidateInput = Form.prototype.validateInput;
 
 Form.prototype.evaluationCascadeAdditions = [ constraintUpdate, relevantErrorUpdate ];
-
-/**
- * Overrides function in Enketo Core to hide asterisk if field has value.
- * 
- * @param  {[type]} n [description]
- */
-Form.prototype.updateRequiredVisibility = function( n ) {
-    var node;
-    if ( n.required ) {
-        node = this.model.node( n.path, n.ind );
-        n.$required.toggleClass( 'hide', node.getVal().toString() !== '' || !node.isRequired( n.required ) );
-    }
-};
-
 
 Form.prototype.init = function() {
     var that = this;
