@@ -473,7 +473,7 @@ function _render( status, body, res ) {
                 message: body
             };
         }
-        body.code = status;
+        //body.code = status;
         res.status( status ).json( body );
     }
 }

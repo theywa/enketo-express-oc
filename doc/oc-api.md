@@ -8,12 +8,11 @@ Api authentication is done via a Authorization header using the well-known [Basi
 
 ### Responses for all /oc/api/v1/.. requests
 
-A successful **POST** response (always has `url` property) with 200 or 201 HTTP status. The code is identical to the HTTP statuscode of the response. It is recommended to check the HTTP statuscode (and ignore the body code).
+A successful **POST** response (always has `url` property) with 200 or 201 HTTP status.
 
 ```xml
-{
-    "url": "https://enke.to/preview/::abcd",
-    "code": 200
+{s
+    "url": "https://enke.to/preview/::abcd"
 }
 ```
 
