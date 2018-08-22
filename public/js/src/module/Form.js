@@ -7,6 +7,7 @@ var $ = require( 'jquery' );
 
 require( './Form-model' );
 require( './relevant' );
+require( './required' );
 require( './page' );
 
 /**
