@@ -17,6 +17,7 @@ function FieldSubmissionQueue() {
     this.lastAdded = {};
     this.repeatRemovalCounter = 0;
     this.queuedSubmitAllRequest = undefined;
+    this._uploadStatus.init();
 }
 
 FieldSubmissionQueue.prototype.get = function() {
@@ -274,11 +275,13 @@ FieldSubmissionQueue.prototype._duplicateCheck = function( path, fragment ) {
  * @type {Object}
  */
 FieldSubmissionQueue.prototype._uploadStatus = {
-    _getBox: function() {
+    init: function() {
         if ( !this._$box ) {
             this._$box = $( '<div class="fieldsubmission-status"/>' ).prependTo( '.form-header' )
                 .add( $( '<div class="form-footer__feedback fieldsubmission-status"/>' ).prependTo( '.form-footer' ) );
         }
+    },
+    _getBox: function() {
         return this._$box;
     },
     _getText: function( status ) {
