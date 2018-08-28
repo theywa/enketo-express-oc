@@ -1,6 +1,5 @@
 'use strict';
 
-require( 'enketo-core/src/js/polyfills-ie11' );
 require( './module/radio-tab' );
 
 var $ = require( 'jquery' );
