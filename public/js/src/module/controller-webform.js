@@ -22,7 +22,6 @@ var formOptions = {
     printRelevantOnly: settings.printRelevantOnly
 };
 
-require( './Form-model' );
 require( './Form' );
 
 function init( selector, data ) {
