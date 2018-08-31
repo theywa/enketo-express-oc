@@ -46,3 +46,32 @@ pageModule.setRepeatHandlers = function() {
             }
         } );
 };
+
+var originalPageModuleNext = pageModule._next;
+
+pageModule._next = function() {
+    var that = this;
+    originalPageModuleNext.call( this )
+        .then( function( valid ) {
+            if ( !valid ) {
+                var strictViolations = that.$current.find( '.question' ).addBack( '.question' ).filter( function() {
+                    return ( this.classList.contains( 'invalid-required' ) && this.querySelector( '[oc-required-type="strict"]' ) ) ||
+                        ( this.classList.contains( 'invalid-constraint' ) && this.querySelector( '[oc-constraint-type="strict"]' ) );
+                } ).length;
+
+                if ( strictViolations === 0 ) {
+                    var currentIndex = that._getCurrentIndex();
+                    var next = that._getNext( currentIndex );
+                    if ( next ) {
+                        var newIndex = currentIndex + 1;
+                        that._flipTo( next, newIndex );
+                        //return newIndex;
+                    }
+
+                    valid = true;
+                }
+            }
+            return valid;
+        } );
+
+};

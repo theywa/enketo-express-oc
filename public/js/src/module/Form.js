@@ -3,7 +3,9 @@
 'use strict';
 
 var Form = require( 'enketo-core/src/js/Form' );
+var FormModel = require( 'enketo-core/src/js/Form-model' );
 var $ = require( 'jquery' );
+var gui = require( './gui' );
 
 require( './Form-model' );
 require( './relevant' );
@@ -74,6 +76,28 @@ Form.prototype.evaluationCascadeAdditions = [ constraintUpdate, relevantErrorUpd
 
 Form.prototype.init = function() {
     var that = this;
+    var initialized = false;
+
+    // Before any other change handlers, add the "hard check" handlers
+    if ( this.hardCheckEnabled ) {
+        console.log( 'setting hard check handlers' );
+        this.view.$
+            .on( 'change.file',
+                'input:not(.ignore)[data-required][oc-required-type="strict"], select:not(.ignore)[data-required][oc-required-type="strict"], textarea:not(.ignore)[data-required][oc-required-type="strict"]',
+                function( evt ) {
+                    if ( initialized ) {
+                        that.hardRequiredCheckHandler( evt, this );
+                    }
+                } )
+            .on( 'change.file',
+                'input:not(.ignore)[data-constraint][oc-constraint-type="strict"], select:not(.ignore)[data-constraint][oc-constraint-type="strict"], textarea:not(.ignore)[data-constraint][oc-constraint-type="strict"]',
+                function( evt ) {
+                    if ( initialized ) {
+                        that.hardConstraintCheckHandler( evt, this );
+                    }
+                } );
+    }
+
     var loadErrors = originalInit.call( this );
     // Add custom functionality
     try {
@@ -93,6 +117,8 @@ Form.prototype.init = function() {
         console.error( e );
         loadErrors.push( e.name + ': ' + e.message );
     }
+
+    initialized = true;
     return loadErrors;
 };
 
@@ -104,7 +130,7 @@ Form.prototype.init = function() {
  */
 Form.prototype.validateInput = function( $input ) {
     var that = this;
-    // There is a condition where a valuechange result in both an invalid-relevant and invalid-constraint,
+    // There is a condition where a valuechange results in both an invalid-relevant and invalid-constraint,
     // where the invalid constraint is added *after* the invalid-relevant. I can reproduce in automated test (not manually).
     // It is probably related due to the asynchronousity of contraint evaluation.
     // 
@@ -120,6 +146,83 @@ Form.prototype.validateInput = function( $input ) {
             }
             return passed;
         } );
+};
+
+
+Form.prototype.hardRequiredCheckHandler = function( evt, input ) {
+    var that = this;
+    var $input = $( input );
+    var n = {
+        path: this.input.getName( $input ),
+        required: this.input.getRequired( $input ),
+        val: this.input.getVal( $input )
+    };
+
+    // No need to validate.
+    if ( n.readonly || n.inputType === 'hidden' ) {
+        return;
+    }
+
+    // Only now, will we determine the index (expensive).
+    n.ind = this.input.getIndex( $input );
+
+    // Check required
+    if ( n.val === '' && this.model.node( n.path, n.ind ).isRequired( n.required ) ) {
+        var msg = $( input ).closest( '.question' ).find( '.or-required-msg.active' ).html();
+        gui.alert( msg, 'Value is required' );
+        // Cancel propagation input
+        evt.stopImmediatePropagation();
+        var currentModelValue = that.model.node( n.path, n.ind ).getVal()[ 0 ];
+        that.input.setVal( $( input ), currentModelValue ).dispatchEvent( new Event( 'change' ) );
+    }
+};
+
+Form.prototype.hardConstraintCheckHandler = function( evt, input ) {
+    var that = this;
+    var $input = $( input );
+    var n = {
+        path: this.input.getName( $input ),
+        xmlType: this.input.getXmlType( $input ),
+        constraint: this.input.getConstraint( $input ),
+        val: this.input.getVal( $input )
+    };
+
+    // No need to validate.
+    if ( n.readonly || n.inputType === 'hidden' ) {
+        return;
+    }
+
+    // Only now, will we determine the index (expensive).
+    n.ind = this.input.getIndex( $input );
+
+    // In order to evaluate the constraint, its value has to be set in the model. 
+    // This would trigger a fieldsubmission, which is what we're trying to prevent.
+    // A heavy-handed dumb-but-safe approach is to clone the model and set the value there.
+    var modelClone = new FormModel( new XMLSerializer().serializeToString( this.model.xml ) );
+    // TODO: initialize clone with **external data**.
+    modelClone.init();
+    // Set the value in the clone
+    var updated = modelClone.node( n.path, n.ind ).setVal( n.val, n.xmlType );
+    // Check if strict constraint passes
+    if ( !updated ) {
+        return;
+    }
+    // Note: we don't use Enketo Core's nodeset.validateConstraintAndType here because it's asynchronous,
+    // which means we couldn't selectively stop event propagation.
+    var modelCloneNodeValue = modelClone.node( n.path, n.ind ).getVal()[ 0 ];
+
+    if ( modelCloneNodeValue.toString() === '' ) {
+        return;
+    }
+
+    if ( typeof n.constraint !== 'undefined' && n.constraint !== null && n.constraint.length > 0 && !modelClone.evaluate( n.constraint, 'boolean', n.path, n.ind ) ) {
+        var msg = $( input ).closest( '.question' ).find( '.or-constraint-msg.active' ).html();
+        gui.alert( msg, 'Value not allowed' );
+        // Cancel propagation input
+        evt.stopImmediatePropagation();
+        var currentModelValue = that.model.node( n.path, n.ind ).getVal()[ 0 ];
+        that.input.setVal( $( input ), currentModelValue ).dispatchEvent( new Event( 'change' ) );
+    }
 };
 
 module.exports = Form;

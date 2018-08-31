@@ -103,6 +103,13 @@ settings.printRelevantOnly = !( ( settings.type === 'view' && !settings.instance
 // Reason for change functionality
 settings.reasonForChange = /\/rfc\//.test( window.location.pathname );
 
+// Strict validation functionality for Participate
+if ( /\/participant\//.test( window.location.pathname ) ) {
+    settings.hardCheckEnabled = true;
+    // override validatePage in enketo/config
+    config.validatePage = true;
+}
+
 function _getEnketoId( prefix, haystack ) {
     var id = new RegExp( prefix ).test( haystack ) ? haystack.substring( haystack.lastIndexOf( prefix ) + prefix.length ) : null;
     return id;

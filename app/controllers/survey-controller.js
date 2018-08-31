@@ -19,6 +19,7 @@ router.param( 'encrypted_enketo_id_view', routerUtils.encryptedEnketoIdView );
 router.param( 'encrypted_enketo_id_view_dn', routerUtils.encryptedEnketoIdViewDn );
 router.param( 'encrypted_enketo_id_view_dnc', routerUtils.encryptedEnketoIdViewDnc );
 router.param( 'encrypted_enketo_id_fs_c', routerUtils.encryptedEnketoIdFsC );
+router.param( 'encrypted_enketo_id_fs_participant', routerUtils.encryptedEnketoIdFsParticipant );
 router.param( 'encrypted_enketo_id_rfc', routerUtils.encryptedEnketoIdEditRfc );
 router.param( 'encrypted_enketo_id_rfc_c', routerUtils.encryptedEnketoIdEditRfcC );
 
@@ -34,6 +35,10 @@ router.param( 'mod', ( req, rex, next, mod ) => {
 
 router
     //.get( '*', loggedInCheck )
+    .get( '*/participant/*', function( req, res, next ) {
+        req.participant = true;
+        next();
+    } )
     .get( '/x/', offlineWebform )
     .get( '/_/', offlineWebform )
     .get( '/preview*', _setJini )
@@ -42,6 +47,7 @@ router
     .get( '/:mod/:enketo_id', webform )
     .get( '/single/fs/:mod/:enketo_id', fieldSubmission )
     .get( '/single/fs/c/:mod/:encrypted_enketo_id_fs_c', fieldSubmission )
+    .get( '/single/fs/participant/:mod/:encrypted_enketo_id_fs_participant', fieldSubmission )
     .get( '/preview/:enketo_id', preview )
     .get( '/preview/:mod/:enketo_id', preview )
     .get( '/preview', preview )
@@ -60,6 +66,7 @@ router
     .get( '/edit/fs/c/:mod/:encrypted_enketo_id_fs_c', fieldSubmission )
     .get( '/edit/fs/dn/:mod/:encrypted_enketo_id_view_dn', fieldSubmission )
     .get( '/edit/fs/dn/c/:mod/:encrypted_enketo_id_view_dnc', fieldSubmission )
+    .get( '/edit/fs/participant/:mod/:encrypted_enketo_id_fs_participant', fieldSubmission )
     .get( '/view/fs/:encrypted_enketo_id_view', fieldSubmission )
     .get( '/view/fs/:mod/:encrypted_enketo_id_view', fieldSubmission )
     .get( '/xform/:enketo_id', xform )
@@ -68,6 +75,7 @@ router
     .get( '/xform/:encrypted_enketo_id_view_dn', xform )
     .get( '/xform/:encrypted_enketo_id_view_dnc', xform )
     .get( '/xform/:encrypted_enketo_id_fs_c', xform )
+    .get( '/xform/:encrypted_enketo_id_fs_participant', xform )
     .get( '/connection', ( req, res ) => {
         res.status = 200;
         res.send( `connected ${Math.random()}` );
@@ -123,6 +131,7 @@ function fieldSubmission( req, res, next ) {
         iframe: req.iframe,
         print: req.query.print === 'true',
         jini: req.jini,
+        participant: req.participant
     };
 
     _renderWebform( req, res, next, options );

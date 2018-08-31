@@ -36,7 +36,7 @@
         "crypto-js": "3.1.x",
         "csurf": "1.9.x",
         "db.js": "0.15.0",
-        "enketo-xpath-extensions-oc": "git+https://github.com/OpenClinica/enketo-xpath-extensions-oc.git#a30e5f9",
+        "enketo-xpath-extensions-oc": "github:OpenClinica/enketo-xpath-extensions-oc#a30e5f9",
         "debug": "3.1.x",
         "enketo-core": "github:enketo/enketo-core#d2246c9b",
         "enketo-transformer": "1.29.0",

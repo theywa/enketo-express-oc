@@ -743,11 +743,11 @@ describe( 'api', () => {
                 '/instance/edit/rfc/c',
                 '/instance/view',
                 '/instance/note',
-                '/instance/note/c'
+                '/instance/note/c',
             ];
 
             // parentWindowOrigin
-            endpoints.concat( [ '/survey/preview' ] ).forEach( endpoint => {
+            endpoints.concat( [ '/survey/preview', '/survey/collect/participant', '/instance/edit/participant' ] ).forEach( endpoint => {
                 const obj = {
                     version,
                     auth: true,
@@ -763,7 +763,8 @@ describe( 'api', () => {
             } );
 
             // ecid
-            endpoints.forEach( endpoint => {
+            const ecidEndpoints = endpoints.concat( [ '/survey/collect/participant', '/instance/edit/participant' ] );
+            ecidEndpoints.forEach( endpoint => {
                 const obj = {
                     version,
                     auth: true,
@@ -777,7 +778,7 @@ describe( 'api', () => {
                 obj.expected = /.+(\?|&)ecid=abcd/;
                 testResponse( obj );
             } );
-            endpoints.forEach( endpoint => {
+            ecidEndpoints.forEach( endpoint => {
                 const obj = {
                     version,
                     auth: true,
@@ -840,7 +841,7 @@ describe( 'api', () => {
                 '/instance/edit',
                 '/instance/edit/c',
                 '/instance/edit/rfc',
-                '/instance/edit/rfc/c'
+                '/instance/edit/rfc/c',
             ].forEach( endpoint => {
                 const obj = {
                     version: 1,

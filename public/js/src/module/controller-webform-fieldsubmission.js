@@ -47,6 +47,10 @@ function init( selector, data, loadWarnings ) {
 
             form = new Form( formSelector, data, formOptions );
 
+            if ( settings.hardCheckEnabled ) {
+                form.hardCheckEnabled = true;
+            }
+
             // Additional layer of security to disable submissions in readonly views.
             // Should not be necessary to do this.
             if ( settings.type !== 'view' ) {
@@ -412,10 +416,15 @@ function _complete( bypassConfirmation ) {
 
 // TODO: Move all of this to server?
 function _removeCompleteButtonIfNeccessary() {
-    // for readonly and note-only views
+
     if ( settings.type === 'view' || /\/fs\/dnc?\//.test( window.location.pathname ) ) {
+        // for readonly, note-only views
         $( 'button#finish-form' ).remove();
         $( 'button#close-form' ).addClass( 'simple' );
+    } else if ( /\/fs\/participant\//.test( window.location.pathname ) ) {
+        // for  participant views
+        $( 'button#finish-form' ).remove();
+        $( 'button#close-form' ).addClass( 'participant' );
     } else if ( settings.type === 'edit' && !settings.completeButton ) {
         // In the future we can use a more robust way to do this by inspecting the record.
         $( 'button#finish-form' ).remove();
@@ -565,7 +574,7 @@ function _setEventHandlers( selector ) {
         } );
     }
 
-    $( 'button#close-form:not(.completed-record, .simple)' ).click( function() {
+    $( 'button#close-form:not(.completed-record, .simple, .participant)' ).click( function() {
         var $button = $( this ).btnBusyState( true );
 
         _close()
@@ -637,6 +646,35 @@ function _setEventHandlers( selector ) {
         var $button = $( this ).btnBusyState( true );
 
         _closeSimple()
+            .catch( function( e ) {
+                gui.alert( e.message );
+            } )
+            .then( function() {
+                $button.btnBusyState( false );
+            } );
+
+        return false;
+    } );
+
+    // This is for closing a participant view.
+    $( 'button#close-form.participant' ).click( function() {
+        var $button = $( this ).btnBusyState( true );
+
+        form.validate()
+            .then( function( valid ) {
+                if ( !valid ) {
+                    var strictViolations = form
+                        .view.$
+                        .find( '.invalid-required [oc-required-type="strict"], .invalid-constraint [oc-constraint-type="strict"]' )
+                        .length;
+
+                    valid = strictViolations === 0;
+                }
+                if ( valid ) {
+                    return _closeSimple();
+                }
+                gui.alert( t( 'fieldsubmission.confirm.autoquery.msg1' ) );
+            } )
             .catch( function( e ) {
                 gui.alert( e.message );
             } )

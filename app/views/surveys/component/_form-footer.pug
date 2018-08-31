@@ -31,6 +31,7 @@ section.form-footer
         span= t('form.pages.back')
 
     .form-footer__content__jump-nav
-      a.btn.btn-default.disabled.first-page(href="#")= t('form.pages.return')
-      a.btn.btn-default.disabled.last-page(href="#")= t('form.pages.end')
+      if !participant
+        a.btn.btn-default.disabled.first-page(href="#")= t('form.pages.return')
+        a.btn.btn-default.disabled.last-page(href="#")= t('form.pages.end')
 

@@ -6,6 +6,7 @@ const keys = {
     viewDn: `${config[ 'less secure encryption key' ]}view-dn`,
     viewDnc: `${config[ 'less secure encryption key' ]}view-dnc`,
     fsC: `${config[ 'less secure encryption key' ]}fs-c`,
+    fsParticipant: `${config[ 'less secure encryption key' ]}fs-participant`,
     editRfc: `${config[ 'less secure encryption key' ]}edit-rfc`,
     editRfcC: `${config[ 'less secure encryption key' ]}edit-rfc-c`,
 };
@@ -37,6 +38,10 @@ function encryptedEnketoIdParamViewDnc( req, res, next, id ) {
 
 function encryptedEnketoIdParamFsC( req, res, next, id ) {
     _encryptedEnketoIdParam( req, res, next, id, keys.fsC );
+}
+
+function encryptedEnketoIdParamFsParticipant( req, res, next, id ) {
+    _encryptedEnketoIdParam( req, res, next, id, keys.fsParticipant );
 }
 
 function encryptedEnketoIdParamEditRfc( req, res, next, id ) {
@@ -83,6 +88,7 @@ module.exports = {
     encryptedEnketoIdViewDn: encryptedEnketoIdParamViewDn,
     encryptedEnketoIdViewDnc: encryptedEnketoIdParamViewDnc,
     encryptedEnketoIdFsC: encryptedEnketoIdParamFsC,
+    encryptedEnketoIdFsParticipant: encryptedEnketoIdParamFsParticipant,
     encryptedEnketoIdEditRfc: encryptedEnketoIdParamEditRfc,
     encryptedEnketoIdEditRfcC: encryptedEnketoIdParamEditRfcC,
 };
