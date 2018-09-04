@@ -202,17 +202,14 @@ Comment.prototype._setDisabledHandler = function() {
  */
 Comment.prototype._setValueChangeHandler = function() {
     var that = this;
-    var previousValue = this.options.helpers.input.getVal( $( this.$linkedQuestion.get( 0 ).querySelector( 'input, select, textarea' ) ) );
+    var previousValue = this.options.helpers.getModelValue( $( this.$linkedQuestion.get( 0 ).querySelector( 'input, select, textarea' ) ) );
 
     this.$linkedQuestion.on( 'valuechange.enketo inputupdate.enketo', function( evt ) {
         var comment;
-        var currentValue = that.options.helpers.input.getVal( $( evt.target ) );
+        var currentValue = that.options.helpers.getModelValue( $( evt.target ) );
         var currentStatus = that._getCurrentStatus( that.notes );
-
         // Note obtaining the values like this does not work for file input types, but since have a different
         // change comment for those that doesn't mention the filename, we don't need to fix that.
-        previousValue = ( Array.isArray( previousValue ) ) ? previousValue.join( ', ' ) : previousValue;
-        currentValue = ( Array.isArray( currentValue ) ) ? currentValue.join( ', ' ) : currentValue;
 
         if ( evt.target.type !== 'file' ) {
             comment = t( 'widget.dn.valuechange', {
@@ -220,7 +217,7 @@ Comment.prototype._setValueChangeHandler = function() {
                 'previous': '"' + previousValue + '"'
             } );
         } else {
-            comment = ( currentValue ) ? t( 'widget.dn.newfile' ) : t( 'widget.dn.fileremoved' );
+            comment = currentValue ? t( 'widget.dn.newfile' ) : t( 'widget.dn.fileremoved' );
         }
 
         that._addAudit( comment, '', false );
