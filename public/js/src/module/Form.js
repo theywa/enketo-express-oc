@@ -172,7 +172,7 @@ Form.prototype.hardRequiredCheckHandler = function( evt, input ) {
         gui.alert( msg, 'Value is required' );
         // Cancel propagation input
         evt.stopImmediatePropagation();
-        var currentModelValue = that.model.node( n.path, n.ind ).getVal()[ 0 ];
+        var currentModelValue = that.model.node( n.path, n.ind ).getVal();
         that.input.setVal( $( input ), currentModelValue ).dispatchEvent( new Event( 'change' ) );
     }
 };
@@ -209,7 +209,7 @@ Form.prototype.hardConstraintCheckHandler = function( evt, input ) {
     }
     // Note: we don't use Enketo Core's nodeset.validateConstraintAndType here because it's asynchronous,
     // which means we couldn't selectively stop event propagation.
-    var modelCloneNodeValue = modelClone.node( n.path, n.ind ).getVal()[ 0 ];
+    var modelCloneNodeValue = modelClone.node( n.path, n.ind ).getVal();
 
     if ( modelCloneNodeValue.toString() === '' ) {
         return;
@@ -220,7 +220,7 @@ Form.prototype.hardConstraintCheckHandler = function( evt, input ) {
         gui.alert( msg, 'Value not allowed' );
         // Cancel propagation input
         evt.stopImmediatePropagation();
-        var currentModelValue = that.model.node( n.path, n.ind ).getVal()[ 0 ];
+        var currentModelValue = that.model.node( n.path, n.ind ).getVal();
         that.input.setVal( $( input ), currentModelValue ).dispatchEvent( new Event( 'change' ) );
     }
 };
