@@ -82,7 +82,6 @@ router
     .post( '/survey/collect', getNewOrExistingSurvey )
     .post( '/survey/collect/c', getNewOrExistingSurvey )
     .post( '/survey/collect/participant', getNewOrExistingSurvey )
-    .post( /\/instance\/(?!\/edit\/participant)/, _setCompleteButtonParam ) // excl /instance/edit/participant
     .post( '/instance/view', cacheInstance )
     .post( '/instance/view/pdf', cacheInstance )
     .post( '/instance/edit', cacheInstance )
@@ -368,15 +367,6 @@ function _setReturnQueryParam( req, res, next ) {
     next();
 }
 
-function _setCompleteButtonParam( req, res, next ) {
-    const completeButton = req.body.complete_button;
-
-    if ( completeButton ) {
-        req.completeButtonParam = `completeButton=${completeButton}`;
-    }
-    next();
-}
-
 function _generateQueryString( params = [] ) {
     let paramsJoined;
 
@@ -415,7 +405,7 @@ function _generateWebformUrls( id, req ) {
         case 'edit':
             {
                 const editId = dnClosePart ? idFsC : idOnline;
-                const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.completeButtonParam, req.goToErrorUrl, req.jini ] );
+                const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.goToErrorUrl, req.jini ] );
                 url = `${BASEURL}edit/${FSPATH}${dnClosePart}${IFRAMEPATH}${editId}${queryString}${hash}`;
                 break;
             }
@@ -459,7 +449,7 @@ function _generateWebformUrls( id, req ) {
         case 'view-instance-dn':
             {
                 const viewId = dnClosePart ? idViewDnc : idViewDn;
-                const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.completeButtonParam, req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning, req.goToErrorUrl ] );
+                const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning, req.goToErrorUrl ] );
                 url = `${BASEURL}edit/${FSPATH}dn/${dnClosePart}${IFRAMEPATH}${viewId}${queryString}${hash}`;
                 break;
             }

@@ -64,7 +64,7 @@ function init( selector, data, loadWarnings ) {
             }
 
             // remove submit button before event handlers are set
-            _removeCompleteButtonIfNeccessary();
+            _augmentCloseButton();
 
             // set eventhandlers before initializing form
             _setEventHandlers( selector );
@@ -92,6 +92,11 @@ function init( selector, data, loadWarnings ) {
             // In order to aggregate regular loadErrors and GoTo loaderrors,
             // this is placed in between form.init() and form.goTo().
             $( 'body > .main-loader' ).remove();
+
+            // Check if record is marked complete
+            if ( form.model.isMarkedComplete() ) {
+                $( 'button#close-form' ).remove();
+            }
 
             if ( settings.goTo && location.hash ) {
                 // form.goTo returns an array of 1 error if it has error. We're using our special
@@ -415,19 +420,14 @@ function _complete( bypassConfirmation ) {
 }
 
 // TODO: Move all of this to server?
-function _removeCompleteButtonIfNeccessary() {
-
+function _augmentCloseButton() {
     if ( settings.type === 'view' || /\/fs\/dnc?\//.test( window.location.pathname ) ) {
         // for readonly, note-only views
-        $( 'button#finish-form' ).remove();
         $( 'button#close-form' ).addClass( 'simple' );
     } else if ( /\/fs\/participant\//.test( window.location.pathname ) ) {
         // for  participant views
-        $( 'button#finish-form' ).remove();
         $( 'button#close-form' ).addClass( 'participant btn-primary' ).removeClass( 'btn-default' );
     } else if ( settings.type === 'edit' && !settings.completeButton ) {
-        // In the future we can use a more robust way to do this by inspecting the record.
-        $( 'button#finish-form' ).remove();
         // Change the behavior of the Close button in edit views except in note-only views
         $( 'button#close-form' ).addClass( 'completed-record' );
     }

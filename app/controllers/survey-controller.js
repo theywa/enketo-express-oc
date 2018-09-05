@@ -43,6 +43,7 @@ router
     .get( '/_/', offlineWebform )
     .get( '/preview*', _setJini )
     .get( /\/(single|edit)\/fs(\/rfc)?(\/c)?\/i/, _setJini )
+    .get( /\/edit\/fs\/(?!(participant|rfc))/, _setCompleteButton )
     .get( '/:enketo_id', webform )
     .get( '/:mod/:enketo_id', webform )
     .get( '/single/fs/:mod/:enketo_id', fieldSubmission )
@@ -125,13 +126,19 @@ function _setJini( req, res, next ) {
     next();
 }
 
+function _setCompleteButton( req, res, next ) {
+    req.completeButton = true;
+    next();
+}
+
 function fieldSubmission( req, res, next ) {
     var options = {
         type: 'fs',
         iframe: req.iframe,
         print: req.query.print === 'true',
         jini: req.jini,
-        participant: req.participant
+        participant: req.participant,
+        completeButton: req.completeButton
     };
 
     _renderWebform( req, res, next, options );

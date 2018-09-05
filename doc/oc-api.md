@@ -11,7 +11,7 @@ Api authentication is done via a Authorization header using the well-known [Basi
 A successful **POST** response (always has `url` property) with 200 or 201 HTTP status.
 
 ```xml
-{s
+{
     "url": "https://enke.to/preview/::abcd"
 }
 ```
@@ -105,8 +105,6 @@ Returns a URL that points to a regular webform fieldsubmission view with an **ex
 - Has an optional `pid` parameter.
 - Has an optional `jini` parameter with string value `"true"` or `"false"`. Defaults to `"false"`. Only works if jini was configured in config.json.
 - Has an optional `go_to_error_url` parameter that in conjunction with `go_to` will prompt the user to redirect to a _mini form_ if the go_to target is not available or hidden.
-- Has an optional `complete_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"false"`. This parameter determines 
-whether a _Complete_ button is present below the form in addition to the always-present _Close_ button. \[**THIS WILL BE REMOVED**\]
 
 Otherwise, use exactly as [POST /instance/iframe](http://apidocs.enketo.org/v2/#/post-instance-iframe)
 
@@ -164,8 +162,6 @@ Returns a url that points to a readonly view of an existing record where **only 
 
 - Has a **required** `ecid` parameter with string value.
 - Has an optional `pid` parameter.
-- Has an optional `complete_button` parameter which is either `"true"` or `"false"`. If omitted, considered `"false"`. This parameter determines 
-whether a _Complete_ button is present below the form in addition to the always-present _Close_ button. \[**THIS WILL BE REMOVED**\]
 - Has an optional `load_warning` parameter for a string value to be displayed in a modal dialog upon load.
 - Has an optional `go_to_error_url` parameter that in conjunction with `go_to` will prompt the user to redirect to a _mini form_ if the go_to target is not available or hidden.
 

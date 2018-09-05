@@ -8,9 +8,10 @@ section.form-footer
             span.option-label= t('formfooter.savedraft.label')
       if type === 'fs'
         button#close-form.btn.btn-default #{t('alert.default.button')}
-        button#finish-form.btn.btn-primary
-          i.icon.icon-check= ' '
-          | #{t('formfooter.complete.btn')}
+        if completeButton
+          button#finish-form.btn.btn-primary
+            i.icon.icon-check= ' '
+            | #{t('formfooter.complete.btn')}
       else if type === 'preview'
         button#validate-form.btn.btn-primary
           i.icon.icon-check= ' '

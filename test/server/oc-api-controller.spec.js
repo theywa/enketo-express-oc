@@ -46,7 +46,7 @@ describe( 'api', () => {
     } );
 
     afterEach( done => {
-        /// select test database and flush it
+        // select test database and flush it
         client.select( 15, err => {
             if ( err ) {
                 return done( err );
@@ -102,7 +102,10 @@ describe( 'api', () => {
         const ecid = typeof test.ecid === 'undefined' ? 'a1b1' : test.ecid;
         const pid = typeof test.pid === 'undefined' ? 'qwe' : test.pid;
 
-        it( `${test.method.toUpperCase()} /oc/api/v${version}${endpoint} with ${authDesc} authentication and ${server}, ${id}, ${ret}, ${instance}, ${instanceId}, ${test.theme}, completeButton: ${test.completeButton}, parentWindowOrigin: ${test.parentWindowOrigin}, defaults: ${JSON.stringify( test.defaults )}, pid:${pid}, ecid:${ecid}, jini:${test.jini} responds with ${test.status}`,
+        it( `${test.method.toUpperCase()} /oc/api/v${version}${endpoint} with ${authDesc} authentication ` +
+            `and ${server}, ${id}, ${ret}, ${instance}, ${instanceId}, ${test.theme}, ` +
+            `parentWindowOrigin: ${test.parentWindowOrigin}, defaults: ${JSON.stringify( test.defaults )}, ` +
+            `åpid:${pid}, ecid:${ecid}, jini:${test.jini} responds with ${test.status}`,
             done => {
                 request( app )[ test.method ]( `/oc/api/v${version}${endpoint}` )
                     .set( auth )[ dataSendMethod ]( {
@@ -112,7 +115,6 @@ describe( 'api', () => {
                         pid,
                         instance,
                         instance_id: instanceId,
-                        complete_button: test.completeButton,
                         return_url: ret,
                         go_to: test.goTo,
                         go_to_error_url: test.goToErrorUrl,
@@ -168,8 +170,6 @@ describe( 'api', () => {
                 version,
                 endpoint: '/survey/collect',
                 method: 'post',
-                // test whether completeButton is ignored as it should be
-                completeButton: true,
                 ret: false,
                 auth: true,
                 status: 200,
@@ -324,28 +324,6 @@ describe( 'api', () => {
                     instance: true,
                     status: 201,
                     expected: /.+(\?|&)returnUrl=https%3A%2F%2Fenke.to/,
-                },
-                // test completeButton in response
-                {
-                    method: 'post',
-                    auth: true,
-                    ret: 'https://enke.to',
-                    instanceId: true,
-                    instance: true,
-                    completeButton: 'true',
-                    status: 201,
-                    expected: /.+(\?|&)completeButton=true/
-                },
-                // test completeButton in response
-                {
-                    method: 'post',
-                    auth: true,
-                    ret: 'https://enke.to',
-                    completeButton: 'false',
-                    instanceId: true,
-                    instance: true,
-                    status: 201,
-                    expected: /.+(\?|&)completeButton=false/
                 },
                 // invalid parameters
                 {
@@ -554,17 +532,6 @@ describe( 'api', () => {
                     instance: true,
                     status: 201,
                 },
-                // test completeButton in response
-                {
-                    method: 'post',
-                    auth: true,
-                    ret: 'https://enke.to',
-                    completeButton: true,
-                    instanceId: true,
-                    instance: true,
-                    status: 201,
-                    expected: /.+(\?|&)completeButton=true/
-                },
                 // test go_to stuff in response
                 {
                     method: 'post',
@@ -680,17 +647,6 @@ describe( 'api', () => {
                     instance: true,
                     status: 201,
                     expected: /.+(\?|&)parentWindowOrigin=http%3A%2F%2Fexample\.com/,
-                },
-                // test ignoring completeButton in response
-                {
-                    method: 'post',
-                    auth: true,
-                    ret: 'https://enke.to',
-                    completeButton: true,
-                    instanceId: true,
-                    instance: true,
-                    status: 201,
-                    expected: /\/view\/fs\/i\/::[A-z0-9]{32}.*(\?|&)instance_id/
                 },
                 // invalid parameters
                 {

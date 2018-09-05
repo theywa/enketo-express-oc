@@ -65,4 +65,8 @@ Model.prototype.getXmlFragmentStr = function( node ) {
     return dataStr;
 };
 
+Model.prototype.isMarkedComplete = function() {
+    return this.evaluate( '/node()/@oc:complete = "true"', 'boolean', null, null, true );
+};
+
 module.exports = Model;
