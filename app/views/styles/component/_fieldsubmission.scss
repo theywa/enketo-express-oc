@@ -35,7 +35,7 @@
 .form-footer .form-footer__content__main-controls {
 
     #finish-form,
-    #close-form {
+    [id^="close-form-"] {
         display: block;
         margin-left: auto;
         margin-right: auto;
@@ -178,7 +178,7 @@
                 }
 
                 .previous-page,
-                #close-form,
+                [id^="close-form-"],
                 .next-page {
                     margin-left: $marg;
                     margin-right: $marg;
@@ -186,7 +186,7 @@
                 }
 
                 #finish-form,
-                #close-form {
+                [id^="close-form-"] {
                     min-width: 140px;
                 }
 
@@ -205,14 +205,14 @@
                     }
                 }
 
-                #close-form,
+                [id^="close-form-"],
                 #submit-form,
                 #validate-form {
                     order: 2;
                 }
 
                 #finish-form,
-                #close-form.participant {
+                #close-form-participant {
                     visibility: hidden;
                 }
 
@@ -246,7 +246,7 @@
 
         #finish-form,
         #submit-form,
-        #close-form.participant,
+        #close-form-participant,
         #validate-form {
             visibility: visible;
         }

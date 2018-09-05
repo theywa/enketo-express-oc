@@ -6,8 +6,8 @@ section.form-footer
           .option-wrapper: label.select 
             input.ignore(type='checkbox', name='draft')
             span.option-label= t('formfooter.savedraft.label')
-      if type === 'fs'
-        button#close-form.btn.btn-default #{t('alert.default.button')}
+      if type === 'fs' || type === 'view'
+        button(id=`close-form-${closeButtonIdSuffix}`, class=`btn ${completeButton ? 'btn-default' : 'btn-primary'}`) #{t('alert.default.button')}
         if completeButton
           button#finish-form.btn.btn-primary
             i.icon.icon-check= ' '
@@ -16,8 +16,6 @@ section.form-footer
         button#validate-form.btn.btn-primary
           i.icon.icon-check= ' '
           | #{t('formfooter.validate.btn')}
-      else if type === 'view'
-        button#close-form.btn.btn-default #{t('alert.default.button')}
       else
         button#submit-form.btn.btn-primary
           i.icon.icon-check= ' '

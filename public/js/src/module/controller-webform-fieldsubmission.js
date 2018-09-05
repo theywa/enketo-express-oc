@@ -63,9 +63,6 @@ function init( selector, data, loadWarnings ) {
                 };
             }
 
-            // remove submit button before event handlers are set
-            _augmentCloseButton();
-
             // set eventhandlers before initializing form
             _setEventHandlers( selector );
 
@@ -96,6 +93,7 @@ function init( selector, data, loadWarnings ) {
             // Check if record is marked complete
             if ( form.model.isMarkedComplete() ) {
                 $( 'button#finish-form' ).remove();
+                $( 'button.close-form-regular' ).removeClass( 'close-form-regular' ).addClass( 'close-form-complete' );
             }
 
             if ( settings.goTo && location.hash ) {
@@ -178,7 +176,7 @@ function init( selector, data, loadWarnings ) {
  * 
  * @return {Promise} [description]
  */
-function _close( bypassAutoQuery ) {
+function _closeRegular( bypassAutoQuery ) {
     var msg = '';
     var tAlertCloseMsg = t( 'fieldsubmission.alert.close.msg1' );
     var tAlertCloseHeading = t( 'fieldsubmission.alert.close.heading1' );
@@ -348,6 +346,24 @@ function _closeCompletedRecord() {
         } );
 }
 
+function _closeParticipant() {
+    return form.validate()
+        .then( function( valid ) {
+            if ( !valid ) {
+                var strictViolations = form
+                    .view.$
+                    .find( '.invalid-required [oc-required-type="strict"], .invalid-constraint [oc-constraint-type="strict"]' )
+                    .length;
+
+                valid = strictViolations === 0;
+            }
+            if ( valid ) {
+                return _closeSimple();
+            }
+            gui.alert( t( 'fieldsubmission.confirm.autoquery.msg1' ) );
+        } );
+}
+
 function _redirect( msec ) {
     ignoreBeforeUnload = true;
     setTimeout( function() {
@@ -417,20 +433,6 @@ function _complete( bypassConfirmation ) {
             }
             gui.alert( msg, t( 'alert.submissionerror.heading' ) );
         } );
-}
-
-// TODO: Move all of this to server?
-function _augmentCloseButton() {
-    if ( settings.type === 'view' || /\/fs\/dnc?\//.test( window.location.pathname ) ) {
-        // for readonly, note-only views
-        $( 'button#close-form' ).addClass( 'simple' );
-    } else if ( /\/fs\/participant\//.test( window.location.pathname ) ) {
-        // for  participant views
-        $( 'button#close-form' ).addClass( 'participant btn-primary' ).removeClass( 'btn-default' );
-    } else if ( settings.type === 'edit' && !settings.completeButton ) {
-        // Change the behavior of the Close button in edit views except in note-only views
-        $( 'button#close-form' ).addClass( 'completed-record' );
-    }
 }
 
 function _autoAddQueries( $questions ) {
@@ -574,25 +576,6 @@ function _setEventHandlers( selector ) {
         } );
     }
 
-    $( 'button#close-form:not(.completed-record, .simple, .participant)' ).click( function() {
-        var $button = $( this ).btnBusyState( true );
-
-        _close()
-            .then( function( again ) {
-                if ( again ) {
-                    return _close( true );
-                }
-            } )
-            .catch( function( e ) {
-                console.error( e );
-            } )
-            .then( function() {
-                $button.btnBusyState( false );
-            } );
-
-        return false;
-    } );
-
     $( 'button#finish-form' ).click( function() {
         var $button = $( this ).btnBusyState( true );
 
@@ -624,9 +607,28 @@ function _setEventHandlers( selector ) {
         return false;
     } );
 
+    $( 'button#close-form-regular' ).click( function() {
+        var $button = $( this ).btnBusyState( true );
+
+        _closeRegular()
+            .then( function( again ) {
+                if ( again ) {
+                    return _closeRegular( true );
+                }
+            } )
+            .catch( function( e ) {
+                console.error( e );
+            } )
+            .then( function() {
+                $button.btnBusyState( false );
+            } );
+
+        return false;
+    } );
+
     // This is for closing a record that was marked as final. It's quite different
     // from Complete or the regular Close.
-    $( 'button#close-form.completed-record' ).click( function() {
+    $( 'button#close-form-complete' ).click( function() {
         var $button = $( this ).btnBusyState( true );
 
         // form.validate() will trigger fieldsubmissions for timeEnd before it resolves
@@ -642,7 +644,7 @@ function _setEventHandlers( selector ) {
     } );
 
     // This is for closing a record in a readonly or note-only view.
-    $( 'button#close-form.simple' ).click( function() {
+    $( 'button#close-form-read' ).click( function() {
         var $button = $( this ).btnBusyState( true );
 
         _closeSimple()
@@ -657,24 +659,10 @@ function _setEventHandlers( selector ) {
     } );
 
     // This is for closing a participant view.
-    $( 'button#close-form.participant' ).click( function() {
+    $( 'button#close-form-participant' ).click( function() {
         var $button = $( this ).btnBusyState( true );
 
-        form.validate()
-            .then( function( valid ) {
-                if ( !valid ) {
-                    var strictViolations = form
-                        .view.$
-                        .find( '.invalid-required [oc-required-type="strict"], .invalid-constraint [oc-constraint-type="strict"]' )
-                        .length;
-
-                    valid = strictViolations === 0;
-                }
-                if ( valid ) {
-                    return _closeSimple();
-                }
-                gui.alert( t( 'fieldsubmission.confirm.autoquery.msg1' ) );
-            } )
+        _closeParticipant()
             .catch( function( e ) {
                 gui.alert( e.message );
             } )

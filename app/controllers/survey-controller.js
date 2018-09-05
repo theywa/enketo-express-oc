@@ -44,6 +44,7 @@ router
     .get( '/preview*', _setJini )
     .get( /\/(single|edit)\/fs(\/rfc)?(\/c)?\/i/, _setJini )
     .get( /\/edit\/fs\/(?!(participant|rfc))/, _setCompleteButton )
+    .get( '*', _setCloseButtonClass )
     .get( '/:enketo_id', webform )
     .get( '/:mod/:enketo_id', webform )
     .get( '/single/fs/:mod/:enketo_id', fieldSubmission )
@@ -131,6 +132,17 @@ function _setCompleteButton( req, res, next ) {
     next();
 }
 
+function _setCloseButtonClass( req, res, next ) {
+    if ( /\/(view|dn)\//.test( req.originalUrl ) ) {
+        req.closeButtonIdSuffix = 'read';
+    } else if ( /participant/.test( req.originalUrl ) ) {
+        req.closeButtonIdSuffix = 'participant';
+    } else {
+        req.closeButtonIdSuffix = 'regular';
+    }
+    next();
+}
+
 function fieldSubmission( req, res, next ) {
     var options = {
         type: 'fs',
@@ -138,7 +150,8 @@ function fieldSubmission( req, res, next ) {
         print: req.query.print === 'true',
         jini: req.jini,
         participant: req.participant,
-        completeButton: req.completeButton
+        completeButton: req.completeButton,
+        closeButtonIdSuffix: req.closeButtonIdSuffix
     };
 
     _renderWebform( req, res, next, options );
