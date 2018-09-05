@@ -424,7 +424,7 @@ function _removeCompleteButtonIfNeccessary() {
     } else if ( /\/fs\/participant\//.test( window.location.pathname ) ) {
         // for  participant views
         $( 'button#finish-form' ).remove();
-        $( 'button#close-form' ).addClass( 'participant' );
+        $( 'button#close-form' ).addClass( 'participant btn-primary' ).removeClass( 'btn-default' );
     } else if ( settings.type === 'edit' && !settings.completeButton ) {
         // In the future we can use a more robust way to do this by inspecting the record.
         $( 'button#finish-form' ).remove();
