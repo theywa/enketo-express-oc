@@ -95,7 +95,7 @@ function init( selector, data, loadWarnings ) {
 
             // Check if record is marked complete
             if ( form.model.isMarkedComplete() ) {
-                $( 'button#close-form' ).remove();
+                $( 'button#finish-form' ).remove();
             }
 
             if ( settings.goTo && location.hash ) {
