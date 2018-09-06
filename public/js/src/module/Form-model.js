@@ -66,6 +66,13 @@ Model.prototype.getXmlFragmentStr = function( node ) {
 };
 
 Model.prototype.isMarkedComplete = function() {
+    // Monkeypatch the namespace resolver to ensure oc namespace prefix is declared
+    // It's alright since this function is only called once.
+    const OPENCLINICA_NS = 'http://openclinica.org/xforms';
+    if ( !this.getNamespacePrefix( OPENCLINICA_NS ) ) {
+        this.namespaces[ 'oc' ] = OPENCLINICA_NS;
+    }
+
     return this.evaluate( '/node()/@oc:complete = "true"', 'boolean', null, null, true );
 };
 
