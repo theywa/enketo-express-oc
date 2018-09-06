@@ -171,6 +171,21 @@ Otherwise, use exactly as [POST /instance/view/iframe](https://apidocs.enketo.or
 
 Same as POST /instance/note except that this view has a **Close button** in the Discrepancy Note Widget.
 
+#### POST /instance/headless
+
+Loads a record headlessly, adds autoqueries and submits. 
+
+The result object has a `"message"`, and `"fieldsubmissions"` property. The `"message"` value contains an error message if the HTTP response is not `200` or `201` (otherwise the value is "OK"). The `"fieldsubmissions"` value is the number of fieldsubmissions that were successfully submitted. For example:
+
+```json
+{
+    "message": "OK",
+    "fieldsubmissions": 1
+}
+```
+
+Otherwise, use like [POST /instance](http://apidocs.enketo.org/v2/#/post-instance) (without `return_url` and `go_to` parameters)
+
 ### DELETE /instance
 
 Removes cached instance. This method may not have a practical use as instances POSTed to enketo for editing are only cached/saved very briefly (available for a maximum of 1 minute).

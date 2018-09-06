@@ -45,8 +45,10 @@ function init( selector, data ) {
             }
 
             form = new Form( formSelector, data, formOptions );
-            loadErrors = form.init();
-
+            loadErrors = loadErrors.concat( form.init() );
+            if ( !settings.headless ) {
+                form.specialOcLoadValidate();
+            }
             // Remove loader. This will make the form visible.
             // In order to aggregate regular loadErrors and GoTo loaderrors,
             // this is placed in between form.init() and form.goTo().

@@ -3,11 +3,10 @@
 'use strict';
 
 var Form = require( 'enketo-core/src/js/Form' );
-var FormModel = require( 'enketo-core/src/js/Form-model' );
+var FormModel = require( './Form-model' );
 var $ = require( 'jquery' );
 var gui = require( './gui' );
 
-require( './Form-model' );
 require( './relevant' );
 require( './required' );
 require( './page' );
@@ -99,28 +98,30 @@ Form.prototype.init = function() {
     }
 
     var loadErrors = originalInit.call( this );
-    // Add custom functionality
-    try {
-        // Evaluate "required" expressions upon load to hide asterisks.
-        // Evaluate "constraint" expressions upon load to show error message for fields that *have a value*.
-        this.getRelatedNodes( 'data-required' ).add( $( this.getRelatedNodes( 'data-constraint' ) ) ).each( function() {
-            var $input = $( this );
-            that.validateInput( $input )
-                .then( function( passed ) {
-                    if ( !passed ) {
-                        // Undo the displaying of a required error message upon load
-                        that.setValid( $input, 'required' );
-                    }
-                } );
-        } );
-    } catch ( e ) {
-        console.error( e );
-        loadErrors.push( e.name + ': ' + e.message );
-    }
+
 
     initialized = true;
     return loadErrors;
 };
+
+Form.prototype.specialOcLoadValidate = function( loadErrors ) {
+    var that = this;
+    // Evaluate "required" expressions upon load to hide asterisks.
+    // Evaluate "constraint" expressions upon load to show error message for fields that *have a value*.
+    this.getRelatedNodes( 'data-required' ).add( $( this.getRelatedNodes( 'data-constraint' ) ) ).each( function() {
+        var $input = $( this );
+        that.validateInput( $input )
+            .then( function( passed ) {
+                if ( !passed ) {
+                    // Undo the displaying of a required error message upon load
+                    //that.setValid( $input, 'required' );
+                }
+            } );
+    } );
+
+    return loadErrors;
+};
+
 
 /**
  * Skip constraint (and required) validation if question is currently marked with "invalid-relevant" error.

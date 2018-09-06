@@ -85,6 +85,10 @@ function init( selector, data, loadWarnings ) {
 
             loadErrors = loadErrors.concat( form.init() );
 
+            if ( !settings.headless ) {
+                form.specialOcLoadValidate();
+            }
+
             // Remove loader. This will make the form visible.
             // In order to aggregate regular loadErrors and GoTo loaderrors,
             // this is placed in between form.init() and form.goTo().
@@ -122,6 +126,7 @@ function init( selector, data, loadWarnings ) {
             if ( loadErrors.length > 0 ) {
                 throw loadErrors;
             }
+
             resolve( form );
         } )
         .catch( function( error ) {
@@ -135,38 +140,85 @@ function init( selector, data, loadWarnings ) {
             gui.alertLoadErrors( loadErrors, advice );
         } )
         .then( function( form ) {
+            if ( settings.headless ) {
+                console.log( 'doing headless things' );
+                var $result = $( '<div id="headless-result" style="position: fixed; background: pink; top: 0; left: 50%;"/>' );
+                if ( loadErrors.length ) {
+                    $result.append( '<span id="error">' + loadErrors[ 0 ] + '</span>' );
+                    $( 'body' ).append( $result );
+                    return form;
+                }
+                return _headlessCloseComplete()
+                    .then( function( fieldsubmissions ) {
+                        $result.append( '<span id="fieldsubmissions">' + fieldsubmissions + '</span>' );
+                    } )
+                    .catch( function( error ) {
+                        $result.append( '<span id="error">' + error.message + '</span>' );
+                    } )
+                    .then( function() {
+                        $( 'body' ).append( $result );
+                        return form;
+                    } );
+            }
+        } )
+        .then( function( form ) {
             // OC will return even if there were errors.
             return form;
         } );
 }
 
-/**
- * Controller function to reset to a blank form. Checks whether all changes have been saved first
- * @param  {boolean=} confirmed Whether unsaved changes can be discarded and lost forever
- */
-/*function _resetForm( confirmed ) {
-    var message;
-    var choices;
+function _headlessValidateAndAutoQuery( valid ) {
+    var markedAsComplete = form.model.isMarkedComplete();
+    var $invalid = $();
 
-    if ( !confirmed && form.editStatus ) {
-        message = t( 'confirm.save.msg' );
-        gui.confirm( message, choices )
-            .then(function(confirmed){
-                _resetForm( true );
-            });
-    } else {
-        //_setDraftStatus( false );
-        form.resetView();
-        ignoreBeforeUnload = false;
-        form = new Form( formSelector, {
-            modelStr: formData.modelStr,
-            external: formData.external
-        }, formOptions );
-        form.init();
-        form.view.$
-            .trigger( 'formreset' );
+    if ( !valid ) {
+        if ( markedAsComplete ) {
+            $invalid = form.view.$.find( '.invalid-relevant, .invalid-constraint, .invalid-required' );
+        } else {
+            $invalid = form.view.$.find( '.invalid-relevant, .invalid-constraint' );
+        }
+        // Trigger auto-queries for relevant, constraint and required (handled in DN widget)
+        _autoAddQueries( $invalid );
+        // Not efficient but robust, and not relying on validateContinuously: true, we just validate again.
+        return form.validate();
     }
-}*/
+    return valid;
+}
+
+function _headlessCloseComplete() {
+    var markedAsComplete = form.model.isMarkedComplete();
+    return form.validate()
+        // We run the autoquery-and-validate logic 3 times for those forms that have validation logic
+        // that is affected by autoqueries, ie. an autoquery for question A makes question B invalid.
+        .then( _headlessValidateAndAutoQuery )
+        .then( _headlessValidateAndAutoQuery )
+        .then( _headlessValidateAndAutoQuery )
+        .then( function( valid ) {
+            if ( !valid && markedAsComplete ) {
+                return valid;
+            }
+            // ignore .invalid-required
+            return form.view.$.find( '.invalid-relevant, .invalid-constraint' ).length === 0;
+        } )
+        .then( function( valid ) {
+            if ( !valid || reasons.getInvalidFields().length ) {
+                throw new Error( 'Could not create valid record using autoqueries' );
+            }
+            return fieldSubmissionQueue.submitAll();
+        } )
+        .then( function() {
+            if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
+                throw new Error( 'Failed to submit fieldsubmissions' );
+            }
+            if ( markedAsComplete ) {
+                return fieldSubmissionQueue.complete( form.instanceID, form.deprecatedID );
+            }
+        } )
+        .then( function() {
+            return ( fieldSubmissionQueue.submittedCounter );
+        } );
+}
+
 
 /**
  * Closes the form after checking that the queue is empty.
@@ -435,6 +487,10 @@ function _complete( bypassConfirmation ) {
         } );
 }
 
+/**
+ * Triggers autoqueries. 
+ * @param {*} $questions 
+ */
 function _autoAddQueries( $questions ) {
     $questions.trigger( 'addquery.oc' );
 }
