@@ -171,7 +171,7 @@ Otherwise, use exactly as [POST /instance/view/iframe](https://apidocs.enketo.or
 
 Same as POST /instance/note except that this view has a **Close button** in the Discrepancy Note Widget.
 
-#### POST /instance/headless
+### POST /instance/headless
 
 Loads a record headlessly, adds autoqueries and submits. 
 
