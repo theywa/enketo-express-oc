@@ -158,7 +158,7 @@ Comment.prototype._setFocusHandler = function() {
         if ( that.$commentButton.is( ':visible' ) ) {
             that.$commentButton.click();
         } else {
-            throw new Error( t( 'alert.gotohidden.msg' ) );
+            throw new Error( t( 'alert.goto.hidden' ) );
         }
     } );
 };
