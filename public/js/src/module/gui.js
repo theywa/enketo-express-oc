@@ -200,7 +200,7 @@ function feedback( message, duration ) {
  *
  * @param {string} message
  * @param {string=} heading
- * @param {string=} level css class or normal (no styling) ('alert', 'info', 'warning', 'error', 'success')
+ * @param {string=} level css class or normal (no styling) ('alert', 'info', 'warning', 'error', 'success', 'oc-strict-error')
  * @param {number=} duration duration in secondsafter which dialog should self-destruct
  */
 function alert( message, heading, level, duration ) {

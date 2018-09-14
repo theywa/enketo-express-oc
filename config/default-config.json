@@ -28,7 +28,7 @@
     "widgets": [
         "note", "select-desktop", "select-mobile", "autocomplete", "geo", "textarea", "url",
         "table", "radio", "date", "time", "datetime", "compact", "file", "draw", "rank",
-        "analog-scale", "../../../widget/discrepancy-note/dn-widget",
+        "analog-scale", "../../../widget/discrepancy-note/dn-widget", "../../../widget/strict-class/strict-class",
         "likert", "range", "horizontal", "image-view", "comment", "image-map", "date-native", "date-mobile"
     ],
     "analytics": "google",

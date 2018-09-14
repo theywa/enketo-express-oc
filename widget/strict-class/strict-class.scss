@@ -1,0 +1,18 @@
+@mixin oc-strict-error {
+    $c: #f58220;
+    border-color: $c;
+    background-color: lighten($c, 20%);
+}
+
+.oc-strict {
+
+    &.invalid-constraint,
+    &.invalid-required,
+    &.invalid-relevant {
+        @include oc-strict-error;
+    }
+}
+
+.alert-box.oc-strict-error {
+    @include oc-strict-error;
+}

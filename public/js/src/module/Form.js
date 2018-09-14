@@ -77,22 +77,22 @@ Form.prototype.init = function() {
     var that = this;
     var initialized = false;
 
-    // Before any other change handlers, add the "hard check" handlers
-    if ( this.hardCheckEnabled ) {
-        console.log( 'setting hard check handlers' );
+    // Before any other change handlers, add the "strict check" handlers
+    if ( this.strictCheckEnabled ) {
+        console.log( 'setting strict check handlers' );
         this.view.$
             .on( 'change.file',
                 'input:not(.ignore)[data-required][oc-required-type="strict"], select:not(.ignore)[data-required][oc-required-type="strict"], textarea:not(.ignore)[data-required][oc-required-type="strict"]',
                 function( evt ) {
                     if ( initialized ) {
-                        that.hardRequiredCheckHandler( evt, this );
+                        that.strictRequiredCheckHandler( evt, this );
                     }
                 } )
             .on( 'change.file',
                 'input:not(.ignore)[data-constraint][oc-constraint-type="strict"], select:not(.ignore)[data-constraint][oc-constraint-type="strict"], textarea:not(.ignore)[data-constraint][oc-constraint-type="strict"]',
                 function( evt ) {
                     if ( initialized ) {
-                        that.hardConstraintCheckHandler( evt, this );
+                        that.strictConstraintCheckHandler( evt, this );
                     }
                 } );
     }
@@ -150,7 +150,7 @@ Form.prototype.validateInput = function( $input ) {
 };
 
 
-Form.prototype.hardRequiredCheckHandler = function( evt, input ) {
+Form.prototype.strictRequiredCheckHandler = function( evt, input ) {
     var that = this;
     var $input = $( input );
     var n = {
@@ -171,7 +171,7 @@ Form.prototype.hardRequiredCheckHandler = function( evt, input ) {
     if ( n.val === '' && this.model.node( n.path, n.ind ).isRequired( n.required ) ) {
         var question = input.closest( '.question' );
         var msg = question.querySelector( '.or-required-msg.active' ).innerHTML;
-        gui.alert( msg, 'Value is required' );
+        gui.alert( msg, 'Value is required', 'oc-strict-error' );
         // Cancel propagation input
         evt.stopImmediatePropagation();
         var currentModelValue = that.model.node( n.path, n.ind ).getVal();
@@ -180,7 +180,7 @@ Form.prototype.hardRequiredCheckHandler = function( evt, input ) {
     }
 };
 
-Form.prototype.hardConstraintCheckHandler = function( evt, input ) {
+Form.prototype.strictConstraintCheckHandler = function( evt, input ) {
     var that = this;
     var $input = $( input );
     var n = {
@@ -221,7 +221,7 @@ Form.prototype.hardConstraintCheckHandler = function( evt, input ) {
     if ( typeof n.constraint !== 'undefined' && n.constraint !== null && n.constraint.length > 0 && !modelClone.evaluate( n.constraint, 'boolean', n.path, n.ind ) ) {
         var question = input.closest( '.question' );
         var msg = question.querySelector( '.or-constraint-msg.active' ).innerHTML;
-        gui.alert( msg, 'Value not allowed' );
+        gui.alert( msg, 'Value not allowed', 'oc-strict-error' );
         // Cancel propagation input
         evt.stopImmediatePropagation();
         var currentModelValue = that.model.node( n.path, n.ind ).getVal();

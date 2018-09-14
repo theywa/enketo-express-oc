@@ -47,8 +47,8 @@ function init( selector, data, loadWarnings ) {
 
             form = new Form( formSelector, data, formOptions );
 
-            if ( settings.hardCheckEnabled ) {
-                form.hardCheckEnabled = true;
+            if ( settings.strictCheckEnabled ) {
+                form.strictCheckEnabled = true;
             }
 
             // Additional layer of security to disable submissions in readonly views.
@@ -404,7 +404,7 @@ function _closeParticipant() {
             if ( !valid ) {
                 var strictViolations = form
                     .view.$
-                    .find( '.invalid-required [oc-required-type="strict"], .invalid-constraint [oc-constraint-type="strict"], .invalid-relevant' )
+                    .find( '.oc-strict.invalid-required, .oc-strict.invalid-constraint, .oc-strict.invalid-relevant' )
                     .length;
 
                 valid = strictViolations === 0;
@@ -412,7 +412,7 @@ function _closeParticipant() {
             if ( valid ) {
                 return _closeSimple();
             }
-            gui.alert( t( 'fieldsubmission.confirm.autoquery.msg1' ) );
+            gui.alert( t( 'fieldsubmission.confirm.autoquery.msg1' ), null, 'oc-strict-error' );
         } );
 }
 

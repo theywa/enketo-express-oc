@@ -57,15 +57,9 @@ pageModule._next = function() {
     originalPageModuleNext.call( this )
         .then( function( valid ) {
             // for strict-validation navigation-blocking, we ignore some errors (compared to Enketo Core module)
-            if ( !valid && settings.hardCheckEnabled ) {
-                var strictViolations =
-                    // TODO: after applying special strict-error classs to .question, we can simplify these queries
-                    ( that.$current[ 0 ].matches( '.invalid-required' ) && that.$current[ 0 ].querySelector( '[oc-required-type="strict"]' ) ) ||
-                    ( that.$current[ 0 ].matches( '.invalid-constraint' ) && that.$current[ 0 ].querySelector( '[oc-constraint-type="strict"]' ) ) ||
-                    !!that.$current[ 0 ].matches( '.invalid-relevant' ) ||
-                    !!that.$current[ 0 ].querySelector( '.invalid-required [oc-required-type="strict"]' ) ||
-                    !!that.$current[ 0 ].querySelector( '.invalid-constraint [oc-constraint-type="strict"]' ) ||
-                    !!that.$current[ 0 ].querySelector( '.invalid-relevant' );
+            if ( !valid && settings.strictCheckEnabled ) {
+                var selector = '.oc-strict.invalid-required, .oc-strict.invalid-constraint, .oc-strict.invalid-relevant';
+                var strictViolations = that.$current[ 0 ].matches( selector ) || !!that.$current[ 0 ].querySelector( selector );
 
                 if ( !strictViolations ) {
                     var currentIndex = that._getCurrentIndex();

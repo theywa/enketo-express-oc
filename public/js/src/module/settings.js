@@ -110,7 +110,7 @@ settings.reasonForChange = /\/rfc\//.test( window.location.pathname );
 
 // Strict validation functionality for Participate
 if ( /\/participant\//.test( window.location.pathname ) ) {
-    settings.hardCheckEnabled = true;
+    settings.strictCheckEnabled = true;
     // override validatePage in enketo/config
     config.validatePage = true;
 }
