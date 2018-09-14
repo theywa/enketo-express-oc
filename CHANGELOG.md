@@ -5,8 +5,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [Unreleased]
 ----------------------
 ##### Changed
+- Made export feature consistent across browsers.
+
+##### Fixed
+- Cascading selections with radiobuttons/checkboxes do not show image labels.
+
+[1.71.0] - 2018-09-11
+----------------------
+##### Changed
 - Performance of form engine (determining index).
 - Clean up translation and JS built files and separate better from source files.
+- Print hints are now guidance hints, and follow ODK XForms specification
 
 ##### Fixed
 - Range pickers not showing current value "thumb" on printouts.
