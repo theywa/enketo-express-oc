@@ -23,5 +23,5 @@ $.fn[ pluginName ] = function( options, event ) {
 module.exports = {
     'name': pluginName,
     'selector': '.or-appearance-dn input[type="text"][data-for], .or-appearance-dn textarea[data-for]',
-    'helpersRequired': [ 'input', 'pathToAbsolute', 'evaluate' ]
+    'helpersRequired': [ 'input', 'pathToAbsolute', 'evaluate', 'getModelValue' ]
 };

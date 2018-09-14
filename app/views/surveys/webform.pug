@@ -17,12 +17,12 @@ block style
 block script
   - var suffix = (type && type !== 'preview' && type !== 'single') ? '-' + type : ''
   if environment == 'production'
-    script(src=`${basePath}/js/enketo-webform${suffix}-bundle.min.js`)
+    script(src=`${basePath}/js/build/enketo-webform${suffix}-bundle.min.js`)
   else
-    script(src=`${basePath}/js/enketo-webform${suffix}-dev-bundle.js`)
+    script(src=`${basePath}/js/build/enketo-webform${suffix}-dev-bundle.js`)
   
   -// load jini stuff asynchronously (OC)
-  if jini
+  if jini && !headless
     script(async, src=`${jini['script url']}`)
     script.
       var jiniSheet = document.createElement('link');

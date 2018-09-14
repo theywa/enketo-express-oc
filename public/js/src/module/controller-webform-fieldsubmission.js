@@ -47,6 +47,10 @@ function init( selector, data, loadWarnings ) {
 
             form = new Form( formSelector, data, formOptions );
 
+            if ( settings.hardCheckEnabled ) {
+                form.hardCheckEnabled = true;
+            }
+
             // Additional layer of security to disable submissions in readonly views.
             // Should not be necessary to do this.
             if ( settings.type !== 'view' ) {
@@ -58,9 +62,6 @@ function init( selector, data, loadWarnings ) {
                     get: function() { return {}; }
                 };
             }
-
-            // remove submit button before event handlers are set
-            _removeCompleteButtonIfNeccessary();
 
             // set eventhandlers before initializing form
             _setEventHandlers( selector );
@@ -84,10 +85,20 @@ function init( selector, data, loadWarnings ) {
 
             loadErrors = loadErrors.concat( form.init() );
 
+            if ( !settings.headless ) {
+                form.specialOcLoadValidate();
+            }
+
             // Remove loader. This will make the form visible.
             // In order to aggregate regular loadErrors and GoTo loaderrors,
             // this is placed in between form.init() and form.goTo().
             $( 'body > .main-loader' ).remove();
+
+            // Check if record is marked complete
+            if ( data.instanceStr && form.model.isMarkedComplete() ) {
+                $( 'button#finish-form' ).remove();
+                $( 'button.close-form-regular' ).removeClass( 'close-form-regular' ).addClass( 'close-form-complete' );
+            }
 
             if ( settings.goTo && location.hash ) {
                 // form.goTo returns an array of 1 error if it has error. We're using our special
@@ -115,6 +126,7 @@ function init( selector, data, loadWarnings ) {
             if ( loadErrors.length > 0 ) {
                 throw loadErrors;
             }
+
             resolve( form );
         } )
         .catch( function( error ) {
@@ -128,38 +140,85 @@ function init( selector, data, loadWarnings ) {
             gui.alertLoadErrors( loadErrors, advice );
         } )
         .then( function( form ) {
+            if ( settings.headless ) {
+                console.log( 'doing headless things' );
+                var $result = $( '<div id="headless-result" style="position: fixed; background: pink; top: 0; left: 50%;"/>' );
+                if ( loadErrors.length ) {
+                    $result.append( '<span id="error">' + loadErrors[ 0 ] + '</span>' );
+                    $( 'body' ).append( $result );
+                    return form;
+                }
+                return _headlessCloseComplete()
+                    .then( function( fieldsubmissions ) {
+                        $result.append( '<span id="fieldsubmissions">' + fieldsubmissions + '</span>' );
+                    } )
+                    .catch( function( error ) {
+                        $result.append( '<span id="error">' + error.message + '</span>' );
+                    } )
+                    .then( function() {
+                        $( 'body' ).append( $result );
+                        return form;
+                    } );
+            }
+        } )
+        .then( function( form ) {
             // OC will return even if there were errors.
             return form;
         } );
 }
 
-/**
- * Controller function to reset to a blank form. Checks whether all changes have been saved first
- * @param  {boolean=} confirmed Whether unsaved changes can be discarded and lost forever
- */
-/*function _resetForm( confirmed ) {
-    var message;
-    var choices;
+function _headlessValidateAndAutoQuery( valid ) {
+    var markedAsComplete = form.model.isMarkedComplete();
+    var $invalid = $();
 
-    if ( !confirmed && form.editStatus ) {
-        message = t( 'confirm.save.msg' );
-        gui.confirm( message, choices )
-            .then(function(confirmed){
-                _resetForm( true );
-            });
-    } else {
-        //_setDraftStatus( false );
-        form.resetView();
-        ignoreBeforeUnload = false;
-        form = new Form( formSelector, {
-            modelStr: formData.modelStr,
-            external: formData.external
-        }, formOptions );
-        form.init();
-        form.view.$
-            .trigger( 'formreset' );
+    if ( !valid ) {
+        if ( markedAsComplete ) {
+            $invalid = form.view.$.find( '.invalid-relevant, .invalid-constraint, .invalid-required' );
+        } else {
+            $invalid = form.view.$.find( '.invalid-relevant, .invalid-constraint' );
+        }
+        // Trigger auto-queries for relevant, constraint and required (handled in DN widget)
+        _autoAddQueries( $invalid );
+        // Not efficient but robust, and not relying on validateContinuously: true, we just validate again.
+        return form.validate();
     }
-}*/
+    return valid;
+}
+
+function _headlessCloseComplete() {
+    var markedAsComplete = form.model.isMarkedComplete();
+    return form.validate()
+        // We run the autoquery-and-validate logic 3 times for those forms that have validation logic
+        // that is affected by autoqueries, ie. an autoquery for question A makes question B invalid.
+        .then( _headlessValidateAndAutoQuery )
+        .then( _headlessValidateAndAutoQuery )
+        .then( _headlessValidateAndAutoQuery )
+        .then( function( valid ) {
+            if ( !valid && markedAsComplete ) {
+                return valid;
+            }
+            // ignore .invalid-required
+            return form.view.$.find( '.invalid-relevant, .invalid-constraint' ).length === 0;
+        } )
+        .then( function( valid ) {
+            if ( !valid || reasons.getInvalidFields().length ) {
+                throw new Error( 'Could not create valid record using autoqueries' );
+            }
+            return fieldSubmissionQueue.submitAll();
+        } )
+        .then( function() {
+            if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
+                throw new Error( 'Failed to submit fieldsubmissions' );
+            }
+            if ( markedAsComplete ) {
+                return fieldSubmissionQueue.complete( form.instanceID, form.deprecatedID );
+            }
+        } )
+        .then( function() {
+            return ( fieldSubmissionQueue.submittedCounter );
+        } );
+}
+
 
 /**
  * Closes the form after checking that the queue is empty.
@@ -169,7 +228,7 @@ function init( selector, data, loadWarnings ) {
  * 
  * @return {Promise} [description]
  */
-function _close( bypassAutoQuery ) {
+function _closeRegular( bypassAutoQuery ) {
     var msg = '';
     var tAlertCloseMsg = t( 'fieldsubmission.alert.close.msg1' );
     var tAlertCloseHeading = t( 'fieldsubmission.alert.close.heading1' );
@@ -339,6 +398,24 @@ function _closeCompletedRecord() {
         } );
 }
 
+function _closeParticipant() {
+    return form.validate()
+        .then( function( valid ) {
+            if ( !valid ) {
+                var strictViolations = form
+                    .view.$
+                    .find( '.invalid-required [oc-required-type="strict"], .invalid-constraint [oc-constraint-type="strict"]' )
+                    .length;
+
+                valid = strictViolations === 0;
+            }
+            if ( valid ) {
+                return _closeSimple();
+            }
+            gui.alert( t( 'fieldsubmission.confirm.autoquery.msg1' ) );
+        } );
+}
+
 function _redirect( msec ) {
     ignoreBeforeUnload = true;
     setTimeout( function() {
@@ -410,20 +487,10 @@ function _complete( bypassConfirmation ) {
         } );
 }
 
-// TODO: Move all of this to server?
-function _removeCompleteButtonIfNeccessary() {
-    // for readonly and note-only views
-    if ( settings.type === 'view' || /\/fs\/dnc?\//.test( window.location.pathname ) ) {
-        $( 'button#finish-form' ).remove();
-        $( 'button#close-form' ).addClass( 'simple' );
-    } else if ( settings.type === 'edit' && !settings.completeButton ) {
-        // In the future we can use a more robust way to do this by inspecting the record.
-        $( 'button#finish-form' ).remove();
-        // Change the behavior of the Close button in edit views except in note-only views
-        $( 'button#close-form' ).addClass( 'completed-record' );
-    }
-}
-
+/**
+ * Triggers autoqueries. 
+ * @param {*} $questions 
+ */
 function _autoAddQueries( $questions ) {
     $questions.trigger( 'addquery.oc' );
 }
@@ -565,25 +632,6 @@ function _setEventHandlers( selector ) {
         } );
     }
 
-    $( 'button#close-form:not(.completed-record, .simple)' ).click( function() {
-        var $button = $( this ).btnBusyState( true );
-
-        _close()
-            .then( function( again ) {
-                if ( again ) {
-                    return _close( true );
-                }
-            } )
-            .catch( function( e ) {
-                console.error( e );
-            } )
-            .then( function() {
-                $button.btnBusyState( false );
-            } );
-
-        return false;
-    } );
-
     $( 'button#finish-form' ).click( function() {
         var $button = $( this ).btnBusyState( true );
 
@@ -615,9 +663,28 @@ function _setEventHandlers( selector ) {
         return false;
     } );
 
+    $( 'button#close-form-regular' ).click( function() {
+        var $button = $( this ).btnBusyState( true );
+
+        _closeRegular()
+            .then( function( again ) {
+                if ( again ) {
+                    return _closeRegular( true );
+                }
+            } )
+            .catch( function( e ) {
+                console.error( e );
+            } )
+            .then( function() {
+                $button.btnBusyState( false );
+            } );
+
+        return false;
+    } );
+
     // This is for closing a record that was marked as final. It's quite different
     // from Complete or the regular Close.
-    $( 'button#close-form.completed-record' ).click( function() {
+    $( 'button#close-form-complete' ).click( function() {
         var $button = $( this ).btnBusyState( true );
 
         // form.validate() will trigger fieldsubmissions for timeEnd before it resolves
@@ -633,10 +700,25 @@ function _setEventHandlers( selector ) {
     } );
 
     // This is for closing a record in a readonly or note-only view.
-    $( 'button#close-form.simple' ).click( function() {
+    $( 'button#close-form-read' ).click( function() {
         var $button = $( this ).btnBusyState( true );
 
         _closeSimple()
+            .catch( function( e ) {
+                gui.alert( e.message );
+            } )
+            .then( function() {
+                $button.btnBusyState( false );
+            } );
+
+        return false;
+    } );
+
+    // This is for closing a participant view.
+    $( 'button#close-form-participant' ).click( function() {
+        var $button = $( this ).btnBusyState( true );
+
+        _closeParticipant()
             .catch( function( e ) {
                 gui.alert( e.message );
             } )

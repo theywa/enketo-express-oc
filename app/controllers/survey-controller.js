@@ -19,8 +19,10 @@ router.param( 'encrypted_enketo_id_view', routerUtils.encryptedEnketoIdView );
 router.param( 'encrypted_enketo_id_view_dn', routerUtils.encryptedEnketoIdViewDn );
 router.param( 'encrypted_enketo_id_view_dnc', routerUtils.encryptedEnketoIdViewDnc );
 router.param( 'encrypted_enketo_id_fs_c', routerUtils.encryptedEnketoIdFsC );
+router.param( 'encrypted_enketo_id_fs_participant', routerUtils.encryptedEnketoIdFsParticipant );
 router.param( 'encrypted_enketo_id_rfc', routerUtils.encryptedEnketoIdEditRfc );
 router.param( 'encrypted_enketo_id_rfc_c', routerUtils.encryptedEnketoIdEditRfcC );
+router.param( 'encrypted_enketo_id_headless', routerUtils.encryptedEnketoIdEditHeadless );
 
 router.param( 'mod', ( req, rex, next, mod ) => {
     if ( mod === 'i' ) {
@@ -34,14 +36,22 @@ router.param( 'mod', ( req, rex, next, mod ) => {
 
 router
     //.get( '*', loggedInCheck )
+    .get( '*/participant/*', function( req, res, next ) {
+        req.participant = true;
+        next();
+    } )
     .get( '/x/', offlineWebform )
     .get( '/_/', offlineWebform )
+    .get( '*/headless*', _setHeadless )
     .get( '/preview*', _setJini )
     .get( /\/(single|edit)\/fs(\/rfc)?(\/c)?\/i/, _setJini )
+    .get( /\/edit\/fs\/(?!(participant|rfc))/, _setCompleteButton )
+    .get( '*', _setCloseButtonClass )
     .get( '/:enketo_id', webform )
     .get( '/:mod/:enketo_id', webform )
     .get( '/single/fs/:mod/:enketo_id', fieldSubmission )
     .get( '/single/fs/c/:mod/:encrypted_enketo_id_fs_c', fieldSubmission )
+    .get( '/single/fs/participant/:mod/:encrypted_enketo_id_fs_participant', fieldSubmission )
     .get( '/preview/:enketo_id', preview )
     .get( '/preview/:mod/:enketo_id', preview )
     .get( '/preview', preview )
@@ -60,6 +70,9 @@ router
     .get( '/edit/fs/c/:mod/:encrypted_enketo_id_fs_c', fieldSubmission )
     .get( '/edit/fs/dn/:mod/:encrypted_enketo_id_view_dn', fieldSubmission )
     .get( '/edit/fs/dn/c/:mod/:encrypted_enketo_id_view_dnc', fieldSubmission )
+    .get( '/edit/fs/participant/:mod/:encrypted_enketo_id_fs_participant', fieldSubmission )
+    .get( '/edit/fs/headless/:encrypted_enketo_id_headless', fieldSubmission )
+    //.get( '/edit/fs/rfc/headless/:enketo_id_rfc', fieldSubmission )
     .get( '/view/fs/:encrypted_enketo_id_view', fieldSubmission )
     .get( '/view/fs/:mod/:encrypted_enketo_id_view', fieldSubmission )
     .get( '/xform/:enketo_id', xform )
@@ -68,6 +81,7 @@ router
     .get( '/xform/:encrypted_enketo_id_view_dn', xform )
     .get( '/xform/:encrypted_enketo_id_view_dnc', xform )
     .get( '/xform/:encrypted_enketo_id_fs_c', xform )
+    .get( '/xform/:encrypted_enketo_id_fs_participant', xform )
     .get( '/connection', ( req, res ) => {
         res.status = 200;
         res.send( `connected ${Math.random()}` );
@@ -117,12 +131,37 @@ function _setJini( req, res, next ) {
     next();
 }
 
+function _setCompleteButton( req, res, next ) {
+    req.completeButton = true;
+    next();
+}
+
+function _setCloseButtonClass( req, res, next ) {
+    if ( /\/(view|dn)\//.test( req.originalUrl ) ) {
+        req.closeButtonIdSuffix = 'read';
+    } else if ( /participant/.test( req.originalUrl ) ) {
+        req.closeButtonIdSuffix = 'participant';
+    } else {
+        req.closeButtonIdSuffix = 'regular';
+    }
+    next();
+}
+
+function _setHeadless( req, res, next ) {
+    req.headless = true;
+    next();
+}
+
 function fieldSubmission( req, res, next ) {
     var options = {
         type: 'fs',
         iframe: req.iframe,
         print: req.query.print === 'true',
         jini: req.jini,
+        participant: req.participant,
+        completeButton: req.completeButton,
+        closeButtonIdSuffix: req.closeButtonIdSuffix,
+        headless: !!req.headless
     };
 
     _renderWebform( req, res, next, options );

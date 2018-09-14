@@ -98,7 +98,7 @@ branchModule.deactivate = function( $branchNode ) {
 
         name = this.form.input.getName( $control );
         index = this.form.input.getIndex( $control );
-        value = this.form.model.node( name, index ).getVal()[ 0 ];
+        value = this.form.model.node( name, index ).getVal();
 
         if ( value !== '' ) {
             //$branchNode.removeClass( 'disabled' );

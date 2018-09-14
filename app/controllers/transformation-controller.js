@@ -23,8 +23,11 @@ router.param( 'encrypted_enketo_id_view', routerUtils.encryptedEnketoIdView );
 router.param( 'encrypted_enketo_id_view_dn', routerUtils.encryptedEnketoIdViewDn );
 router.param( 'encrypted_enketo_id_view_dnc', routerUtils.encryptedEnketoIdViewDnc );
 router.param( 'encrypted_enketo_id_fs_c', routerUtils.encryptedEnketoIdFsC );
+router.param( 'encrypted_enketo_id_fs_participant', routerUtils.encryptedEnketoIdFsParticipant );
 router.param( 'encrypted_enketo_id_rfc', routerUtils.encryptedEnketoIdEditRfc );
 router.param( 'encrypted_enketo_id_rfc_c', routerUtils.encryptedEnketoIdEditRfcC );
+router.param( 'encrypted_enketo_id_headless', routerUtils.encryptedEnketoIdEditHeadless );
+
 router
     .post( '*', ( req, res, next ) => {
         // set content-type to json to provide appropriate json Error responses
@@ -39,6 +42,8 @@ router
     .post( '/xform/:encrypted_enketo_id_fs_c', getSurveyParts )
     .post( '/xform/:encrypted_enketo_id_rfc', getSurveyParts )
     .post( '/xform/:encrypted_enketo_id_rfc_c', getSurveyParts )
+    .post( '/xform/:encrypted_enketo_id_fs_participant', getSurveyParts )
+    .post( '/xform/:encrypted_enketo_id_headless', getSurveyParts )
     .post( '/xform', getSurveyParts )
     .post( '/xform/hash/:enketo_id', getSurveyHash );
 

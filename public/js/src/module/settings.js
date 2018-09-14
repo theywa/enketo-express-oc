@@ -80,6 +80,11 @@ if ( window.location.pathname.indexOf( '/preview' ) === 0 ) {
 // determine whether DN close button should be shown
 settings.dnCloseButton = window.location.pathname.indexOf( '/c/' ) !== -1;
 
+// headless?
+if ( window.location.pathname.indexOf( '/pdf' ) > 0 || window.location.pathname.indexOf( '/headless' ) > 0 ) {
+    settings.headless = true;
+}
+
 // Provide easy way to change online-only prefix if we wanted to in the future
 settings.enketoIdPrefix = '::';
 
@@ -102,6 +107,13 @@ settings.printRelevantOnly = !( ( settings.type === 'view' && !settings.instance
 
 // Reason for change functionality
 settings.reasonForChange = /\/rfc\//.test( window.location.pathname );
+
+// Strict validation functionality for Participate
+if ( /\/participant\//.test( window.location.pathname ) ) {
+    settings.hardCheckEnabled = true;
+    // override validatePage in enketo/config
+    config.validatePage = true;
+}
 
 function _getEnketoId( prefix, haystack ) {
     var id = new RegExp( prefix ).test( haystack ) ? haystack.substring( haystack.lastIndexOf( prefix ) + prefix.length ) : null;
