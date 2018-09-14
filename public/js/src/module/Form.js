@@ -169,12 +169,14 @@ Form.prototype.hardRequiredCheckHandler = function( evt, input ) {
 
     // Check required
     if ( n.val === '' && this.model.node( n.path, n.ind ).isRequired( n.required ) ) {
-        var msg = $( input ).closest( '.question' ).find( '.or-required-msg.active' ).html();
+        var question = input.closest( '.question' );
+        var msg = question.querySelector( '.or-required-msg.active' ).innerHTML;
         gui.alert( msg, 'Value is required' );
         // Cancel propagation input
         evt.stopImmediatePropagation();
         var currentModelValue = that.model.node( n.path, n.ind ).getVal();
         that.input.setVal( $( input ), currentModelValue ).dispatchEvent( new Event( 'change' ) );
+        question.scrollIntoView();
     }
 };
 
@@ -217,12 +219,14 @@ Form.prototype.hardConstraintCheckHandler = function( evt, input ) {
     }
 
     if ( typeof n.constraint !== 'undefined' && n.constraint !== null && n.constraint.length > 0 && !modelClone.evaluate( n.constraint, 'boolean', n.path, n.ind ) ) {
-        var msg = $( input ).closest( '.question' ).find( '.or-constraint-msg.active' ).html();
+        var question = input.closest( '.question' );
+        var msg = question.querySelector( '.or-constraint-msg.active' ).innerHTML;
         gui.alert( msg, 'Value not allowed' );
         // Cancel propagation input
         evt.stopImmediatePropagation();
         var currentModelValue = that.model.node( n.path, n.ind ).getVal();
         that.input.setVal( $( input ), currentModelValue ).dispatchEvent( new Event( 'change' ) );
+        question.scrollIntoView();
     }
 };
 
