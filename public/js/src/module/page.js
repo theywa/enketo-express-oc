@@ -3,6 +3,7 @@
 
 var pageModule = require( 'enketo-core/src/js/page' );
 var reasons = require( './reasons' );
+var settings = require( './settings' );
 var $ = require( 'jquery' );
 
 /*
@@ -19,10 +20,11 @@ pageModule.setRepeatHandlers = function() {
             that.updateAllActive();
             // Removing the class in effect avoids the animation
             // It also prevents multiple .or-repeat[role="page"] to be shown on the same page
-            $( event.target ).removeClass( 'current contains-current' ).find( '.current' ).removeClass( 'current' );
+            event.target.classList.remove( 'current', 'contains-current' );
+            event.target.querySelector( '.current' ).classList.remove( 'current' );
 
             // ---------- Custom OC --------------
-            if ( $( event.target ).attr( 'role' ) === 'page' && !reasons.validate() ) {
+            if ( event.target.getAttribute( 'role' ) === 'page' && !reasons.validate() ) {
                 that.toggleButtons();
             }
             // ------- End of Custom OC ----------
@@ -51,15 +53,21 @@ var originalPageModuleNext = pageModule._next;
 
 pageModule._next = function() {
     var that = this;
+    // the original call takes care of all the validations
     originalPageModuleNext.call( this )
         .then( function( valid ) {
-            if ( !valid ) {
-                var strictViolations = that.$current.find( '.question' ).addBack( '.question' ).filter( function() {
-                    return ( this.classList.contains( 'invalid-required' ) && this.querySelector( '[oc-required-type="strict"]' ) ) ||
-                        ( this.classList.contains( 'invalid-constraint' ) && this.querySelector( '[oc-constraint-type="strict"]' ) );
-                } ).length;
+            // for strict-validation navigation-blocking, we ignore some errors (compared to Enketo Core module)
+            if ( !valid && settings.hardCheckEnabled ) {
+                var strictViolations =
+                    // TODO: after applying special strict-error classs to .question, we can simplify these queries
+                    ( that.$current[ 0 ].matches( '.invalid-required' ) && that.$current[ 0 ].querySelector( '[oc-required-type="strict"]' ) ) ||
+                    ( that.$current[ 0 ].matches( '.invalid-constraint' ) && that.$current[ 0 ].querySelector( '[oc-constraint-type="strict"]' ) ) ||
+                    !!that.$current[ 0 ].matches( '.invalid-relevant' ) ||
+                    !!that.$current[ 0 ].querySelector( '.invalid-required [oc-required-type="strict"]' ) ||
+                    !!that.$current[ 0 ].querySelector( '.invalid-constraint [oc-constraint-type="strict"]' ) ||
+                    !!that.$current[ 0 ].querySelector( '.invalid-relevant' );
 
-                if ( strictViolations === 0 ) {
+                if ( !strictViolations ) {
                     var currentIndex = that._getCurrentIndex();
                     var next = that._getNext( currentIndex );
                     if ( next ) {

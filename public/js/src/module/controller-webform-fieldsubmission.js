@@ -404,7 +404,7 @@ function _closeParticipant() {
             if ( !valid ) {
                 var strictViolations = form
                     .view.$
-                    .find( '.invalid-required [oc-required-type="strict"], .invalid-constraint [oc-constraint-type="strict"]' )
+                    .find( '.invalid-required [oc-required-type="strict"], .invalid-constraint [oc-constraint-type="strict"], .invalid-relevant' )
                     .length;
 
                 valid = strictViolations === 0;
