@@ -45,6 +45,11 @@ function init( selector, data, loadWarnings ) {
                 fileManager.setInstanceAttachments( data.instanceAttachments );
             }
 
+            if ( data.instanceStr ) {
+                // TODO: REMOVE THIS! It is to troubleshoot https://github.com/OpenClinica/enketo-express-oc/issues/109
+                console.log( 'loading record:', data.instanceStr );
+            }
+
             form = new Form( formSelector, data, formOptions );
 
             if ( settings.strictCheckEnabled ) {
