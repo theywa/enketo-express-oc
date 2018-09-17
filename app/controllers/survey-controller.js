@@ -45,7 +45,7 @@ router
     .get( '*/headless*', _setHeadless )
     .get( '/preview*', _setJini )
     .get( /\/(single|edit)\/fs(\/rfc)?(\/c)?\/i/, _setJini )
-    .get( /\/edit\/fs\/(?!(participant|rfc))/, _setCompleteButton )
+    .get( /\/(edit|single)\/fs\/(?!(participant|rfc))/, _setCompleteButton )
     .get( '*', _setCloseButtonClass )
     .get( '/:enketo_id', webform )
     .get( '/:mod/:enketo_id', webform )
