@@ -40,6 +40,11 @@
             },
             "reasonforchangevalidationerror": {
                 "msg": "For each changed field a reason for change has to be provided. Please add any missing reasons."
+            },
+            "stricterror": {
+                "heading": "Invalid Value",
+                "msg1": "Value not updated.",
+                "msg2": "Please enter a suitable value to update the field."
             }
         },
         "confirm": {

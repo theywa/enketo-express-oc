@@ -394,6 +394,12 @@ function _getHomeScreenGuidanceObj( imageClass1, imageClass2 ) {
     };
 }
 
+
+function alertStrictError(msg){
+    msg +='<p><strong>' + t( 'fieldsubmission.alert.stricterror.msg1' ) + '</strong> ' + t( 'fieldsubmission.alert.stricterror.msg2' ) + '</p>';
+    alert( msg, t( 'fieldsubmission.alert.stricterror.heading' ), 'oc-strict-error' );
+}
+
 /**
  * Prompts for print settings (for Grid Theme) and prints from the regular view of the form.
  */
@@ -654,4 +660,5 @@ module.exports = {
     getErrorResponseMsg: getErrorResponseMsg,
     applyPrintStyle: applyPrintStyle,
     getPrintDialogComponents: getPrintDialogComponents,
+    alertStrictError: alertStrictError,
 };

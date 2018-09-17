@@ -171,7 +171,7 @@ Form.prototype.strictRequiredCheckHandler = function( evt, input ) {
     if ( n.val === '' && this.model.node( n.path, n.ind ).isRequired( n.required ) ) {
         var question = input.closest( '.question' );
         var msg = question.querySelector( '.or-required-msg.active' ).innerHTML;
-        gui.alert( msg, 'Value is required', 'oc-strict-error' );
+        gui.alertStrictError( msg );
         // Cancel propagation input
         evt.stopImmediatePropagation();
         var currentModelValue = that.model.node( n.path, n.ind ).getVal();
@@ -221,7 +221,7 @@ Form.prototype.strictConstraintCheckHandler = function( evt, input ) {
     if ( typeof n.constraint !== 'undefined' && n.constraint !== null && n.constraint.length > 0 && !modelClone.evaluate( n.constraint, 'boolean', n.path, n.ind ) ) {
         var question = input.closest( '.question' );
         var msg = question.querySelector( '.or-constraint-msg.active' ).innerHTML;
-        gui.alert( msg, 'Value not allowed', 'oc-strict-error' );
+        gui.alertStrictError( msg );
         // Cancel propagation input
         evt.stopImmediatePropagation();
         var currentModelValue = that.model.node( n.path, n.ind ).getVal();
