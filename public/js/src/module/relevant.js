@@ -128,14 +128,19 @@ branchModule.deactivate = function( $branchNode ) {
          * 
          * If the result has length > 0, one form control in the group has a value.
          */
-        value = this.form.model.node( name, index ).get().find( '*' ).filter( function() {
-            if ( $( this ).children().length === 0 ) {
-                var path = that.form.model.getXPath( this, 'instance' );
-                var $n = that.form.view.$.find( '.calculation > [name="' + path + '"], .or-appearance-dn > [name="' + path + '"]' );
-                return $n.length === 0;
-            }
-            return false;
-        } ).text().trim();
+        value = Array.prototype.slice.call( this.form.model.node( name, index ).getElement().querySelectorAll( '*' ) )
+            .filter( function( el ) {
+                if ( el.children.length === 0 ) {
+                    var path = that.form.model.getXPath( el, 'instance' );
+                    var n = that.form.view.html.querySelector( '.calculation > [name="' + path + '"], .or-appearance-dn > [name="' + path + '"]' );
+                    return !n;
+                }
+                return false;
+            } )
+            .map( function( el ) {
+                return el.textContent ? el.textContent.trim() : '';
+            } )
+            .join( '' );
 
         if ( value.length ) {
             this.form.setInvalid( $branchNode, 'relevant' );
