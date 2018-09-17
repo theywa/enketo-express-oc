@@ -46,7 +46,8 @@ function init( selector, data ) {
             }
 
             form = new Form( formSelector, data, formOptions );
-            loadErrors = loadErrors.concat( form.init() );
+            loadErrors = form.init();
+
             if ( !settings.headless && data.instanceStr ) {
                 form.specialOcLoadValidate();
             }
@@ -515,7 +516,17 @@ function _setEventHandlers() {
                     .then( function( valid ) {
                         $button.btnBusyState( false );
                         if ( !valid ) {
-                            gui.alert( t( 'alert.validationerror.msg' ) );
+                            if ( settings.strictCheckEnabled ) {
+                                var strictViolations = form.view.html
+                                    .querySelector( '.oc-strict.invalid-required, .oc-strict.invalid-constraint, .oc-strict.invalid-relevant' );
+                                if ( strictViolations ) {
+                                    gui.alert( t( 'fieldsubmission.confirm.autoquery.msg1' ), null, 'oc-strict-error' );
+                                } else {
+                                    gui.alert( t( 'alert.validationsuccess.msg' ), t( 'alert.validationsuccess.heading' ), 'success' );
+                                }
+                            } else {
+                                gui.alert( t( 'alert.validationerror.msg' ) );
+                            }
                         } else {
                             gui.alert( t( 'alert.validationsuccess.msg' ), t( 'alert.validationsuccess.heading' ), 'success' );
                         }

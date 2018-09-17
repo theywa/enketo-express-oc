@@ -91,6 +91,14 @@ Returns a URL that points to an **empty** form preview.
 
 Otherwise, use exactly as [POST /survey/preview/iframe](http://apidocs.enketo.org/v2/#/post-survey-preview-iframe)
 
+### POST /survey/preview/participant
+
+Returns a URL that points to an **empty** "Participant" form preview.
+
+- Has an optional `go_to_error_url` parameter that in conjunction with `go_to` will prompt the user to redirect to a _mini form_ if the go_to target is not available or hidden.
+
+Otherwise, use exactly as [POST /survey/preview/iframe](http://apidocs.enketo.org/v2/#/post-survey-preview-iframe)
+
 ### DELETE /survey/cache
 
 Remove the cached survey transformation results from Enketo. To be used when an already-launched XForm has been edited and is re-published. Highly recommended to use this only when necessary to avoid severe loading performance degradation.

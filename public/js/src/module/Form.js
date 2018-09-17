@@ -6,6 +6,7 @@ var Form = require( 'enketo-core/src/js/Form' );
 var FormModel = require( './Form-model' );
 var $ = require( 'jquery' );
 var gui = require( './gui' );
+var settings = require( './settings' );
 
 require( './relevant' );
 require( './required' );
@@ -78,7 +79,7 @@ Form.prototype.init = function() {
     var initialized = false;
 
     // Before any other change handlers, add the "strict check" handlers
-    if ( this.strictCheckEnabled ) {
+    if ( settings.strictCheckEnabled ) {
         console.log( 'setting strict check handlers' );
         this.view.$
             .on( 'change.file',

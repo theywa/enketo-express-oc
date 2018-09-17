@@ -281,6 +281,16 @@ describe( 'api', () => {
                 status: 200,
                 expected: /\/preview\/i\/::[A-z0-9]{8,10}/,
             } );
+            // POST /survey/preview
+            testResponse( {
+                version,
+                endpoint: '/survey/preview/participant',
+                method: 'post',
+                ret: false,
+                auth: true,
+                status: 200,
+                expected: /\/preview\/participant\/i\/::[A-z0-9]{32}$/,
+            } );
         } );
 
         // /instance/*

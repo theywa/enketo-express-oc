@@ -52,10 +52,6 @@ function init( selector, data, loadWarnings ) {
 
             form = new Form( formSelector, data, formOptions );
 
-            if ( settings.strictCheckEnabled ) {
-                form.strictCheckEnabled = true;
-            }
-
             // Additional layer of security to disable submissions in readonly views.
             // Should not be necessary to do this.
             if ( settings.type !== 'view' ) {
@@ -407,12 +403,10 @@ function _closeParticipant() {
     return form.validate()
         .then( function( valid ) {
             if ( !valid ) {
-                var strictViolations = form
-                    .view.$
-                    .find( '.oc-strict.invalid-required, .oc-strict.invalid-constraint, .oc-strict.invalid-relevant' )
-                    .length;
+                var strictViolations = form.view.html
+                    .querySelector( '.oc-strict.invalid-required, .oc-strict.invalid-constraint, .oc-strict.invalid-relevant' );
 
-                valid = strictViolations === 0;
+                valid = !strictViolations;
             }
             if ( valid ) {
                 return _closeSimple();

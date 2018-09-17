@@ -58,19 +58,15 @@ router
     //    next();
     //} )
     .post( '/instance/note*', ( req, res, next ) => {
-        req.webformType = 'view-instance-dn';
+        req.webformType = 'note-instance';
         next();
     } )
     .post( '/instance/edit/rfc*', ( req, res, next ) => {
-        req.webformType = 'rfc';
+        req.webformSubType = 'rfc';
         next();
     } )
-    .post( '/survey/collect/participant*', ( req, res, next ) => {
-        req.webformType = 'single-participant';
-        next();
-    } )
-    .post( '/instance/edit/participant*', ( req, res, next ) => {
-        req.webformType = 'edit-participant';
+    .post( '*/participant*', ( req, res, next ) => {
+        req.webformSubType = 'participant';
         next();
     } )
     .delete( '/survey/cache', emptySurveyCache )
@@ -86,6 +82,7 @@ router
     .post( /\/(view|note)/, _setLoadWarning )
     .post( '*/pdf', _setPage )
     .post( '/survey/preview', getNewOrExistingSurvey )
+    .post( '/survey/preview/participant', getNewOrExistingSurvey )
     .post( '/survey/view', getNewOrExistingSurvey )
     .post( '/survey/view/pdf', getNewOrExistingSurvey )
     .post( '/survey/collect', getNewOrExistingSurvey )
@@ -407,13 +404,19 @@ function _generateWebformUrls( id, req ) {
 
     let url;
 
-    req.webformType = req.webformType || 'single';
+    const type = `${req.webformType || 'single'}${req.webformSubType ? '-'+req.webformSubType : ''}`;
 
-    switch ( req.webformType ) {
+    switch ( type ) {
         case 'preview':
             {
                 const queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam, req.goToErrorUrl, req.jini ] );
                 url = `${BASEURL}preview/${IFRAMEPATH}${idOnline}${queryString}${hash}`;
+                break;
+            }
+        case 'preview-participant':
+            {
+                const queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam, req.goToErrorUrl ] );
+                url = `${BASEURL}preview/participant/${IFRAMEPATH}${idFsParticipant}${queryString}${hash}`;
                 break;
             }
         case 'edit':
@@ -423,7 +426,7 @@ function _generateWebformUrls( id, req ) {
                 url = `${BASEURL}edit/${FSPATH}${dnClosePart}${IFRAMEPATH}${editId}${queryString}${hash}`;
                 break;
             }
-        case 'rfc':
+        case 'edit-rfc':
             {
                 const rfcId = dnClosePart ? idEditRfcC : idEditRfc;
                 const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.goToErrorUrl, req.jini ] );
@@ -469,7 +472,7 @@ function _generateWebformUrls( id, req ) {
                 url = `${BASEURL}view/${FSPATH}${IFRAMEPATH}${idView}${queryString}${hash}`;
                 break;
             }
-        case 'view-instance-dn':
+        case 'note-instance':
             {
                 const viewId = dnClosePart ? idViewDnc : idViewDn;
                 const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning, req.goToErrorUrl ] );
