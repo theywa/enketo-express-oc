@@ -25,12 +25,14 @@ $secondary-color: #eeeeee;
     }
 
     // hover style of radiobuttons and checkboxes
-    .option-wrapper:not(.or-comment-widget__content__user__dn-notify) > label:hover {
+    .option-wrapper:not(.or-comment-widget__content__user__dn-notify)>label:hover {
         background: inherit !important;
     }
 
     // suppress focus style, for most form controls except for discrepancy note controls
-    select:not([name=dn-assignee]), textarea:not([name=dn-comment]), input:not([name=dn-notify], [name=dn-comment]),
+    select:not([name=dn-assignee]),
+    textarea:not([name=dn-comment]),
+    input:not([name=dn-notify], [name=dn-comment]),
     .draw-widget__body__canvas {
         &:focus {
             box-shadow: inherit !important;
@@ -47,14 +49,15 @@ $secondary-color: #eeeeee;
     }
 
     // suppress image grid focus style
-    input:focus ~ .active {
+    input:focus~.active {
         box-shadow: inherit !important;
         border: none !important;
     }
 }
 
 // Error messages on groups (which is a feature that doesn't exist in Enketo Express and Enketo Core)
-.or-group, .or-group-data {
+.or-group,
+.or-group-data {
     &.invalid-relevant {
         border: 2px solid $state-danger-text;
 
@@ -67,14 +70,14 @@ $secondary-color: #eeeeee;
         }
 
         // only show relevant error message that belong to groups (not questions)
-        > .or-relevant-msg {
+        >.or-relevant-msg {
             display: block;
         }
 
         .or-repeat,
         .or-group,
         .or-group-data {
-            > .or-relevant-msg {
+            >.or-relevant-msg {
                 display: block;
             }
         }
@@ -87,6 +90,296 @@ $secondary-color: #eeeeee;
         }
     }
 }
+
+
+.fieldsubmission-status {
+    order: 15;
+    color: #555;
+    font-size: 12px;
+    line-height: 1.5em;
+    min-height: 1.5em;
+    padding-right: 10px;
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &.error,
+    &.fail {
+        color: $state-danger-text;
+    }
+
+    &.readonly {
+        font-weight: bold;
+    }
+}
+
+.record-signed-status {
+    text-align: center;
+    font-weight: bold;
+}
+
+.form-footer__feedback.fieldsubmission-status {
+    margin: 10px auto;
+    text-align: center;
+    max-width: 100%;
+}
+
+// regular non-pages-mode webform
+.form-footer .form-footer__content__main-controls {
+
+    #finish-form,
+    [id^="close-form-"] {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+.reason-for-change {
+    $b: 1px solid $gray-light;
+    margin-bottom: 10px;
+
+    &__item {
+        margin: 0;
+        padding: 10px 10px 0 10px;
+        border-left: $b;
+        border-right: $b;
+        border-bottom: 1px solid transparent;
+        background-color: #f1f1f1;
+
+        &:first-of-type {
+            border-top: $b;
+        }
+
+        &:last-of-type {
+            border-bottom: $b;
+            padding-bottom: 10px;
+        }
+
+        &__repeat-number {
+            padding: 0 5px;
+        }
+
+        &.added:not(.edited) {
+            input[type=text] {
+                opacity: 0.5;
+            }
+        }
+
+        &.invalid {
+            input[type=text] {
+                @extend .invalid-required;
+                border: 1px solid $state-danger-border;
+                margin: inherit !important;
+                padding: inherit !important;
+                border-radius: 0;
+            }
+        }
+
+        &:not(.added) {
+
+            .reason-for-change__item__label,
+            .reason-for-change__item__repeat-number {
+                &:last-of-type::after {
+                    content: '*';
+                    color: $brand-primary-color;
+                    padding: 0 3px;
+                }
+            }
+        }
+
+        input[type=text] {
+            @include form-control;
+            background-color: $question-bg;
+            padding-left: 5px;
+            padding-right: 5px;
+            width: 100%;
+        }
+    }
+
+    &__header {
+        h5 {
+            margin-bottom: 5px;
+        }
+
+        &__apply-to-all.question {
+            display: flex;
+            flex-direction: row;
+            border: $b;
+            border-bottom: none;
+            margin-bottom: 0;
+            padding: 10px;
+
+            &.question:not(.note):not(.focus):hover {
+                background: none;
+            }
+
+            .option-wrapper {
+                flex-direction: row;
+                align-items: center;
+                margin-left: 10px;
+            }
+
+            input[type=text] {
+                @include form-control;
+                flex: 1;
+                width: auto;
+                background-color: $question-bg;
+                padding-left: 5px;
+                padding-right: 5px;
+                border: 1px solid #ccc;
+                margin: 0;
+            }
+
+        }
+
+        // do not show heading if there is no following sibling
+        &:last-child {
+            display: none
+        }
+    }
+}
+
+.bootstrap-select .btn-default.dropdown-toggle {
+    background: white;
+}
+
+.oc-reason-msg {
+    @extend .or-required-msg;
+    color: #4f89bd !important;
+    display: block !important;
+}
+
+.pages~.form-footer {
+    .form-footer {
+        &__content {
+            &__main-controls {
+                $marg: 15px;
+
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: space-around;
+
+                .btn {
+                    padding-left: 10px;
+                    padding-right: 10px;
+
+                    .icon {
+                        margin-left: 6px;
+                    }
+                }
+
+                .previous-page,
+                [id^="close-form-"],
+                .next-page {
+                    margin-left: $marg;
+                    margin-right: $marg;
+                    max-width: calc(33% - (2 * #{$marg}));
+                }
+
+                #finish-form,
+                [id^="close-form-"] {
+                    min-width: 140px;
+                }
+
+                .previous-page,
+                .next-page {
+                    position: static;
+                    min-width: 90px;
+                }
+
+                .previous-page {
+                    order: 1;
+
+                    &.disabled {
+                        display: block;
+                        visibility: hidden;
+                    }
+                }
+
+                [id^="close-form-"],
+                #submit-form,
+                #validate-form {
+                    order: 2;
+                }
+
+                [id^="close-form-"] {
+                    display: block;
+                }
+
+                #finish-form,
+                #close-form-participant {
+                    visibility: hidden;
+                }
+
+                .next-page {
+                    order: 3;
+
+                    &.disabled {
+                        display: block;
+                        visibility: hidden;
+                    }
+                }
+
+                #finish-form {
+                    display: block;
+                    margin: 0 30% 20px 30%;
+                    order: 4;
+                }
+
+                .logout {
+                    order: 5;
+                }
+
+                .enketo-power {
+                    order: 6;
+                }
+            }
+        }
+    }
+
+    &.end {
+
+        #finish-form,
+        #submit-form,
+        #close-form-participant,
+        #validate-form {
+            visibility: visible;
+        }
+    }
+}
+
+@media screen and (max-width: 430px) {
+    .fieldsubmission-status {
+        order: 65;
+        max-width: 100%;
+        width: 100%;
+        margin-top: 16px;
+    }
+
+    .pages~.form-footer {
+        .form-footer {
+            &__content {
+                &__main-controls {
+
+                    .previous-page,
+                    .next-page {
+                        margin-left: 5px;
+                        margin-right: 5px;
+                        min-width: 40px;
+
+                        span {
+                            display: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 //IE11 fixes
 @media all and (-ms-high-contrast: none),
@@ -108,6 +401,7 @@ $secondary-color: #eeeeee;
                 // so responsiveness can be broken.
                 width: 80%;
             }
+
             &__query-btns {
                 min-width: 200px;
             }
