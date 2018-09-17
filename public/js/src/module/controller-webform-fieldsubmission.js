@@ -85,7 +85,7 @@ function init( selector, data, loadWarnings ) {
 
             loadErrors = loadErrors.concat( form.init() );
 
-            if ( !settings.headless ) {
+            if ( !settings.headless && data.instanceStr ) {
                 form.specialOcLoadValidate();
             }
 

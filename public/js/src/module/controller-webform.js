@@ -47,7 +47,7 @@ function init( selector, data ) {
 
             form = new Form( formSelector, data, formOptions );
             loadErrors = loadErrors.concat( form.init() );
-            if ( !settings.headless ) {
+            if ( !settings.headless && data.instanceStr ) {
                 form.specialOcLoadValidate();
             }
             // Remove loader. This will make the form visible.
