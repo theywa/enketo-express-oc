@@ -72,6 +72,7 @@ $secondary-color: #eeeeee;
         // only show relevant error message that belong to groups (not questions)
         >.or-relevant-msg {
             display: block;
+            width: 100%;
         }
 
         .or-repeat,
