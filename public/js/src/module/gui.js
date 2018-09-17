@@ -395,8 +395,8 @@ function _getHomeScreenGuidanceObj( imageClass1, imageClass2 ) {
 }
 
 
-function alertStrictError(msg){
-    msg +='<p><strong>' + t( 'fieldsubmission.alert.stricterror.msg1' ) + '</strong> ' + t( 'fieldsubmission.alert.stricterror.msg2' ) + '</p>';
+function alertStrictError( msg ) {
+    msg += '<p><strong>' + t( 'fieldsubmission.alert.stricterror.msg1' ) + '</strong> ' + t( 'fieldsubmission.alert.stricterror.msg2' ) + '</p>';
     alert( msg, t( 'fieldsubmission.alert.stricterror.heading' ), 'oc-strict-error' );
 }
 
