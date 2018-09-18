@@ -86,10 +86,6 @@ function init( selector, data, loadWarnings ) {
 
             loadErrors = loadErrors.concat( form.init() );
 
-            if ( !settings.headless && data.instanceStr ) {
-                form.specialOcLoadValidate();
-            }
-
             // Remove loader. This will make the form visible.
             // In order to aggregate regular loadErrors and GoTo loaderrors,
             // this is placed in between form.init() and form.goTo().
@@ -99,6 +95,9 @@ function init( selector, data, loadWarnings ) {
             if ( data.instanceStr && form.model.isMarkedComplete() ) {
                 $( 'button#finish-form' ).remove();
                 $( 'button.close-form-regular' ).removeClass( 'close-form-regular' ).addClass( 'close-form-complete' );
+                if ( !settings.headless ) {
+                    form.specialOcLoadValidate();
+                }
             }
 
             if ( settings.goTo && location.hash ) {
