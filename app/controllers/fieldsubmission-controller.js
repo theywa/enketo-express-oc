@@ -17,6 +17,7 @@ router.param( 'enketo_id', routerUtils.enketoId );
 router.param( 'encrypted_enketo_id_view_dn', routerUtils.encryptedEnketoIdViewDn );
 router.param( 'encrypted_enketo_id_view_dnc', routerUtils.encryptedEnketoIdViewDnc );
 router.param( 'encrypted_enketo_id_fs_c', routerUtils.encryptedEnketoIdFsC );
+router.param( 'encrypted_enketo_id_participant', routerUtils.encryptedEnketoIdFsParticipant );
 router.param( 'encrypted_enketo_id_rfc', routerUtils.encryptedEnketoIdEditRfc );
 router.param( 'encrypted_enketo_id_rfc_c', routerUtils.encryptedEnketoIdEditRfcC );
 router.param( 'encrypted_enketo_id_headless', routerUtils.encryptedEnketoIdEditHeadless );
@@ -28,6 +29,7 @@ router
     } )
     .post( '/:enketo_id', submit )
     .post( '/:encrypted_enketo_id_fs_c', submit )
+    .post( '/:encrypted_enketo_id_participant', submit )
     .post( '/complete/:enketo_id', complete )
     .post( '/complete/:encrypted_enketo_id_fs_c', complete )
     .put( '/:enketo_id', submit )
@@ -37,6 +39,7 @@ router
     .put( '/:encrypted_enketo_id_rfc', submit )
     .put( '/:encrypted_enketo_id_rfc_c', submit )
     .put( '/:encrypted_enketo_id_headless', submit )
+    .put( '/:encrypted_enketo_id_participant', submit )
     .put( '/complete/:enketo_id', complete )
     .put( '/complete/:encrypted_enketo_id_fs_c', complete )
     .put( '/complete/:encrypted_enketo_id_view_dn', complete )
@@ -49,6 +52,7 @@ router
     .delete( '/:encrypted_enketo_id_rfc', submit )
     .delete( '/:encrypted_enketo_id_rfc_c', submit )
     .delete( '/:encrypted_enketo_id_headless', submit )
+    .delete( '/:encrypted_enketo_id_participant', submit )
     .all( '/*', function( req, res, next ) {
         var error = new Error( 'Not allowed' );
         error.status = 405;

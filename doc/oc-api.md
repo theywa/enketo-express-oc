@@ -127,7 +127,7 @@ Returns a URL that points to a special "Participate" webform fieldsubmission vie
 - Has a **required** `ecid` parameter with string value.
 - Has an optional `go_to_error_url` parameter that in conjunction with `go_to` will prompt the user to redirect to a _mini form_ if the go_to target is not available or hidden.
 
-Otherwise, use as POST /instance/edit except that 
+Otherwise, use as POST /instance/edit.
 
 ### POST /instance/edit/rfc 
 

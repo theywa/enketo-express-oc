@@ -73,7 +73,6 @@ router
     .get( '/edit/fs/dn/c/:mod/:encrypted_enketo_id_view_dnc', fieldSubmission )
     .get( '/edit/fs/participant/:mod/:encrypted_enketo_id_fs_participant', fieldSubmission )
     .get( '/edit/fs/headless/:encrypted_enketo_id_headless', fieldSubmission )
-    //.get( '/edit/fs/rfc/headless/:enketo_id_rfc', fieldSubmission )
     .get( '/view/fs/:encrypted_enketo_id_view', fieldSubmission )
     .get( '/view/fs/:mod/:encrypted_enketo_id_view', fieldSubmission )
     .get( '/xform/:enketo_id', xform )
@@ -87,12 +86,6 @@ router
         res.status = 200;
         res.send( `connected ${Math.random()}` );
     } );
-
-// TODO: I suspect this check is no longer used and can be removed
-//function loggedInCheck( req, res, next ) {
-//    req.logout = !!userModel.getCredentials( req );
-//    next();
-//}
 
 function offlineWebform( req, res, next ) {
     if ( !req.app.get( 'offline enabled' ) ) {
