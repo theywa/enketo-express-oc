@@ -4,6 +4,7 @@
 var pageModule = require( 'enketo-core/src/js/page' );
 var reasons = require( './reasons' );
 var settings = require( './settings' );
+var gui = require( './gui' );
 var $ = require( 'jquery' );
 
 /*
@@ -71,6 +72,8 @@ pageModule._next = function() {
                     }
 
                     valid = true;
+                } else {
+                    gui.alert( 'We will not let you get away with this.', 'What do you think you are doing?', 'oc-strict-error', 5 );
                 }
             }
             return valid;
