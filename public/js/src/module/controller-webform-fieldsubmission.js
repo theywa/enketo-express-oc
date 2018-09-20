@@ -72,15 +72,7 @@ function init( selector, data, loadWarnings ) {
                 // In OC hidden go_to fields should show loadError except if go_to field is a disrepancy_note
                 // as those are always hidden upon load.
                 if ( !e.target.classList.contains( 'or-appearance-dn' ) ) {
-                    var err = t( 'alert.goto.hidden' ) + ' ';
-                    err = goToErrorLink ? [ err + t( 'alert.goto.msg2', {
-                        miniform: goToErrorLink,
-                        // switch off escaping
-                        interpolation: {
-                            escapeValue: false
-                        }
-                    } ) ] : [ err + t( 'alert.goto.msg1' ) ];
-                    loadErrors.push( err );
+                    loadErrors.push( t( 'alert.goto.hidden' ) );
                 }
             } );
 

@@ -158,7 +158,16 @@ Comment.prototype._setFocusHandler = function() {
         if ( that.$commentButton.is( ':visible' ) ) {
             that.$commentButton.click();
         } else {
-            throw new Error( t( 'alert.goto.hidden' ) );
+            var err = t( 'alert.goto.hidden' ) + ' ';
+            var goToErrorLink = settings.goToErrorUrl ? '<a href="' + settings.goToErrorUrl + '">' + settings.goToErrorUrl + '</a>' : '';
+            err += goToErrorLink ? t( 'alert.goto.msg2', {
+                miniform: goToErrorLink,
+                // switch off escaping
+                interpolation: {
+                    escapeValue: false
+                }
+            } ) : t( 'alert.goto.msg1' );
+            throw new Error( err );
         }
     } );
 };
