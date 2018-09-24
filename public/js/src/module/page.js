@@ -73,7 +73,7 @@ pageModule._next = function() {
 
                     valid = true;
                 } else {
-                    gui.alert( 'We will not let you get away with this.', 'What do you think you are doing?', 'oc-strict-error', 5 );
+                    gui.alertStrictBlock();
                 }
             }
             return valid;

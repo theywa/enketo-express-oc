@@ -1,6 +1,17 @@
 // background of default button
 $secondary-color: #eeeeee;
 
+// error block inside a modal dialog (e.g. upon Complete button click).
+.vex.vex-theme-plain .vex-dialog-form .vex-dialog-message {
+    color: inherit;
+}
+
+.vex-dialog-title {
+    .icon {
+        margin-right: 10px;
+    }
+}
+
 .or .or-repeat .repeat-number {
     display: none;
 }
@@ -408,4 +419,8 @@ $secondary-color: #eeeeee;
             }
         }
     }
+}
+
+.icon-exclamation-circle {
+    @extend .fa-exclamation-circle;
 }

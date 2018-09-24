@@ -359,6 +359,16 @@ function alertLoadErrorsOc( loadErrors ) {
     alert( errorStringHTML, t( 'alert.loaderror.heading' ) );
 }
 
+function alertStrictError( msg ) {
+    msg += '<p><strong>' + t( 'fieldsubmission.alert.stricterror.msg1' ) + '</strong> ' + t( 'fieldsubmission.alert.stricterror.msg2' ) + '</p>';
+    alert( msg, t( 'fieldsubmission.alert.stricterror.heading' ), 'oc-strict-error' );
+}
+
+function alertStrictBlock() {
+    var icon = '<i class="icon icon-exclamation-circle oc-strict-error"> </i>';
+    alert( t( 'fieldsubmission.alert.participanterror.msg' ), icon + t( 'alert.loaderror.heading' ), 'oc-strict-error' );
+}
+
 function alertHomeScreenGuidance() {
     alert( _getHomeScreenGuidance(), t( 'alert.addtohomescreen.heading' ), 'normal' );
 }
@@ -392,12 +402,6 @@ function _getHomeScreenGuidanceObj( imageClass1, imageClass2 ) {
             escapeValue: false
         }
     };
-}
-
-
-function alertStrictError( msg ) {
-    msg += '<p><strong>' + t( 'fieldsubmission.alert.stricterror.msg1' ) + '</strong> ' + t( 'fieldsubmission.alert.stricterror.msg2' ) + '</p>';
-    alert( msg, t( 'fieldsubmission.alert.stricterror.heading' ), 'oc-strict-error' );
 }
 
 /**
@@ -661,4 +665,5 @@ module.exports = {
     applyPrintStyle: applyPrintStyle,
     getPrintDialogComponents: getPrintDialogComponents,
     alertStrictError: alertStrictError,
+    alertStrictBlock: alertStrictBlock,
 };

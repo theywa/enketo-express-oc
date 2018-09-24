@@ -397,7 +397,7 @@ function _closeParticipant() {
             if ( valid ) {
                 return _closeSimple();
             }
-            gui.alert( t( 'fieldsubmission.confirm.autoquery.msg1' ), null, 'oc-strict-error' );
+            gui.alertStrictBlock();
         } );
 }
 
