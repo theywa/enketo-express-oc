@@ -79,11 +79,13 @@ function init( selector, data, loadWarnings ) {
             $( 'body > .main-loader' ).remove();
 
             // Check if record is marked complete
-            if ( data.instanceStr && form.model.isMarkedComplete() ) {
-                $( 'button#finish-form' ).remove();
-                $( 'button.close-form-regular' ).removeClass( 'close-form-regular' ).addClass( 'close-form-complete' );
+            if ( data.instanceStr ) {
+                if ( form.model.isMarkedComplete() ) {
+                    $( 'button#finish-form' ).remove();
+                    $( 'button.close-form-regular' ).removeClass( 'close-form-regular' ).addClass( 'close-form-complete' );
+                }
                 if ( !settings.headless ) {
-                    form.specialOcLoadValidate();
+                    form.specialOcLoadValidate( form.model.isMarkedComplete() );
                 }
             }
 

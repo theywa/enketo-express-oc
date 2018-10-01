@@ -105,22 +105,29 @@ Form.prototype.init = function() {
     return loadErrors;
 };
 
-Form.prototype.specialOcLoadValidate = function( loadErrors ) {
+Form.prototype.specialOcLoadValidate = function( includeRequired ) {
     var that = this;
-    // Evaluate "required" expressions upon load to hide asterisks.
-    // Evaluate "constraint" expressions upon load to show error message for fields that *have a value*.
-    this.getRelatedNodes( 'data-required' ).add( $( this.getRelatedNodes( 'data-constraint' ) ) ).each( function() {
+    var $collectionToValidate = this.getRelatedNodes( 'data-constraint' );
+    console.log( 'inclde required?', includeRequired );
+    if ( includeRequired ) {
+        $collectionToValidate = $collectionToValidate.add( this.getRelatedNodes( 'data-required' ) );
+    }
+
+    // Note, even if includeRequired is falsy, any empty question that has both a required and constraint expression
+    // will show a required error.
+    // So the above collection determining is just to limit the amount of validation the engine has to perform but it
+    // still needs cleaning, because the engine will validate **all** expressions on the selected question.
+
+    $collectionToValidate.each( function() {
         var $input = $( this );
         that.validateInput( $input )
             .then( function( passed ) {
-                if ( !passed ) {
+                if ( !passed && !includeRequired ) {
                     // Undo the displaying of a required error message upon load
-                    //that.setValid( $input, 'required' );
+                    that.setValid( $input, 'required' );
                 }
             } );
     } );
-
-    return loadErrors;
 };
 
 
