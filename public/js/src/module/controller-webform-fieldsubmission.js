@@ -59,6 +59,11 @@ function init( selector, data, loadWarnings ) {
                 };
             }
 
+            // For Participant emtpy-form view in order to show Close button on all pages
+            if ( settings.strictCheckEnabled && settings.type !== 'edit' ) {
+                form.view.html.classList.add( 'empty-untouched' );
+            }
+
             // set eventhandlers before initializing form
             _setEventHandlers( selector );
 
@@ -551,6 +556,10 @@ function _setEventHandlers( selector ) {
             if ( updated.file ) {
                 file = fileManager.getCurrentFile( updated.file );
             }
+
+            // remove the Participate class that shows a Close button on every page
+            form.view.html.classList.remove( 'empty-untouched' );
+
             // Only now will we check for the deprecatedID value, which at this point should be (?) 
             // populated at the time the instanceID dataupdate event is processed and added to the fieldSubmission queue.
             fieldSubmissionQueue.addFieldSubmission( updated.fullPath, updated.xmlFragment, instanceId, form.deprecatedID, file );

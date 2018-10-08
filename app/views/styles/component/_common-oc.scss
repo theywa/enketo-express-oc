@@ -363,6 +363,17 @@ $secondary-color: #eeeeee;
     }
 }
 
+.pages.empty-untouched~.form-footer {
+    .form-footer__content {
+        &__main-controls {
+            #close-form-participant {
+                visibility: visible;
+            }
+        }
+    }
+}
+
+
 @media screen and (max-width: 430px) {
     .fieldsubmission-status {
         order: 65;

@@ -129,7 +129,7 @@ function _init( formParts ) {
     $formheader.after( formParts.form );
     $( document ).ready( function() {
         translator.localize( document.querySelector( 'form.or' ) );
-        controller.init( 'form.or:eq(0)', {
+        controller.init( 'form.or', {
             modelStr: formParts.model,
             instanceStr: formParts.instance,
             external: formParts.externalData,
