@@ -388,6 +388,17 @@ function _closeCompletedRecord() {
 }
 
 function _closeParticipant() {
+
+    // If the form is untouched, allow closing it without any checks.
+    // TODO: can we ignore calculations?
+    if ( Object.keys( fieldSubmissionQueue.get() ).length === 0 && fieldSubmissionQueue.submittedCounter === 0 ) {
+        return Promise.resolve()
+            .then( function() {
+                gui.alert( t( 'alert.submissionsuccess.redirectmsg' ), null, 'success' );
+                _redirect( 600 );
+            } );
+    }
+
     return form.validate()
         .then( function( valid ) {
             if ( !valid ) {
