@@ -63,6 +63,14 @@ function init( selector, data, loadWarnings ) {
             if ( settings.strictCheckEnabled && settings.type !== 'edit' ) {
                 form.view.html.classList.add( 'empty-untouched' );
             }
+            // For all Participant views, use a hacky solution to change the default relevant message
+            if ( settings.strictCheckEnabled ) {
+                var list = form.view.html.querySelectorAll( '[data-i18n="constraint.relevant"]' );
+                for ( var i = 0; i < list.length; i++ ) {
+                    var relevantErrorMsg = t( 'constraint.relevantparticipant' );
+                    list[ i ].textContent = relevantErrorMsg;
+                }
+            }
 
             // set eventhandlers before initializing form
             _setEventHandlers( selector );

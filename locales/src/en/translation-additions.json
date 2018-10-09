@@ -104,7 +104,8 @@
         }
     },
     "constraint": {
-        "relevant": "Response(s) in related field(s) make this data invalid. This must be corrected to mark the form complete."
+        "relevant": "Response(s) in related field(s) make this data invalid. This must be corrected to mark the form complete.",
+        "relevantparticipant": "Response(s) in related field(s) make this data invalid. This must be corrected before proceeding."
     },
     "alert": {
         "goto": {
