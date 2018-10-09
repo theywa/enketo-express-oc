@@ -400,6 +400,8 @@ function _closeParticipant() {
         return Promise.resolve()
             .then( function() {
                 gui.alert( t( 'alert.submissionsuccess.redirectmsg' ), null, 'success' );
+                // this event is used in communicating back to iframe parent window
+                $( document ).trigger( 'close' );
                 _redirect( 600 );
             } );
     }
