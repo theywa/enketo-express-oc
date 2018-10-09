@@ -72,8 +72,8 @@ function init( selector, data, loadWarnings ) {
                 }
             }
 
-            // set eventhandlers before initializing form
-            _setEventHandlers( selector );
+            // set form eventhandlers before initializing form
+            _setFormEventHandlers( selector );
 
             // listen for "gotohidden.enketo" event and add error
             $( formSelector ).on( 'gotohidden.enketo', function( e ) {
@@ -86,21 +86,23 @@ function init( selector, data, loadWarnings ) {
 
             loadErrors = loadErrors.concat( form.init() );
 
-            // Remove loader. This will make the form visible.
-            // In order to aggregate regular loadErrors and GoTo loaderrors,
-            // this is placed in between form.init() and form.goTo().
-            $( 'body > .main-loader' ).remove();
-
-            // Check if record is marked complete
+            // Check if record is marked complete, before setting button event handlers.
             if ( data.instanceStr ) {
                 if ( form.model.isMarkedComplete() ) {
                     $( 'button#finish-form' ).remove();
-                    $( 'button.close-form-regular' ).removeClass( 'close-form-regular' ).addClass( 'close-form-complete' );
+                    $( 'button#close-form-regular' ).attr( 'id', 'close-form-complete' );
                 }
                 if ( !settings.headless ) {
                     form.specialOcLoadValidate( form.model.isMarkedComplete() );
                 }
             }
+
+            _setButtonEventHandlers();
+
+            // Remove loader. This will make the form visible.
+            // In order to aggregate regular loadErrors and GoTo loaderrors,
+            // this is placed in between form.init() and form.goTo().
+            $( 'body > .main-loader' ).remove();
 
             if ( settings.goTo && location.hash ) {
                 // form.goTo returns an array of 1 error if it has error. We're using our special
@@ -517,7 +519,7 @@ function _doNotSubmit( fullPath ) {
     return !!form.view.$.get( 0 ).querySelector( 'input[oc-external="clinicaldata"][name="' + fullPath + '"]' );
 }
 
-function _setEventHandlers( selector ) {
+function _setFormEventHandlers( selector ) {
     var $doc = $( document );
     $doc
         .on( 'progressupdate.enketo', selector, function( event, status ) {
@@ -648,7 +650,9 @@ function _setEventHandlers( selector ) {
             return false;
         } );
     }
+}
 
+function _setButtonEventHandlers() {
     $( 'button#finish-form' ).click( function() {
         var $button = $( this ).btnBusyState( true );
 
@@ -747,7 +751,7 @@ function _setEventHandlers( selector ) {
     } );
 
     if ( rc.inIframe() && settings.parentWindowOrigin ) {
-        $doc.on( 'submissionsuccess edited.enketo close', rc.postEventAsMessageToParentWindow );
+        $( document ).on( 'submissionsuccess edited.enketo close', rc.postEventAsMessageToParentWindow );
     }
 
     window.onbeforeunload = function() {
