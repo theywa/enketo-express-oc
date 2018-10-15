@@ -516,7 +516,8 @@ function _autoAddReasonQueries( $rfcInputs ) {
 
 function _doNotSubmit( fullPath ) {
     // no need to check on cloned radiobuttons, selects or textareas
-    return !!form.view.$.get( 0 ).querySelector( 'input[oc-external="clinicaldata"][name="' + fullPath + '"]' );
+    var pathWithoutPositions = fullPath.replace( /\[[0-9]+\]/g, '' );
+    return !!form.view.$.get( 0 ).querySelector( 'input[oc-external="clinicaldata"][name="' + pathWithoutPositions + '"]' );
 }
 
 function _setFormEventHandlers( selector ) {
