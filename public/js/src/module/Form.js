@@ -108,7 +108,7 @@ Form.prototype.init = function() {
 Form.prototype.specialOcLoadValidate = function( includeRequired ) {
     var that = this;
     var $collectionToValidate = this.getRelatedNodes( 'data-constraint' );
-    console.log( 'inclde required?', includeRequired );
+
     if ( includeRequired ) {
         $collectionToValidate = $collectionToValidate.add( this.getRelatedNodes( 'data-required' ) );
     }

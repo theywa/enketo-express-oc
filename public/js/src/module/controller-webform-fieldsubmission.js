@@ -8,7 +8,7 @@
 
 var gui = require( './gui' );
 var settings = require( './settings' );
-var Form = require( 'enketo-core' );
+var Form = require( './Form' ); // modified for OC
 var fileManager = require( './file-manager' );
 var Promise = require( 'lie' );
 var t = require( './translator' ).t;
@@ -26,9 +26,6 @@ var ignoreBeforeUnload = false;
 var formOptions = {
     printRelevantOnly: settings.printRelevantOnly
 };
-
-// Modify Enketo Core
-require( './Form' );
 
 
 function init( selector, data, loadWarnings ) {

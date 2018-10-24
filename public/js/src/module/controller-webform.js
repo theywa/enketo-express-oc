@@ -7,7 +7,7 @@
 var gui = require( './gui' );
 var connection = require( './connection' );
 var settings = require( './settings' );
-var Form = require( 'enketo-core' );
+var Form = require( './Form' ); // modified for OC
 var coreUtils = require( 'enketo-core/src/js/utils' );
 require( 'enketo-core/src/js/workarounds-ie11' );
 var fileManager = require( './file-manager' );
@@ -24,8 +24,6 @@ var formOptions = {
     clearIrrelevantImmediately: true,
     printRelevantOnly: settings.printRelevantOnly
 };
-
-require( './Form' );
 
 function init( selector, data ) {
     var advice;

@@ -23,21 +23,17 @@ branchModule.update = function( updated, forceClearIrrelevant ) {
     this.updateNodes( $nodes, forceClearIrrelevant );
 };
 
+branchModule.originalEnable = branchModule.enable;
 
 /**
- * Overwrite core functionality by removing isSelfRelevant check
+ * Overwrite core functionality.
+ * The reason for this customization is to remove any shown irrelevant errors on the group (and perhaps question as well?)
+ * once it becomes relevant again.
  */
 branchModule.enable = function( $branchNode, path ) {
-    $branchNode.removeClass( 'disabled pre-init' );
-    // Update calculated items, both individual question or descendants of group
-    this.form.calc.update( {
-        relevantPath: path
-    } );
-    this.form.widgets.enable( $branchNode );
-    this.activate( $branchNode );
-    return true;
+    $branchNode.removeClass( 'invalid-relevant' );
+    this.originalEnable( $branchNode, path );
 };
-
 
 /**
  * Overwrite clear function
@@ -58,6 +54,7 @@ branchModule.clear = function( $branchNode, path ) {
         } );
     }
 };
+
 
 branchModule.activate = function( $branchNode ) {
     var $control;
@@ -120,10 +117,10 @@ branchModule.deactivate = function( $branchNode ) {
          * (ie. excl discrepancy note questions) has a value.
          * The best way is to do this in the model.
          * 
-         * First get all the leafnodes (nodes without children) and then check if there is a calculation 
+         * First get all the leaf nodes (nodes without children) and then check if there is a calculation 
          * or dn question for this node.
          * 
-         * Then get the concatenated textContent of the filtered leafnodes and trim to avoid 
+         * Then get the concatenated textContent of the filtered leaf nodes and trim to avoid 
          * recognizing whitespace-only as a value. (whitespace in between is fine as it won't give a false positive)
          * 
          * If the result has length > 0, one form control in the group has a value.
