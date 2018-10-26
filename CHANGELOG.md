@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+----------------------
+##### Changed
+- Updated Russian, Spanish, Czech and Dutch translations.
+  
+##### Fixed
+- Autocomplete widget not updating when form language is changed.
+
 [1.72.2] - 2018-10-19
 ----------------------
 ##### Fixed

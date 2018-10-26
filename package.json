@@ -38,7 +38,7 @@
         "db.js": "0.15.0",
         "enketo-xpath-extensions-oc": "github:OpenClinica/enketo-xpath-extensions-oc#a30e5f9",
         "debug": "3.1.x",
-        "enketo-core": "4.60.4",
+        "enketo-core": "github:enketo/enketo-core.git#5ceb0592",
         "enketo-transformer": "1.30.0",
         "express": "4.x.x",
         "grunt": "^1.0.3",
