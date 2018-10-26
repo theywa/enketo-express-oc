@@ -85,6 +85,8 @@ function init( selector, data, loadWarnings ) {
 
             // Check if record is marked complete, before setting button event handlers.
             if ( data.instanceStr ) {
+                // DEBUG
+                console.log( 'record to load:', data.instanceStr );
                 if ( form.model.isMarkedComplete() ) {
                     $( 'button#finish-form' ).remove();
                     $( 'button#close-form-regular' ).attr( 'id', 'close-form-complete' );
