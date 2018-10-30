@@ -28,8 +28,8 @@ requiredModule.update = function( updated ) {
 
     $nodes.each( function() {
         var $input = $( this );
-        var value = that.form.input.getVal( $input );
-        var hide = !!value;
+        var value = that.form.input.getVal( $input ); // String or Array!
+        var hide = !!value.length;
 
         if ( !hide ) {
             var requiredExpr = that.form.input.getRequired( $input );
