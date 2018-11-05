@@ -88,8 +88,17 @@ function init( selector, data, loadWarnings ) {
                 // DEBUG
                 console.log( 'record to load:', data.instanceStr );
                 if ( form.model.isMarkedComplete() ) {
-                    $( 'button#finish-form' ).remove();
-                    $( 'button#close-form-regular' ).attr( 'id', 'close-form-complete' );
+                    var finishButton = document.querySelector( 'button#finish-form' );
+                    var regCloseButton = document.querySelector( 'button#close-form-regular' );
+                    if ( finishButton ) {
+                        finishButton.remove();
+                    }
+                    if ( regCloseButton ) {
+                        regCloseButton.id = 'close-form-complete';
+                    }
+                } else if ( settings.reasonForChange ) {
+                    loadErrors.push( 'This record is not complete and cannot be used here.' );
+                    document.querySelector( 'button#close-form-regular' ).remove();
                 }
                 if ( !settings.headless ) {
                     form.specialOcLoadValidate( form.model.isMarkedComplete() );
