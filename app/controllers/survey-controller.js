@@ -56,6 +56,7 @@ router
     .get( '/preview/:mod/:enketo_id', preview )
     .get( '/preview', preview )
     .get( '/preview/:mod', preview )
+    .get( '/preview/participant/:mod', preview )
     .get( '/preview/participant/:mod/:encrypted_enketo_id_fs_participant', preview )
     .get( '/single/:enketo_id', single )
     .get( '/single/:encrypted_enketo_id_single', single )
