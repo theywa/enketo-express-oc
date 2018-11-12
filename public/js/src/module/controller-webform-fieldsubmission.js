@@ -86,7 +86,7 @@ function init( selector, data, loadWarnings ) {
             // Check if record is marked complete, before setting button event handlers.
             if ( data.instanceStr ) {
                 // DEBUG
-                console.log( 'record to load:', data.instanceStr );
+                // console.log( 'record to load:', data.instanceStr );
                 if ( form.model.isMarkedComplete() ) {
                     var finishButton = document.querySelector( 'button#finish-form' );
                     var regCloseButton = document.querySelector( 'button#close-form-regular' );
