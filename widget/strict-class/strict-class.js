@@ -35,6 +35,8 @@ StrictClass.prototype._init = function() {
         .map( function( el ) { return el.closest( '.question' ); } )
         .concat( Array.prototype.slice.call( this.element.querySelectorAll( '.or-branch' ) )
             .map( function( el ) { return el.closest( '.question, .or-group, .or-group-data' ); } )
+            // If branch is calculation without form control, exclude it;
+            .filter( function( el ) { return !!el; } )
         );
 
     elements.forEach( function( el ) {
