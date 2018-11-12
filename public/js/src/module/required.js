@@ -29,6 +29,9 @@ requiredModule.update = function( updated ) {
     $nodes.each( function() {
         var $input = $( this );
         var value = that.form.input.getVal( $input ); // String or Array!
+        if ( typeof value === 'string' ) {
+            value = value.trim();
+        }
         var hide = !!value.length;
 
         if ( !hide ) {
