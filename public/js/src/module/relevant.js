@@ -32,7 +32,7 @@ branchModule.originalEnable = branchModule.enable;
  */
 branchModule.enable = function( $branchNode, path ) {
     $branchNode.removeClass( 'invalid-relevant' );
-    this.originalEnable( $branchNode, path );
+    return this.originalEnable( $branchNode, path );
 };
 
 /**
