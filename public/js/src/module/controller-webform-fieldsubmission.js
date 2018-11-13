@@ -4,39 +4,38 @@
  * Field values are automatically submitted upon change to a special OpenClinica Field Submission API.
  */
 
-'use strict';
+import gui from './gui';
 
-var gui = require( './gui' );
-var settings = require( './settings' );
-var Form = require( './Form' ); // modified for OC
-var fileManager = require( './file-manager' );
-var Promise = require( 'lie' );
-var t = require( './translator' ).t;
-var $ = require( 'jquery' );
-var FieldSubmissionQueue = require( './field-submission-queue' );
-var fieldSubmissionQueue;
-var rc = require( './controller-webform' );
-var reasons = require( './reasons' );
-var DEFAULT_THANKS_URL = '/thanks';
-var form;
-var formSelector;
-var $formprogress;
-var ignoreBeforeUnload = false;
+import settings from './settings';
+import Form from './Form'; // modified for OC
+import fileManager from './file-manager';
+import Promise from 'lie';
+import { t } from './translator';
+import $ from 'jquery';
+import FieldSubmissionQueue from './field-submission-queue';
+let fieldSubmissionQueue;
+import rc from './controller-webform';
+import reasons from './reasons';
+const DEFAULT_THANKS_URL = '/thanks';
+let form;
+let formSelector;
+let $formprogress;
+let ignoreBeforeUnload = false;
 
-var formOptions = {
+const formOptions = {
     printRelevantOnly: settings.printRelevantOnly
 };
 
 
 function init( selector, data, loadWarnings ) {
-    var advice;
-    var loadErrors = [].concat( loadWarnings );
+    let advice;
+    let loadErrors = [].concat( loadWarnings );
 
     formSelector = selector;
     $formprogress = $( '.form-progress' );
 
-    return new Promise( function( resolve ) {
-            var goToErrorLink = settings.goToErrorUrl ? '<a href="' + settings.goToErrorUrl + '">' + settings.goToErrorUrl + '</a>' : '';
+    return new Promise( resolve => {
+            const goToErrorLink = settings.goToErrorUrl ? `<a href="${settings.goToErrorUrl}">${settings.goToErrorUrl}</a>` : '';
 
             if ( data.instanceAttachments ) {
                 fileManager.setInstanceAttachments( data.instanceAttachments );
@@ -51,8 +50,8 @@ function init( selector, data, loadWarnings ) {
             } else {
                 console.log( 'Fieldsubmissions disabled' );
                 fieldSubmissionQueue = {
-                    submitAll: function() { return Promise.resolve(); },
-                    get: function() { return {}; }
+                    submitAll() { return Promise.resolve(); },
+                    get() { return {}; }
                 };
             }
 
@@ -62,9 +61,9 @@ function init( selector, data, loadWarnings ) {
             }
             // For all Participant views, use a hacky solution to change the default relevant message
             if ( settings.strictCheckEnabled ) {
-                var list = form.view.html.querySelectorAll( '[data-i18n="constraint.relevant"]' );
-                for ( var i = 0; i < list.length; i++ ) {
-                    var relevantErrorMsg = t( 'constraint.relevantparticipant' );
+                const list = form.view.html.querySelectorAll( '[data-i18n="constraint.relevant"]' );
+                for ( let i = 0; i < list.length; i++ ) {
+                    const relevantErrorMsg = t( 'constraint.relevantparticipant' );
                     list[ i ].textContent = relevantErrorMsg;
                 }
             }
@@ -73,7 +72,7 @@ function init( selector, data, loadWarnings ) {
             _setFormEventHandlers( selector );
 
             // listen for "gotohidden.enketo" event and add error
-            $( formSelector ).on( 'gotohidden.enketo', function( e ) {
+            $( formSelector ).on( 'gotohidden.enketo', e => {
                 // In OC hidden go_to fields should show loadError except if go_to field is a disrepancy_note
                 // as those are always hidden upon load.
                 if ( !e.target.classList.contains( 'or-appearance-dn' ) ) {
@@ -88,8 +87,8 @@ function init( selector, data, loadWarnings ) {
                 // DEBUG
                 // console.log( 'record to load:', data.instanceStr );
                 if ( form.model.isMarkedComplete() ) {
-                    var finishButton = document.querySelector( 'button#finish-form' );
-                    var regCloseButton = document.querySelector( 'button#close-form-regular' );
+                    const finishButton = document.querySelector( 'button#finish-form' );
+                    const regCloseButton = document.querySelector( 'button#close-form-regular' );
                     if ( finishButton ) {
                         finishButton.remove();
                     }
@@ -115,9 +114,9 @@ function init( selector, data, loadWarnings ) {
             if ( settings.goTo && location.hash ) {
                 // form.goTo returns an array of 1 error if it has error. We're using our special
                 // knowledge of Enketo Core to replace this error
-                var goToErrors = form.goTo( location.hash.substring( 1 ) );
+                let goToErrors = form.goTo( location.hash.substring( 1 ) );
                 if ( goToErrors.length ) {
-                    var replErr = t( 'alert.goto.notfound' ) + ' ';
+                    const replErr = `${t( 'alert.goto.notfound' )} `;
                     goToErrors = goToErrorLink ? [ replErr + t( 'alert.goto.msg2', {
                         miniform: goToErrorLink,
                         // switch off escaping
@@ -130,7 +129,7 @@ function init( selector, data, loadWarnings ) {
             }
 
             if ( form.encryptionKey ) {
-                loadErrors.unshift( '<strong>' + t( 'error.encryptionnotsupported' ) + '</strong>' );
+                loadErrors.unshift( `<strong>${t( 'error.encryptionnotsupported' )}</strong>` );
             }
 
             rc.setLogoutLinkVisibility();
@@ -141,7 +140,7 @@ function init( selector, data, loadWarnings ) {
 
             resolve( form );
         } )
-        .catch( function( error ) {
+        .catch( error => {
             if ( Array.isArray( error ) ) {
                 loadErrors = error;
             } else {
@@ -151,37 +150,35 @@ function init( selector, data, loadWarnings ) {
             advice = ( data.instanceStr ) ? t( 'alert.loaderror.editadvice' ) : t( 'alert.loaderror.entryadvice' );
             gui.alertLoadErrors( loadErrors, advice );
         } )
-        .then( function( form ) {
+        .then( form => {
             if ( settings.headless ) {
                 console.log( 'doing headless things' );
-                var $result = $( '<div id="headless-result" style="position: fixed; background: pink; top: 0; left: 50%;"/>' );
+                const $result = $( '<div id="headless-result" style="position: fixed; background: pink; top: 0; left: 50%;"/>' );
                 if ( loadErrors.length ) {
-                    $result.append( '<span id="error">' + loadErrors[ 0 ] + '</span>' );
+                    $result.append( `<span id="error">${loadErrors[ 0 ]}</span>` );
                     $( 'body' ).append( $result );
                     return form;
                 }
                 return _headlessCloseComplete()
-                    .then( function( fieldsubmissions ) {
-                        $result.append( '<span id="fieldsubmissions">' + fieldsubmissions + '</span>' );
+                    .then( fieldsubmissions => {
+                        $result.append( `<span id="fieldsubmissions">${fieldsubmissions}</span>` );
                     } )
-                    .catch( function( error ) {
-                        $result.append( '<span id="error">' + error.message + '</span>' );
+                    .catch( error => {
+                        $result.append( `<span id="error">${error.message}</span>` );
                     } )
-                    .then( function() {
+                    .then( () => {
                         $( 'body' ).append( $result );
                         return form;
                     } );
             }
         } )
-        .then( function( form ) {
-            // OC will return even if there were errors.
-            return form;
-        } );
+        .then( form => // OC will return even if there were errors.
+            form );
 }
 
 function _headlessValidateAndAutoQuery( valid ) {
-    var markedAsComplete = form.model.isMarkedComplete();
-    var $invalid = $();
+    const markedAsComplete = form.model.isMarkedComplete();
+    let $invalid = $();
 
     if ( !valid ) {
         if ( markedAsComplete ) {
@@ -198,27 +195,27 @@ function _headlessValidateAndAutoQuery( valid ) {
 }
 
 function _headlessCloseComplete() {
-    var markedAsComplete = form.model.isMarkedComplete();
+    const markedAsComplete = form.model.isMarkedComplete();
     return form.validate()
         // We run the autoquery-and-validate logic 3 times for those forms that have validation logic
         // that is affected by autoqueries, ie. an autoquery for question A makes question B invalid.
         .then( _headlessValidateAndAutoQuery )
         .then( _headlessValidateAndAutoQuery )
         .then( _headlessValidateAndAutoQuery )
-        .then( function( valid ) {
+        .then( valid => {
             if ( !valid && markedAsComplete ) {
                 return valid;
             }
             // ignore .invalid-required
             return form.view.$.find( '.invalid-relevant, .invalid-constraint' ).length === 0;
         } )
-        .then( function( valid ) {
+        .then( valid => {
             if ( !valid || reasons.getInvalidFields().length ) {
                 throw new Error( 'Could not create valid record using autoqueries' );
             }
             return fieldSubmissionQueue.submitAll();
         } )
-        .then( function() {
+        .then( () => {
             if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
                 throw new Error( 'Failed to submit fieldsubmissions' );
             }
@@ -226,9 +223,7 @@ function _headlessCloseComplete() {
                 return fieldSubmissionQueue.complete( form.instanceID, form.deprecatedID );
             }
         } )
-        .then( function() {
-            return ( fieldSubmissionQueue.submittedCounter );
-        } );
+        .then( () => fieldSubmissionQueue.submittedCounter );
 }
 
 
@@ -241,11 +236,11 @@ function _headlessCloseComplete() {
  * @return {Promise} [description]
  */
 function _closeRegular( bypassAutoQuery ) {
-    var msg = '';
-    var tAlertCloseMsg = t( 'fieldsubmission.alert.close.msg1' );
-    var tAlertCloseHeading = t( 'fieldsubmission.alert.close.heading1' );
-    var authLink = '<a href="/login" target="_blank">' + t( 'here' ) + '</a>';
-    var $violated = form.view.$.find( '.invalid-constraint' );
+    let msg = '';
+    const tAlertCloseMsg = t( 'fieldsubmission.alert.close.msg1' );
+    const tAlertCloseHeading = t( 'fieldsubmission.alert.close.heading1' );
+    const authLink = `<a href="/login" target="_blank">${t( 'here' )}</a>`;
+    const $violated = form.view.$.find( '.invalid-constraint' );
 
     // First check if any constraints have been violated and prompt option to generate automatic queries
     if ( !bypassAutoQuery && $violated.length ) {
@@ -257,7 +252,7 @@ function _closeRegular( bypassAutoQuery ) {
                 posButton: t( 'fieldsubmission.confirm.autoquery.automatic' ),
                 negButton: t( 'fieldsubmission.confirm.autoquery.manual' ),
             } )
-            .then( function( confirmed ) {
+            .then( confirmed => {
                 if ( confirmed ) {
                     _autoAddQueries( $violated );
                 }
@@ -266,11 +261,10 @@ function _closeRegular( bypassAutoQuery ) {
     }
 
     // Start with actually closing, but only proceed once the queue is emptied.
-    gui.alert( tAlertCloseMsg + '<br/>' +
-        '<div class="loader-animation-small" style="margin: 40px auto 0 auto;"/>', tAlertCloseHeading, 'bare' );
+    gui.alert( `${tAlertCloseMsg}<br/><div class="loader-animation-small" style="margin: 40px auto 0 auto;"/>`, tAlertCloseHeading, 'bare' );
 
     return fieldSubmissionQueue.submitAll()
-        .then( function() {
+        .then( () => {
             if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
                 throw new Error( t( 'fieldsubmission.alert.close.msg2' ) );
             } else {
@@ -282,8 +276,8 @@ function _closeRegular( bypassAutoQuery ) {
                 _redirect();
             }
         } )
-        .catch( function( error ) {
-            var errorMsg;
+        .catch( error => {
+            let errorMsg;
             error = error || {};
 
             console.error( 'close error', error );
@@ -296,13 +290,13 @@ function _closeRegular( bypassAutoQuery ) {
                 errorMsg = error.message || gui.getErrorResponseMsg( error.status );
                 gui.confirm( {
                         heading: t( 'alert.default.heading' ),
-                        errorMsg: errorMsg,
+                        errorMsg,
                         msg: t( 'fieldsubmission.confirm.leaveanyway.msg' )
                     }, {
                         posButton: t( 'confirm.default.negButton' ),
                         negButton: t( 'fieldsubmission.confirm.leaveanyway.button' )
                     } )
-                    .then( function( confirmed ) {
+                    .then( confirmed => {
                         if ( !confirmed ) {
                             $( document ).trigger( 'close' );
                             _redirect( 100 );
@@ -314,17 +308,16 @@ function _closeRegular( bypassAutoQuery ) {
 }
 
 function _closeSimple() {
-    var msg = '';
-    var tAlertCloseMsg = t( 'fieldsubmission.alert.close.msg1' );
-    var tAlertCloseHeading = t( 'fieldsubmission.alert.close.heading1' );
-    var authLink = '<a href="/login" target="_blank">' + t( 'here' ) + '</a>';
+    let msg = '';
+    const tAlertCloseMsg = t( 'fieldsubmission.alert.close.msg1' );
+    const tAlertCloseHeading = t( 'fieldsubmission.alert.close.heading1' );
+    const authLink = `<a href="/login" target="_blank">${t( 'here' )}</a>`;
 
     // Start with actually closing, but only proceed once the queue is emptied.
-    gui.alert( tAlertCloseMsg + '<br/>' +
-        '<div class="loader-animation-small" style="margin: 40px auto 0 auto;"/>', tAlertCloseHeading, 'bare' );
+    gui.alert( `${tAlertCloseMsg}<br/><div class="loader-animation-small" style="margin: 40px auto 0 auto;"/>`, tAlertCloseHeading, 'bare' );
 
     return fieldSubmissionQueue.submitAll()
-        .then( function() {
+        .then( () => {
             if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
                 throw new Error( t( 'fieldsubmission.alert.close.msg2' ) );
             } else {
@@ -336,8 +329,8 @@ function _closeSimple() {
                 _redirect();
             }
         } )
-        .catch( function( error ) {
-            var errorMsg;
+        .catch( error => {
+            let errorMsg;
             error = error || {};
 
             console.error( 'close error', error );
@@ -350,13 +343,13 @@ function _closeSimple() {
                 errorMsg = error.message || gui.getErrorResponseMsg( error.status );
                 gui.confirm( {
                         heading: t( 'alert.default.heading' ),
-                        errorMsg: errorMsg,
+                        errorMsg,
                         msg: t( 'fieldsubmission.confirm.leaveanyway.msg' )
                     }, {
                         posButton: t( 'confirm.default.negButton' ),
                         negButton: t( 'fieldsubmission.confirm.leaveanyway.button' )
                     } )
-                    .then( function( confirmed ) {
+                    .then( confirmed => {
                         if ( !confirmed ) {
                             $( document ).trigger( 'close' );
                             _redirect( 100 );
@@ -368,10 +361,10 @@ function _closeSimple() {
 
 // This is conceptually a Complete function that has some pre-processing.
 function _closeCompletedRecord() {
-    var $violated;
+    let $violated;
 
     if ( !reasons.validate() ) {
-        var firstInvalidInput = reasons.getFirstInvalidField();
+        const firstInvalidInput = reasons.getFirstInvalidField();
         gui.alert( t( 'fieldsubmission.alert.reasonforchangevalidationerror.msg' ) );
         firstInvalidInput.scrollIntoView();
         firstInvalidInput.focus();
@@ -381,7 +374,7 @@ function _closeCompletedRecord() {
     }
 
     return form.validate()
-        .then( function( valid ) {
+        .then( valid => {
             if ( valid ) {
                 // do not show confirmation dialog
                 return _complete( true );
@@ -399,7 +392,7 @@ function _closeCompletedRecord() {
                         posButton: t( 'fieldsubmission.confirm.autoquery.automatic' ),
                         negButton: t( 'fieldsubmission.confirm.autoquery.manual' )
                     } )
-                    .then( function( confirmed ) {
+                    .then( confirmed => {
                         if ( !confirmed ) {
                             return false;
                         }
@@ -416,7 +409,7 @@ function _closeParticipant() {
     // TODO: can we ignore calculations?
     if ( settings.type !== 'edit' && Object.keys( fieldSubmissionQueue.get() ).length === 0 && fieldSubmissionQueue.submittedCounter === 0 ) {
         return Promise.resolve()
-            .then( function() {
+            .then( () => {
                 gui.alert( t( 'alert.submissionsuccess.redirectmsg' ), null, 'success' );
                 // this event is used in communicating back to iframe parent window
                 $( document ).trigger( 'close' );
@@ -425,9 +418,9 @@ function _closeParticipant() {
     }
 
     return form.validate()
-        .then( function( valid ) {
+        .then( valid => {
             if ( !valid ) {
-                var strictViolations = form.view.html
+                const strictViolations = form.view.html
                     .querySelector( '.oc-strict.invalid-required, .oc-strict.invalid-constraint, .oc-strict.invalid-relevant' );
 
                 valid = !strictViolations;
@@ -441,7 +434,7 @@ function _closeParticipant() {
 
 function _redirect( msec ) {
     ignoreBeforeUnload = true;
-    setTimeout( function() {
+    setTimeout( () => {
         location.href = decodeURIComponent( settings.returnUrl || DEFAULT_THANKS_URL );
     }, msec || 1200 );
 }
@@ -454,11 +447,11 @@ function _redirect( msec ) {
  * 
  */
 function _complete( bypassConfirmation ) {
-    var beforeMsg;
-    var authLink;
-    var instanceId;
-    var deprecatedId;
-    var msg = '';
+    let beforeMsg;
+    let authLink;
+    let instanceId;
+    let deprecatedId;
+    let msg = '';
 
     // First check if any constraints have been violated and prompt option to generate automatic queries
     if ( !bypassConfirmation ) {
@@ -471,14 +464,13 @@ function _complete( bypassConfirmation ) {
     form.view.$.trigger( 'beforesave' );
 
     beforeMsg = t( 'alert.submission.redirectmsg' );
-    authLink = '<a href="/login" target="_blank">' + t( 'here' ) + '</a>';
+    authLink = `<a href="/login" target="_blank">${t( 'here' )}</a>`;
 
-    gui.alert( beforeMsg +
-        '<div class="loader-animation-small" style="margin: 40px auto 0 auto;"/>', t( 'alert.submission.msg' ), 'bare' );
+    gui.alert( `${beforeMsg}<div class="loader-animation-small" style="margin: 40px auto 0 auto;"/>`, t( 'alert.submission.msg' ), 'bare' );
 
     return fieldSubmissionQueue.submitAll()
-        .then( function() {
-            var queueLength = Object.keys( fieldSubmissionQueue.get() ).length;
+        .then( () => {
+            const queueLength = Object.keys( fieldSubmissionQueue.get() ).length;
 
             if ( queueLength === 0 ) {
                 instanceId = form.instanceID;
@@ -488,7 +480,7 @@ function _complete( bypassConfirmation ) {
                 throw new Error( t( 'fieldsubmission.alert.complete.msg' ) );
             }
         } )
-        .then( function() {
+        .then( () => {
             // this event is used in communicating back to iframe parent window
             $( document ).trigger( 'submissionsuccess' );
 
@@ -496,7 +488,7 @@ function _complete( bypassConfirmation ) {
             gui.alert( msg, t( 'alert.submissionsuccess.heading' ), 'success' );
             _redirect();
         } )
-        .catch( function( result ) {
+        .catch( result => {
             result = result || {};
             console.error( 'submission failed' );
             if ( result.status === 401 ) {
@@ -524,21 +516,21 @@ function _autoAddReasonQueries( $rfcInputs ) {
 
 function _doNotSubmit( fullPath ) {
     // no need to check on cloned radiobuttons, selects or textareas
-    var pathWithoutPositions = fullPath.replace( /\[[0-9]+\]/g, '' );
-    return !!form.view.$.get( 0 ).querySelector( 'input[oc-external="clinicaldata"][name="' + pathWithoutPositions + '"]' );
+    const pathWithoutPositions = fullPath.replace( /\[[0-9]+\]/g, '' );
+    return !!form.view.$.get( 0 ).querySelector( `input[oc-external="clinicaldata"][name="${pathWithoutPositions}"]` );
 }
 
 function _setFormEventHandlers( selector ) {
-    var $doc = $( document );
+    const $doc = $( document );
     $doc
-        .on( 'progressupdate.enketo', selector, function( event, status ) {
+        .on( 'progressupdate.enketo', selector, ( event, status ) => {
             if ( $formprogress.length > 0 ) {
-                $formprogress.css( 'width', status + '%' );
+                $formprogress.css( 'width', `${status}%` );
             }
         } )
         // After repeat removal from view (before removal from model)
-        .on( 'removed.enketo', function( event, updated ) {
-            var instanceId = form.instanceID;
+        .on( 'removed.enketo', ( event, updated ) => {
+            const instanceId = form.instanceID;
             if ( !updated.xmlFragment ) {
                 console.error( 'Could not submit repeat removal fieldsubmission. XML fragment missing.' );
                 return;
@@ -551,9 +543,9 @@ function _setFormEventHandlers( selector ) {
             fieldSubmissionQueue.submitAll();
         } )
         // Field is changed
-        .on( 'dataupdate.enketo', selector, function( event, updated ) {
-            var instanceId = form.instanceID;
-            var file;
+        .on( 'dataupdate.enketo', selector, ( event, updated ) => {
+            const instanceId = form.instanceID;
+            let file;
 
             if ( updated.cloned ) {
                 // This event is fired when a repeat is cloned. It does not trigger
@@ -592,21 +584,21 @@ function _setFormEventHandlers( selector ) {
     if ( settings.reasonForChange ) {
         // We need to catch the click before repeat.js does. So 
         // we attach the handler to a lower level DOM element and make sure it's only attached once.
-        $( '.or-repeat-info' ).parent( '.or-group, .or-group-data' ).on( 'click.propagate', 'button.remove:enabled', function( evt, data ) {
+        $( '.or-repeat-info' ).parent( '.or-group, .or-group-data' ).on( 'click.propagate', 'button.remove:enabled', ( evt, data ) => {
             if ( data && data.propagate ) {
                 return true;
             }
             // Any form controls inside the repeat need a Reason for Change
             // TODO: exclude controls that have no value?
-            var $questions = $( evt.currentTarget ).closest( '.or-repeat' ).find( '.question:not(.disabled)' );
-            var texts = {
+            const $questions = $( evt.currentTarget ).closest( '.or-repeat' ).find( '.question:not(.disabled)' );
+            const texts = {
                 heading: t( 'fieldsubmission.prompt.repeatdelete.heading' ),
-                msg: t( 'fieldsubmission.prompt.repeatdelete.msg' ) + ' ' + t( 'fieldsubmission.prompt.reason.msg' )
+                msg: `${t( 'fieldsubmission.prompt.repeatdelete.msg' )} ${t( 'fieldsubmission.prompt.reason.msg' )}`
             };
-            var inputs = '<p><label><input name="reason" type="text"/></label></p>';
+            const inputs = '<p><label><input name="reason" type="text"/></label></p>';
 
             gui.prompt( texts, {}, inputs )
-                .then( function( values ) {
+                .then( values => {
                     if ( !values ) {
                         return;
                     } else if ( !values.reason || !values.reason.trim() ) {
@@ -625,8 +617,8 @@ function _setFormEventHandlers( selector ) {
             return false;
         } );
 
-        $( '.form-footer' ).find( '.next-page, .last-page, .previous-page, .first-page' ).on( 'click', function( evt ) {
-            var valid = reasons.validate();
+        $( '.form-footer' ).find( '.next-page, .last-page, .previous-page, .first-page' ).on( 'click', evt => {
+            const valid = reasons.validate();
             if ( !valid ) {
                 evt.stopImmediatePropagation();
 
@@ -638,16 +630,16 @@ function _setFormEventHandlers( selector ) {
     } else {
         // We need to catch the click before repeat.js does. So 
         // we attach the handler to a lower level DOM element and make sure it's only attached once.
-        $( '.or-repeat-info' ).parent( '.or-group, .or-group-data' ).on( 'click.propagate', 'button.remove:enabled', function( evt, data ) {
+        $( '.or-repeat-info' ).parent( '.or-group, .or-group-data' ).on( 'click.propagate', 'button.remove:enabled', ( evt, data ) => {
             if ( data && data.propagate ) {
                 return true;
             }
-            var texts = {
+            const texts = {
                 heading: t( 'fieldsubmission.prompt.repeatdelete.heading' ),
                 msg: t( 'fieldsubmission.prompt.repeatdelete.msg' )
             };
             gui.confirm( texts )
-                .then( function( confirmed ) {
+                .then( confirmed => {
                     if ( confirmed ) {
                         // Propagate to repeat.js
                         $( evt.currentTarget ).trigger( 'click', {
@@ -663,14 +655,14 @@ function _setFormEventHandlers( selector ) {
 
 function _setButtonEventHandlers() {
     $( 'button#finish-form' ).click( function() {
-        var $button = $( this ).btnBusyState( true );
+        const $button = $( this ).btnBusyState( true );
 
         // form.validate() will trigger fieldsubmissions for timeEnd before it resolves
         form.validate()
-            .then( function( valid ) {
+            .then( valid => {
                 if ( valid ) {
                     return _complete()
-                        .then( function( again ) {
+                        .then( again => {
                             if ( again ) {
                                 return _complete( again );
                             }
@@ -683,10 +675,10 @@ function _setButtonEventHandlers() {
                     }
                 }
             } )
-            .catch( function( e ) {
+            .catch( e => {
                 gui.alert( e.message );
             } )
-            .then( function() {
+            .then( () => {
                 $button.btnBusyState( false );
             } );
 
@@ -694,18 +686,18 @@ function _setButtonEventHandlers() {
     } );
 
     $( 'button#close-form-regular' ).click( function() {
-        var $button = $( this ).btnBusyState( true );
+        const $button = $( this ).btnBusyState( true );
 
         _closeRegular()
-            .then( function( again ) {
+            .then( again => {
                 if ( again ) {
                     return _closeRegular( true );
                 }
             } )
-            .catch( function( e ) {
+            .catch( e => {
                 console.error( e );
             } )
-            .then( function() {
+            .then( () => {
                 $button.btnBusyState( false );
             } );
 
@@ -715,14 +707,14 @@ function _setButtonEventHandlers() {
     // This is for closing a record that was marked as final. It's quite different
     // from Complete or the regular Close.
     $( 'button#close-form-complete' ).click( function() {
-        var $button = $( this ).btnBusyState( true );
+        const $button = $( this ).btnBusyState( true );
 
         // form.validate() will trigger fieldsubmissions for timeEnd before it resolves
         _closeCompletedRecord()
-            .catch( function( e ) {
+            .catch( e => {
                 gui.alert( e.message );
             } )
-            .then( function() {
+            .then( () => {
                 $button.btnBusyState( false );
             } );
 
@@ -731,13 +723,13 @@ function _setButtonEventHandlers() {
 
     // This is for closing a record in a readonly or note-only view.
     $( 'button#close-form-read' ).click( function() {
-        var $button = $( this ).btnBusyState( true );
+        const $button = $( this ).btnBusyState( true );
 
         _closeSimple()
-            .catch( function( e ) {
+            .catch( e => {
                 gui.alert( e.message );
             } )
-            .then( function() {
+            .then( () => {
                 $button.btnBusyState( false );
             } );
 
@@ -746,13 +738,13 @@ function _setButtonEventHandlers() {
 
     // This is for closing a participant view.
     $( 'button#close-form-participant' ).click( function() {
-        var $button = $( this ).btnBusyState( true );
+        const $button = $( this ).btnBusyState( true );
 
         _closeParticipant()
-            .catch( function( e ) {
+            .catch( e => {
                 gui.alert( e.message );
             } )
-            .then( function() {
+            .then( () => {
                 $button.btnBusyState( false );
             } );
 
@@ -763,7 +755,7 @@ function _setButtonEventHandlers() {
         $( document ).on( 'submissionsuccess edited.enketo close', rc.postEventAsMessageToParentWindow );
     }
 
-    window.onbeforeunload = function() {
+    window.onbeforeunload = () => {
         if ( !ignoreBeforeUnload ) {
             _autoAddQueries( form.view.$.find( '.invalid-constraint' ) );
             _autoAddReasonQueries( reasons.getInvalidFields() );
@@ -774,6 +766,6 @@ function _setButtonEventHandlers() {
     };
 }
 
-module.exports = {
-    init: init
+export default {
+    init
 };

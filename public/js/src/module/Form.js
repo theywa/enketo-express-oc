@@ -1,16 +1,12 @@
 // Extend the Enketo Core Form class, and expose it for local testing.
-
-'use strict';
-
-var Form = require( 'enketo-core/src/js/Form' );
-var FormModel = require( './Form-model' );
-var $ = require( 'jquery' );
-var gui = require( './gui' );
-var settings = require( './settings' );
-
-require( './relevant' );
-require( './required' );
-require( './page' );
+import { Form } from 'enketo-core';
+import FormModel from './Form-model';
+import $ from 'jquery';
+import gui from './gui';
+import settings from './settings';
+import './relevant';
+import './required';
+import './page';
 
 /**
  * This function doesn't actually evaluate constraints. It triggers
@@ -19,7 +15,7 @@ require( './page' );
  * 
  * @param  {[type]} updated [description]
  */
-var constraintUpdate = function( updated ) {
+const constraintUpdate = function( updated ) {
     updated = updated || {};
     // If the update object is a repeat node (cloned=true), do nothing
     if ( !updated.cloned ) {
@@ -57,8 +53,8 @@ var constraintUpdate = function( updated ) {
  * @param  {[type]} updated [description]
  * @return {[type]}         [description]
  */
-var relevantErrorUpdate = function( updated ) {
-    var $nodes;
+const relevantErrorUpdate = function( updated ) {
+    let $nodes;
 
     $nodes = this.getRelatedNodes( 'name', '[data-relevant]', updated )
         .closest( '.invalid-relevant' )
@@ -69,14 +65,14 @@ var relevantErrorUpdate = function( updated ) {
     this.relevant.updateNodes( $nodes );
 };
 
-var originalInit = Form.prototype.init;
-var originalValidateInput = Form.prototype.validateInput;
+const originalInit = Form.prototype.init;
+const originalValidateInput = Form.prototype.validateInput;
 
 Form.prototype.evaluationCascadeAdditions = [ constraintUpdate, relevantErrorUpdate ];
 
 Form.prototype.init = function() {
-    var that = this;
-    var initialized = false;
+    const that = this;
+    let initialized = false;
 
     // Before any other change handlers, add the "strict check" handlers
     if ( settings.strictCheckEnabled ) {
@@ -98,7 +94,7 @@ Form.prototype.init = function() {
                 } );
     }
 
-    var loadErrors = originalInit.call( this );
+    const loadErrors = originalInit.call( this );
 
 
     initialized = true;
@@ -106,8 +102,8 @@ Form.prototype.init = function() {
 };
 
 Form.prototype.specialOcLoadValidate = function( includeRequired ) {
-    var that = this;
-    var $collectionToValidate = this.getRelatedNodes( 'data-constraint' );
+    const that = this;
+    let $collectionToValidate = this.getRelatedNodes( 'data-constraint' );
 
     if ( includeRequired ) {
         $collectionToValidate = $collectionToValidate.add( this.getRelatedNodes( 'data-required' ) );
@@ -119,9 +115,9 @@ Form.prototype.specialOcLoadValidate = function( includeRequired ) {
     // still needs cleaning, because the engine will validate **all** expressions on the selected question.
 
     $collectionToValidate.each( function() {
-        var $input = $( this );
+        const $input = $( this );
         that.validateInput( $input )
-            .then( function( passed ) {
+            .then( passed => {
                 if ( !passed && !includeRequired ) {
                     // Undo the displaying of a required error message upon load
                     that.setValid( $input, 'required' );
@@ -138,7 +134,7 @@ Form.prototype.specialOcLoadValidate = function( includeRequired ) {
  * @return {[type]}        [description]
  */
 Form.prototype.validateInput = function( $input ) {
-    var that = this;
+    const that = this;
     // There is a condition where a valuechange results in both an invalid-relevant and invalid-constraint,
     // where the invalid constraint is added *after* the invalid-relevant. I can reproduce in automated test (not manually).
     // It is probably related due to the asynchronousity of contraint evaluation.
@@ -149,7 +145,7 @@ Form.prototype.validateInput = function( $input ) {
     // 
     // This is very unfortunate, but these are the kind of acrobatics that are necessary to "fight" the built-in behavior of Enketo's form engine.
     return originalValidateInput.call( this, $input )
-        .then( function( passed ) {
+        .then( passed => {
             if ( !passed && $input.closest( '.question' ).hasClass( 'invalid-relevant' ) ) {
                 that.setValid( $input, 'constraint' );
             }
@@ -159,9 +155,9 @@ Form.prototype.validateInput = function( $input ) {
 
 
 Form.prototype.strictRequiredCheckHandler = function( evt, input ) {
-    var that = this;
-    var $input = $( input );
-    var n = {
+    const that = this;
+    const $input = $( input );
+    const n = {
         path: this.input.getName( $input ),
         required: this.input.getRequired( $input ),
         val: this.input.getVal( $input )
@@ -177,21 +173,21 @@ Form.prototype.strictRequiredCheckHandler = function( evt, input ) {
 
     // Check required
     if ( n.val === '' && this.model.node( n.path, n.ind ).isRequired( n.required ) ) {
-        var question = input.closest( '.question' );
-        var msg = question.querySelector( '.or-required-msg.active' ).innerHTML;
+        const question = input.closest( '.question' );
+        const msg = question.querySelector( '.or-required-msg.active' ).innerHTML;
         gui.alertStrictError( msg );
         // Cancel propagation input
         evt.stopImmediatePropagation();
-        var currentModelValue = that.model.node( n.path, n.ind ).getVal();
+        const currentModelValue = that.model.node( n.path, n.ind ).getVal();
         that.input.setVal( $( input ), currentModelValue ).dispatchEvent( new Event( 'change' ) );
         question.scrollIntoView();
     }
 };
 
 Form.prototype.strictConstraintCheckHandler = function( evt, input ) {
-    var that = this;
-    var $input = $( input );
-    var n = {
+    const that = this;
+    const $input = $( input );
+    const n = {
         path: this.input.getName( $input ),
         xmlType: this.input.getXmlType( $input ),
         constraint: this.input.getConstraint( $input ),
@@ -209,33 +205,33 @@ Form.prototype.strictConstraintCheckHandler = function( evt, input ) {
     // In order to evaluate the constraint, its value has to be set in the model. 
     // This would trigger a fieldsubmission, which is what we're trying to prevent.
     // A heavy-handed dumb-but-safe approach is to clone the model and set the value there.
-    var modelClone = new FormModel( new XMLSerializer().serializeToString( this.model.xml ) );
+    const modelClone = new FormModel( new XMLSerializer().serializeToString( this.model.xml ) );
     // TODO: initialize clone with **external data**.
     modelClone.init();
     // Set the value in the clone
-    var updated = modelClone.node( n.path, n.ind ).setVal( n.val, n.xmlType );
+    const updated = modelClone.node( n.path, n.ind ).setVal( n.val, n.xmlType );
     // Check if strict constraint passes
     if ( !updated ) {
         return;
     }
     // Note: we don't use Enketo Core's nodeset.validateConstraintAndType here because it's asynchronous,
     // which means we couldn't selectively stop event propagation.
-    var modelCloneNodeValue = modelClone.node( n.path, n.ind ).getVal();
+    const modelCloneNodeValue = modelClone.node( n.path, n.ind ).getVal();
 
     if ( modelCloneNodeValue.toString() === '' ) {
         return;
     }
 
     if ( typeof n.constraint !== 'undefined' && n.constraint !== null && n.constraint.length > 0 && !modelClone.evaluate( n.constraint, 'boolean', n.path, n.ind ) ) {
-        var question = input.closest( '.question' );
-        var msg = question.querySelector( '.or-constraint-msg.active' ).innerHTML;
+        const question = input.closest( '.question' );
+        const msg = question.querySelector( '.or-constraint-msg.active' ).innerHTML;
         gui.alertStrictError( msg );
         // Cancel propagation input
         evt.stopImmediatePropagation();
-        var currentModelValue = that.model.node( n.path, n.ind ).getVal();
+        const currentModelValue = that.model.node( n.path, n.ind ).getVal();
         that.input.setVal( $( input ), currentModelValue ).dispatchEvent( new Event( 'change' ) );
         question.scrollIntoView();
     }
 };
 
-module.exports = Form;
+export default Form;

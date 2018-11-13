@@ -44,7 +44,7 @@
         "debug": "3.2.x",
         "enketo-core": "github:enketo/enketo-core.git#2311d14c",
         "enketo-transformer": "1.30.0",
-        "enketo-xpath-extensions-oc": "github:OpenClinica/enketo-xpath-extensions-oc#a30e5f9",
+        "enketo-xpath-extensions-oc": "github:OpenClinica/enketo-xpath-extensions-oc#22c6b94",
         "express": "4.x.x",
         "grunt": "^1.0.3",
         "grunt-contrib-uglify-es": "^3.3.0",
@@ -122,6 +122,7 @@
         "public/js/src/enketo-webform.js",
         "public/js/src/enketo-webform-edit.js",
         "public/js/src/enketo-webform-view.js",
-        "public/js/src/enketo-offline-fallback.js"
+        "public/js/src/enketo-offline-fallback.js",
+        "public/js/src/enketo-webform-fieldsubmission.js"
     ]
 }

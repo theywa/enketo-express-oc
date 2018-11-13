@@ -149,7 +149,7 @@ function _setHeadless( req, res, next ) {
 
 function fieldSubmission( req, res, next ) {
     var options = {
-        type: 'fs',
+        type: 'fieldsubmission',
         iframe: req.iframe,
         print: req.query.print === 'true',
         jini: req.jini,

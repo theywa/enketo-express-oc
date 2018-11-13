@@ -1,11 +1,11 @@
 // Extend the Enketo Core page class by overwriting some functionality
 'use strict';
 
-var pageModule = require( 'enketo-core/src/js/page' );
-var reasons = require( './reasons' );
-var settings = require( './settings' );
-var gui = require( './gui' );
-var $ = require( 'jquery' );
+import pageModule from 'enketo-core/src/js/page';
+import reasons from './reasons';
+import settings from './settings';
+import gui from './gui';
+import $ from 'jquery';
 
 /*
  * The only thing we want to change in this function for OC, 

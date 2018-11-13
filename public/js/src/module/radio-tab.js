@@ -1,15 +1,13 @@
-'use strict';
+import $ from 'jquery';
 
-var $ = require( 'jquery' );
-
-$( document ).keydown( function( e ) {
+$( document ).keydown( e => {
     if ( e.key === 'Tab' ) {
-        var currentFocus = $( ':focus' );
+        const currentFocus = $( ':focus' );
         if ( currentFocus.is( 'input[type=radio]' ) ) {
-            var name = currentFocus.attr( 'name' );
-            var allRadiosSameName = $( 'input[type=radio][name="' + name + '"]' );
-            var currentRadio = allRadiosSameName.index( currentFocus );
-            var nextRadio;
+            const name = currentFocus.attr( 'name' );
+            const allRadiosSameName = $( `input[type=radio][name="${name}"]` );
+            const currentRadio = allRadiosSameName.index( currentFocus );
+            let nextRadio;
             if ( !e.shiftKey ) {
                 nextRadio = allRadiosSameName[ currentRadio + 1 ];
             } else {

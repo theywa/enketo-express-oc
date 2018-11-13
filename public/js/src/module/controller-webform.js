@@ -6,7 +6,7 @@ import gui from './gui';
 
 import connection from './connection';
 import settings from './settings';
-import { Form } from 'enketo-core';
+import Form from './Form';
 import { updateDownloadLink } from 'enketo-core/src/js/utils';
 import fileManager from './file-manager';
 import { t } from './translator';

@@ -1,11 +1,9 @@
-'use strict';
-
-var Widget = require( 'enketo-core/src/js/Widget' );
-var $ = require( 'jquery' );
-var settings = require( '../../public/js/src/module/settings' );
+import Widget from 'enketo-core/src/js/Widget';
+import $ from 'jquery';
+import settings from '../../public/js/src/module/settings';
 
 // It is very helpful to make this the same as widget class, except for converting the first character to lowercase.
-var pluginName = 'strictClass';
+const pluginName = 'strictClass';
 
 /**
  * [My Fancy Widget description]
@@ -31,15 +29,15 @@ StrictClass.prototype.constructor = StrictClass;
 
 // add your widget functions
 StrictClass.prototype._init = function() {
-    var elements = Array.prototype.slice.call( this.element.querySelectorAll( '[oc-required-type="strict"], [oc-constraint-type="strict"]' ) )
-        .map( function( el ) { return el.closest( '.question' ); } )
+    const elements = Array.prototype.slice.call( this.element.querySelectorAll( '[oc-required-type="strict"], [oc-constraint-type="strict"]' ) )
+        .map( el => el.closest( '.question' ) )
         .concat( Array.prototype.slice.call( this.element.querySelectorAll( '.or-branch' ) )
-            .map( function( el ) { return el.closest( '.question, .or-group, .or-group-data' ); } )
+            .map( el => el.closest( '.question, .or-group, .or-group-data' ) )
             // If branch is calculation without form control, exclude it;
-            .filter( function( el ) { return !!el; } )
+            .filter( el => !!el )
         );
 
-    elements.forEach( function( el ) {
+    elements.forEach( el => {
         el.classList.add( 'oc-strict' );
     } );
 };
@@ -67,8 +65,8 @@ $.fn[ pluginName ] = function( options, event ) {
     return this.each( function() {
 
         if ( settings.strictCheckEnabled ) {
-            var $this = $( this );
-            var data = $this.data( pluginName );
+            const $this = $( this );
+            const data = $this.data( pluginName );
 
             // only instantiate if options is an object (i.e. not a string) and if it doesn't exist already
             if ( !data && typeof options === 'object' ) {
@@ -84,7 +82,7 @@ $.fn[ pluginName ] = function( options, event ) {
 };
 
 // returns its own properties so we can use this to instantiate the widget
-module.exports = {
+export default {
     'name': pluginName,
     'selector': 'form',
 };
