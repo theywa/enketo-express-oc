@@ -123,7 +123,9 @@ Form.prototype.specialOcLoadValidate = function( includeRequired ) {
         that.validateInput( $input )
             .then( function( passed ) {
                 if ( !passed && !includeRequired ) {
-                    // Undo the displaying of a required error message upon load
+                    // Undo the displaying of a required error message upon load.
+                    // Note: a failed required means there cannot be a failed constraint, because they are mutually exclusive
+                    // in the engine (constraint is only evaluated if question has a value).
                     that.setValid( $input, 'required' );
                 }
             } );

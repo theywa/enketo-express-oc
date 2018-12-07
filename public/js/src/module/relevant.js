@@ -23,6 +23,14 @@ branchModule.update = function( updated, forceClearIrrelevant ) {
     this.updateNodes( $nodes, forceClearIrrelevant );
 };
 
+branchModule.originalSelfRelevant = branchModule.selfRelevant;
+
+// Overwrite in order to add the && !branchNode.classList.contains('invalid-relevant') clause because an irrelevant branch in OC, 
+// would not be disabled if it is a question with a value!
+branchModule.selfRelevant = function( $branchNode ) {
+    return this.originalSelfRelevant( $branchNode ) && !$branchNode.hasClass( 'invalid-relevant' );
+};
+
 branchModule.originalEnable = branchModule.enable;
 
 /**
@@ -31,8 +39,9 @@ branchModule.originalEnable = branchModule.enable;
  * once it becomes relevant again.
  */
 branchModule.enable = function( $branchNode, path ) {
+    const change = this.originalEnable( $branchNode, path );
     $branchNode.removeClass( 'invalid-relevant' );
-    return this.originalEnable( $branchNode, path );
+    return change;
 };
 
 /**
