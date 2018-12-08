@@ -44,6 +44,19 @@ branchModule.enable = function( $branchNode, path ) {
     return change;
 };
 
+/*
+ * Overwrite to bypass the overwritten isRelevantCheck.
+ * No need for functionality to clear values in irrelevant fields either.
+ */
+branchModule.disable = function( $branchNode ) {
+    if ( $branchNode.hasClass( 'pre-init' ) || !$branchNode.hasClass( 'disabled' ) ) {
+        this.deactivate( $branchNode );
+        $branchNode.removeClass( 'pre-init' );
+        return true;
+    }
+    return false;
+};
+
 /**
  * Overwrite clear function
  */
