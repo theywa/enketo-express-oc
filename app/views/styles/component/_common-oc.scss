@@ -376,10 +376,11 @@ $secondary-color: #eeeeee;
 
 @media screen and (max-width: 430px) {
     .fieldsubmission-status {
-        order: 65;
+        order: 10;
         max-width: 100%;
         width: 100%;
         margin-top: 16px;
+        flex: 1;
     }
 
     .pages~.form-footer {
