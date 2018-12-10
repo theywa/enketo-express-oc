@@ -212,6 +212,7 @@ $offline-color: #d15200;
 
         &__branding {
             margin-top: 16px;
+            display: none;
         }
 
         .form-language-selector {
@@ -224,17 +225,24 @@ $offline-color: #d15200;
         }
 
         &__button--print {
-            display: none;
+            // display: none;
+            margin-top: 10px;
         }
 
         &__button--homescreen {
             top: -2px; // TODO: ensure button takes up on vertical space if there is no branding
             // https://github.com/kobotoolbox/enketo-express/issues/634
             // ensure that reason-for-change is pushed to the side
-            position: static;
+            // position: static;
             align-self: flex-start;
-            margin-top: -1px;
+            // margin-top: -1px;
             margin-right: 0;
+            position: absolute;
+            left: 0;
+        }
+
+        .pages-toc {
+            margin-top: 4px;
         }
     }
 
