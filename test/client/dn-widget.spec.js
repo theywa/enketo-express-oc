@@ -1,12 +1,23 @@
 /* global describe, it, expect */
 
-import Dn from '../../widget/discrepancy-note/Dn';
+import Dn from '../../widget/discrepancy-note/dn-widget';
 Dn.prototype._init = () => {};
+const fragment = document.createRange().createContextualFragment(
+    `<form>
+        <label class="question">
+            <input name="/data/node"/>
+        </label>
+        <label class="question or-appearance-dn">
+            <input name="/data/comment" data-for="/data/node">
+        </label>
+    </form>`
+);
+const el = fragment.querySelector( '[data-for]' );
 
 describe( 'DN object', () => {
 
     describe( 'parses JSON string', () => {
-        const dn = new Dn();
+        const dn = new Dn( el );
 
         [ 'a', '[]', '{queries:[], logs:[]}', true, null, false, {},
             [], {
@@ -46,7 +57,7 @@ describe( 'DN object', () => {
 
 
     describe( 'extracts the current status from the discrepancy note data model', () => {
-        const dn = new Dn();
+        const dn = new Dn( el );
 
         [
             [ '{}', '' ],
@@ -65,7 +76,7 @@ describe( 'DN object', () => {
     } );
 
     describe( 'getting parsed elapsed time from datetime string', () => {
-        const dn = new Dn();
+        const dn = new Dn( el );
 
         [ false, true, null, 'a', {},
             []
@@ -77,7 +88,7 @@ describe( 'DN object', () => {
     } );
 
     describe( 'parsing elapsed time from milliseconds', () => {
-        const dn = new Dn();
+        const dn = new Dn( el );
 
         [ -1, -Infinity, false, true, null, 'a', {},
             []
@@ -109,7 +120,7 @@ describe( 'DN object', () => {
     } );
 
     describe( 'sorting queries and logs', () => {
-        const dn = new Dn();
+        const dn = new Dn( el );
         const a = {
             date_time: "2016-09-01 15:01 -06:00"
         };
@@ -154,7 +165,7 @@ describe( 'DN object', () => {
     } );
 
     describe( 'extracting default assignee', () => {
-        const dn = new Dn();
+        const dn = new Dn( el );
         [
             [ '{}', '' ],
             [ '{"queries":[], "logs":[{"type": "comment"}]}', '' ],
