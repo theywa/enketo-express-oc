@@ -222,17 +222,17 @@ module.exports = grunt => {
     } );
 
     grunt.registerTask( 'transforms', 'Creating forms.json', function() {
-        var forms = {};
-        var done = this.async();
-        var jsonStringify = require( 'json-pretty' );
-        var formsJsonPath = 'test/client/forms/forms.json';
-        var xformsPaths = grunt.file.expand( {}, 'test/client/forms/*.xml' );
-        var transformer = require( 'enketo-transformer' );
+        const forms = {};
+        const done = this.async();
+        const jsonStringify = require( 'json-pretty' );
+        const formsJsonPath = 'test/client/forms/forms.json';
+        const xformsPaths = grunt.file.expand( {}, 'test/client/forms/*.xml' );
+        const transformer = require( 'enketo-transformer' );
 
         xformsPaths.reduce( function( prevPromise, filePath ) {
                 return prevPromise.then( function() {
-                    var xformStr = grunt.file.read( filePath );
-                    grunt.log.writeln( 'Transforming ' + filePath + '...' );
+                    const xformStr = grunt.file.read( filePath );
+                    grunt.log.writeln( `Transforming ${filePath}...` );
                     return transformer.transform( {
                             xform: xformStr,
                             includeRelevantMsg: true

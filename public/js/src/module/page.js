@@ -1,6 +1,3 @@
-// Extend the Enketo Core page class by overwriting some functionality
-'use strict';
-
 import pageModule from 'enketo-core/src/js/page';
 import reasons from './reasons';
 import settings from './settings';
@@ -14,10 +11,10 @@ import $ from 'jquery';
  * while there are empty reason-for-change fields.
  */
 pageModule.setRepeatHandlers = function() {
-    var that = this;
+    const that = this;
     this.form.view.$
         .off( 'addrepeat.pagemode' )
-        .on( 'addrepeat.pagemode', function( event, index, byCountUpdate ) {
+        .on( 'addrepeat.pagemode', ( event, index, byCountUpdate ) => {
             that.updateAllActive();
             // Removing the class in effect avoids the animation
             // It also prevents multiple .or-repeat[role="page"] to be shown on the same page
@@ -35,12 +32,12 @@ pageModule.setRepeatHandlers = function() {
             }
         } )
         .off( 'removerepeat.pagemode' )
-        .on( 'removerepeat.pagemode', function( event ) {
+        .on( 'removerepeat.pagemode', event => {
             // if the current page is removed
             // note that that.$current will have length 1 even if it was removed from DOM!
             if ( that.$current.closest( 'html' ).length === 0 ) {
                 that.updateAllActive();
-                var $target = $( event.target ).prev();
+                let $target = $( event.target ).prev();
                 if ( $target.length === 0 ) {
                     $target = $( event.target );
                 }
@@ -50,23 +47,23 @@ pageModule.setRepeatHandlers = function() {
         } );
 };
 
-var originalPageModuleNext = pageModule._next;
+const originalPageModuleNext = pageModule._next;
 
 pageModule._next = function() {
-    var that = this;
+    const that = this;
     // the original call takes care of all the validations
     originalPageModuleNext.call( this )
-        .then( function( valid ) {
+        .then( valid => {
             // for strict-validation navigation-blocking, we ignore some errors (compared to Enketo Core module)
             if ( !valid && settings.strictCheckEnabled ) {
-                var selector = '.oc-strict.invalid-required, .oc-strict.invalid-constraint, .oc-strict.invalid-relevant';
-                var strictViolations = that.$current[ 0 ].matches( selector ) || !!that.$current[ 0 ].querySelector( selector );
+                const selector = '.oc-strict.invalid-required, .oc-strict.invalid-constraint, .oc-strict.invalid-relevant';
+                const strictViolations = that.$current[ 0 ].matches( selector ) || !!that.$current[ 0 ].querySelector( selector );
 
                 if ( !strictViolations ) {
-                    var currentIndex = that._getCurrentIndex();
-                    var next = that._getNext( currentIndex );
+                    const currentIndex = that._getCurrentIndex();
+                    const next = that._getNext( currentIndex );
                     if ( next ) {
-                        var newIndex = currentIndex + 1;
+                        const newIndex = currentIndex + 1;
                         that._flipTo( next, newIndex );
                         //return newIndex;
                     }

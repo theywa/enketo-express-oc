@@ -349,7 +349,7 @@ function alertLoadErrors( loadErrors, advice ) {
 */
 
 function alertLoadErrorsOc( loadErrors ) {
-    var errorStringHTML = loadErrors.map( function( error ) { return '<p>' + error + '</p>'; } ).join( '' );
+    const errorStringHTML = loadErrors.map( function( error ) { return '<p>' + error + '</p>'; } ).join( '' );
     alert( errorStringHTML, t( 'alert.loaderror.heading' ) );
 }
 
@@ -359,7 +359,7 @@ function alertStrictError( msg ) {
 }
 
 function alertStrictBlock() {
-    var icon = '<i class="icon icon-exclamation-circle oc-strict-error"> </i>';
+    const icon = '<i class="icon icon-exclamation-circle oc-strict-error"> </i>';
     alert( t( 'fieldsubmission.alert.participanterror.msg' ), icon + t( 'alert.loaderror.heading' ), 'oc-strict-error' );
 }
 
@@ -429,23 +429,28 @@ function printForm() {
 */
 
 function printOcForm() {
-    var components = getPrintDialogComponents();
-    var texts = {
+    const components = getPrintDialogComponents();
+    const texts = {
         heading: components.heading,
         msg: components.msg
     };
-    var options = {
+    const options = {
         posButton: components.posButton,
         negButton: components.negButton,
     };
-    var inputDn = '<fieldset><legend>' + t( 'confirm.print.queries' ) + '</legend>' +
-        '<label><input name="queries" style="margin-left: 10px;" type="checkbox" value="yes" checked/><span>' + t( 'confirm.print.queryShow' ) + '</span></label>' +
-        '</fieldset>';
-    var gridInputs = inputDn + components.gridInputs + components.gridWarning;
-    var regularInputs = inputDn;
+    const inputDn =
+        `<fieldset>
+            <legend>${t( 'confirm.print.queries' )}</legend>
+            <label>
+                <input name="queries" style="margin-left: 10px;" type="checkbox" value="yes" checked/>
+                <span>${t( 'confirm.print.queryShow' )}</span>
+            </label>
+        </fieldset>`;
+    const gridInputs = inputDn + components.gridInputs + components.gridWarning;
+    const regularInputs = inputDn;
 
-    var $dn = $( '.or-appearance-dn' );
-    var printified;
+    const $dn = $( '.or-appearance-dn' );
+    let printified;
 
     return new Promise( function( resolve ) {
             if ( formTheme === 'grid' || ( !formTheme && printHelper.isGrid() ) ) {

@@ -527,7 +527,7 @@ function _setEventHandlers() {
                         $button.btnBusyState( false );
                         if ( !valid ) {
                             if ( settings.strictCheckEnabled ) {
-                                var strictViolations = form.view.html
+                                const strictViolations = form.view.html
                                     .querySelector( '.oc-strict.invalid-required, .oc-strict.invalid-constraint, .oc-strict.invalid-relevant' );
                                 if ( strictViolations ) {
                                     gui.alert( t( 'fieldsubmission.confirm.autoquery.msg1' ), null, 'oc-strict-error' );
