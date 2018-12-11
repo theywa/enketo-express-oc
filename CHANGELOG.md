@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased] 
+----------------------
+
+##### Changed
+- Updated Spanish translation
+- Updated to new widget format. **WARNING: custom widgets need to be converted to new format!**
+
+##### Fixed
+- API has 100kb body content limit causing issues when editing large instances.
+
 [1.73.0] - 11-13-2018
 ----------------------
 ##### Changed
