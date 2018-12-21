@@ -48,13 +48,24 @@ branchModule.enable = function( $branchNode, path ) {
  * Overwrite to bypass the overwritten isRelevantCheck.
  * No need for functionality to clear values in irrelevant fields either.
  */
-branchModule.disable = function( $branchNode ) {
-    if ( $branchNode.hasClass( 'pre-init' ) || !$branchNode.hasClass( 'disabled' ) ) {
+branchModule.disable = function( $branchNode, path, forceClearIrrelevant ) {
+    const virgin = $branchNode.hasClass( 'pre-init' );
+    let change = false;
+
+    if ( virgin || !$branchNode.hasClass( 'disabled' ) ) {
+        change = true;
+        // if the branch was previously enabled, keep any default values
+        if ( !virgin ) {
+            if ( this.form.options.clearIrrelevantImmediately || forceClearIrrelevant ) {
+                this.clear( $branchNode, path );
+            }
+        } else {
+            $branchNode.removeClass( 'pre-init' );
+        }
+
         this.deactivate( $branchNode );
-        $branchNode.removeClass( 'pre-init' );
-        return true;
     }
-    return false;
+    return change;
 };
 
 /**
