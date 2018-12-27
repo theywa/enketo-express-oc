@@ -103,8 +103,8 @@ class Comment extends Widget {
     _setCommentButtonHandler() {
         const that = this;
         this.$commentButton.click( () => {
-            if ( that._isCommentModalShown( that.$linkedQuestion ) ) {
-                that._hideCommentModal( that.$linkedQuestion );
+            if ( that._isCommentModalShown( that.$linkedQuestion[ 0 ] ) ) {
+                that._hideCommentModal( that.$linkedQuestion[ 0 ] );
             } else {
                 const errorMsg = that._getCurrentErrorMsg();
                 that._showCommentModal( errorMsg );
@@ -289,8 +289,8 @@ class Comment extends Widget {
         } );
     }
 
-    _isCommentModalShown( $linkedQuestion ) {
-        return $linkedQuestion.find( '.or-comment-widget' ).length === 1;
+    _isCommentModalShown( linkedQuestion ) {
+        return !!linkedQuestion.querySelector( '.or-comment-widget' );
     }
 
     /**
@@ -315,108 +315,131 @@ class Comment extends Widget {
     }
 
     _showCommentModal( linkedQuestionErrorMsg ) {
-        let $widget;
-        let $content;
-        let $assignee;
-        let $notify;
-        let $user;
-        let $input;
-        let $overlay;
-        const that = this;
-        const $queryButtons = $( '<div class="or-comment-widget__content__query-btns">' );
-        const $comment = $( this.element ).closest( '.question' ).clone( false );
+        const range = document.createRange();
+        const comment = this.element.closest( '.question' ).cloneNode( true );
         const noClose = settings.dnCloseButton !== true;
         const submitText = t( 'formfooter.submit.btn' ) || 'Submit';
         const updateText = t( 'widget.comment.update' ) || 'Update';
         const closeText = t( 'widget.dn.closeQueryText' ) || 'Close Query';
         const assignText = t( 'widget.dn.assignto' ) || 'Assign To'; // TODO: add string to kobotoolbox/enketo-express
         const notifyText = t( 'widget.dn.notifyText' ) || 'Email?'; // TODO: add string to kobotoolbox/enketo-express
-        const $closeButton = $( '<button class="btn-icon-only or-comment-widget__content__btn-close-x" type="button">&times;</button>' );
-        const $newQueryButton = $( `<button name="new" class="btn btn-primary or-comment-widget__content__btn-submit" type="button">${submitText}</button>` );
-        const $updateQueryButton = $( `<button name="updated" class="btn btn-primary or-comment-widget__content__btn-submit" type="button">${updateText}</button>` );
-        const $closeQueryButton = ( noClose ) ? $() : $( `<button name="closed" class="btn btn-default or-comment-widget__content__btn-submit" type="button">${closeText}</button>` );
+        const closeButtonHtml = '<button class="btn-icon-only or-comment-widget__content__btn-close-x" type="button">&times;</button>';
+        const newQueryButtonHtml = `<button name="new" class="btn btn-primary or-comment-widget__content__btn-submit" type="button">${submitText}</button>`;
+        const updateQueryButtonHtml = `<button name="updated" class="btn btn-primary or-comment-widget__content__btn-submit" type="button">${updateText}</button>`;
+        const closeQueryButtonHtml = noClose ? '' : `<button name="closed" class="btn btn-default or-comment-widget__content__btn-submit" type="button">${closeText}</button>`;
         const status = this._getCurrentStatus( this.notes );
         const readOnlyAttr = this.readOnly ? 'readonly ' : '';
 
+        let btnsHtml;
         if ( status === 'new' || status === 'updated' || status === 'closed-modified' ) {
-            $queryButtons.append( $updateQueryButton ).append( $closeQueryButton );
+            btnsHtml = updateQueryButtonHtml + closeQueryButtonHtml;
         } else if ( status === 'closed' ) {
-            $queryButtons.append( $updateQueryButton );
+            btnsHtml = updateQueryButtonHtml;
         } else {
-            $queryButtons.append( $newQueryButton );
+            btnsHtml = newQueryButtonHtml;
         }
+        const btnGroupHtml = `<div class="or-comment-widget__content__query-btns">${btnsHtml}</div>`;
 
-        $input = $comment
-            .removeClass( 'hide' )
-            .removeAttr( 'role' )
-            .find( 'input, textarea' )
-            .addClass( 'ignore' )
-            .removeAttr( 'name data-for data-type-xml' )
-            .attr( 'name', 'dn-comment' )
-            .removeData()
-            .val( linkedQuestionErrorMsg );
+        comment.classList.remove( 'hide' );
+        comment.removeAttribute( 'role' );
 
-        $overlay = $( '<div class="or-comment-widget__overlay"></div>' );
-        $assignee = $( `<label class="or-comment-widget__content__user__dn-assignee"><span>${assignText}</span><select name="dn-assignee" class="ignore" >${usersOptionsHtml}</select>` );
-        $notify = $( `<div class="or-comment-widget__content__user__dn-notify option-wrapper"><label><input name="dn-notify" class="ignore" value="true" type="checkbox" ${readOnlyAttr}/><span class="option-label">${notifyText}</span></label></div>` );
-        this.$history = $( '<div class="or-comment-widget__content__history closed"><p></p><table></table></div>' );
-        $user = $( '<div class="or-comment-widget__content__user">' ).append( $assignee ).append( $notify );
+        const input = comment.querySelector( 'input, textarea' );
+        input.classList.add( 'ignore' );
+        input.removeAttribute( 'data-for' );
+        input.removeAttribute( ' data-type-xml' );
+        input.setAttribute( 'name', 'dn-comment' );
+        input.value = linkedQuestionErrorMsg;
 
-        $content = $( '<form onsubmit="return false;" class="or-comment-widget__content" autocomplete="off"></form>' )
-            .append( $comment )
-            .append( $user )
-            .append( $closeButton )
-            .append( $queryButtons )
-            .append( this.$history );
+        const fragment = range.createContextualFragment(
+            `<section class="widget or-comment-widget">
+                <div class="or-comment-widget__overlay"></div>
+                <form onsubmit="return false;" class="or-comment-widget__content" autocomplete="off">
+                    <div class="or-comment-widget__content__user">
+                        <label class="or-comment-widget__content__user__dn-assignee">
+                            <span>${assignText}</span>
+                            <select name="dn-assignee" class="ignore" >${usersOptionsHtml}</select>
+                        </label>
+                        <div class="or-comment-widget__content__user__dn-notify option-wrapper">
+                            <label>
+                                <input name="dn-notify" class="ignore" value="true" type="checkbox" ${readOnlyAttr}/>
+                                <span class="option-label">${notifyText}</span>
+                            </label>
+                        </div>
+                    </div>
+                    ${closeButtonHtml}
+                    ${btnGroupHtml}
+                    <div class="or-comment-widget__content__history closed">
+                        <p></p>
+                        <table></table>
+                    </div>
+                </section>
+            </form>`
+        );
 
-        $widget = $(
-            '<section class="widget or-comment-widget"></section>'
-        ).append( $overlay ).append( $content ).css( this._getFullWidthStyleCorrection() );
+        fragment.querySelector( 'form' ).prepend( comment );
 
-        this.$linkedQuestion
-            .find( '.or-comment-widget' ).remove().end()
-            .prepend( $widget )
-            .before( $overlay.clone( false ) );
+        const oldWidget = this.$linkedQuestion[ 0 ].querySelector( '.or-comment-widget' );
+        if ( oldWidget ) {
+            oldWidget.remove();
+        }
+        this.$linkedQuestion[ 0 ].prepend( fragment );
 
-        this._renderHistory();
+        const widget = this.$linkedQuestion[ 0 ].querySelector( '.or-comment-widget' );
 
-        $input
-            .on( 'input', () => {
-                $queryButtons.find( '.btn' ).prop( 'disabled', !$input.val().trim() );
-            } )
-            .trigger( 'input' )
-            .focus();
-
-        $widget
-            .find( 'form.or-comment-widget__content' ).on( 'submit', () => {
-                $updateQueryButton.add( $newQueryButton ).click();
-            } ).end()
-            .get( 0 ).scrollIntoView( false );
-
-        $queryButtons.find( '.btn' ).on( 'click', function() {
-            if ( $input.val() ) {
-                const comment = $input.val();
-                const status = this.getAttribute( 'name' );
-                const assignee = $assignee.find( 'select' ).val();
-                const notify = $notify.find( 'input:checked' ).val() === 'true';
-                that._addQuery( comment, status, assignee, notify );
-                $input.val( '' );
-                that._hideCommentModal( that.$linkedQuestion );
-            }
-
-            return false;
+        // Display widget in full form width even if its linked question is not a full row (in the Grid theme)
+        Object.entries( this._getFullWidthStyleCorrection() ).forEach( o => {
+            console.log( 'setting style', o[ 0 ], o[ 1 ] );
+            widget.style[ o[ 0 ] ] = o[ 1 ];
         } );
 
-        $closeButton.add( $overlay ).on( 'click', () => {
-            that._hideCommentModal( that.$linkedQuestion );
-            return false;
+        this.$history = $( widget.querySelector( '.or-comment-widget__content__history' ) );
+        this._renderHistory();
+
+        const queryButtons = widget.querySelectorAll( '.or-comment-widget__content__query-btns .btn' );
+
+        input.addEventListener( 'input', () => {
+            queryButtons.forEach( el => el.disabled = !input.value.trim() );
+        } );
+        input.dispatchEvent( new Event( 'input' ) );
+        input.focus();
+
+        widget.querySelector( 'form.or-comment-widget__content' ).addEventListener( 'submit', () => {
+            const btn = widget.querySelector( '.btn[name="updated"], .btn[name="new"]' );
+            if ( btn ) {
+                btn.click();
+            }
+        } );
+        widget.scrollIntoView( false );
+
+        queryButtons.forEach( btn => {
+            btn.addEventListener( 'click', event => {
+                if ( input.value ) {
+                    const comment = input.value;
+                    const status = event.target.getAttribute( 'name' );
+                    const assignee = widget.querySelector( 'select[name="dn-assignee"]' ).value;
+                    const notify = widget.querySelector( 'input[name="dn-notify"]' ).checked;
+                    this._addQuery( comment, status, assignee, notify );
+                    input.value = '';
+                    this._hideCommentModal( this.$linkedQuestion[ 0 ] );
+                }
+                event.preventDefault();
+                event.stopPropagation();
+            } );
+        } );
+
+        const closeButton = widget.querySelector( '.or-comment-widget__content__btn-close-x' );
+        const overlay = widget.querySelector( '.or-comment-widget__overlay' );
+        [ closeButton, overlay ].forEach( el => {
+            el.addEventListener( 'click', event => {
+                this._hideCommentModal( this.$linkedQuestion[ 0 ] );
+                event.preventDefault();
+                event.stopPropagation();
+            } );
         } );
     }
 
-    _hideCommentModal( $linkedQuestion ) {
-        $linkedQuestion
-            .find( '.or-comment-widget' ).remove().end()
-            .prev( '.or-comment-widget__overlay' ).remove();
+    _hideCommentModal( linkedQuestion ) {
+        linkedQuestion.querySelector( '.or-comment-widget' ).remove();
     }
 
     /**
