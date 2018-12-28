@@ -366,6 +366,13 @@ class Comment extends Widget {
                             </label>
                         </div>
                     </div>
+                    <label class="or-comment-widget__content__type">
+                        <span>Type:</span>
+                        <select name="dn-type">
+                            <option value="comment" selected>comment</option>
+                            <option value="annotation">annotation</option>
+                        </select>
+                    </label>
                     ${closeButtonHtml}
                     ${btnGroupHtml}
                     <div class="or-comment-widget__content__history closed">
@@ -388,7 +395,6 @@ class Comment extends Widget {
 
         // Display widget in full form width even if its linked question is not a full row (in the Grid theme)
         Object.entries( this._getFullWidthStyleCorrection() ).forEach( o => {
-            console.log( 'setting style', o[ 0 ], o[ 1 ] );
             widget.style[ o[ 0 ] ] = o[ 1 ];
         } );
 
@@ -415,10 +421,11 @@ class Comment extends Widget {
             btn.addEventListener( 'click', event => {
                 if ( input.value ) {
                     const comment = input.value;
-                    const status = event.target.getAttribute( 'name' );
                     const assignee = widget.querySelector( 'select[name="dn-assignee"]' ).value;
                     const notify = widget.querySelector( 'input[name="dn-notify"]' ).checked;
-                    this._addQuery( comment, status, assignee, notify );
+                    const type = widget.querySelector( 'select[name="dn-type"]' ).value;
+                    const status = type !== 'annotation' ? event.target.getAttribute( 'name' ) : undefined;
+                    this._addQuery( comment, status, assignee, notify, null, type );
                     input.value = '';
                     this._hideCommentModal( this.$linkedQuestion[ 0 ] );
                 }
@@ -584,12 +591,10 @@ class Comment extends Widget {
         return `${Math.round( months / 12 )} year(s)`;
     }
 
-    _addQuery( comment, status, assignee, notify, user ) {
+    _addQuery( comment, status, assignee, notify, user, type = 'comment' ) {
         const that = this;
-        let error;
-        let modelDataStr;
         const q = {
-            type: 'comment',
+            type,
             id: ( ++this.ordinal ).toString(),
             date_time: this._getFormattedCurrentDatetimeStr(),
             comment,
@@ -604,15 +609,16 @@ class Comment extends Widget {
 
         this.notes.queries.unshift( q );
 
-        // strip logs from model
-        modelDataStr = JSON.stringify( {
+        // Strip logs from model
+        // This also automatically leaves out undefined properties such as status!
+        const modelDataStr = JSON.stringify( {
             queries: that.notes.queries
         } );
 
-        // update XML Model
-        $( this.element ).val( modelDataStr ).trigger( 'change' );
-        error = this._commentHasError();
-        that._setCommentButtonState( that.element.value, error, status );
+        // Update XML Model
+        this.originalInputValue = modelDataStr;
+        const error = this._commentHasError();
+        this._setCommentButtonState( this.originalInputValue, error, this._getCurrentStatus( this.notes ) );
     }
 
     _addAudit( comment, assignee, notify ) {
@@ -724,7 +730,8 @@ class Comment extends Widget {
         const types = {
             comment: '<span class="icon tooltip fa-comment-o" data-title="Query/Comment"> </span>',
             audit: '<span class="icon tooltip fa-edit" data-title="Audit Event"> </span>',
-            reason: '<span class="icon tooltip icon-delta" data-title="Reason for Change"> </span>'
+            reason: '<span class="icon tooltip icon-delta" data-title="Reason for Change"> </span>',
+            annotation: '<span class="icon tooltip icon-pencil" data-title="Annotation"> </span>'
         };
         if ( typeof item.user === 'undefined' ) {
             item.user = currentUser;
