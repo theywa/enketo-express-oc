@@ -360,7 +360,10 @@ function alertLoadErrorsOc( loadErrors ) {
 }
 
 function alertStrictError( msg ) {
-    msg += '<p><strong>' + t( 'fieldsubmission.alert.stricterror.msg1' ) + '</strong> ' + t( 'fieldsubmission.alert.stricterror.msg2' ) + '</p>';
+    msg +=
+        `<p>
+            <strong>${t( 'fieldsubmission.alert.stricterror.msg' )}</strong>
+        </p>`;
     alert( msg, t( 'fieldsubmission.alert.stricterror.heading' ), 'oc-strict-error' );
 }
 

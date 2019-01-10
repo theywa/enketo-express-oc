@@ -43,8 +43,7 @@
             },
             "stricterror": {
                 "heading": "Invalid Value",
-                "msg1": "Value not updated.",
-                "msg2": "Please enter a suitable value to update the field."
+                "msg": "Please enter a suitable value to update the field."
             },
             "participanterror": {
                 "msg": [ "It looks like some fields need attention", "Please review them before proceeding." ]
