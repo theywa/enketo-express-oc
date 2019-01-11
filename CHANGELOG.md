@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+---------------------
+##### Fixed
+- IE11 fails to load.
+
+[1.74.3] - 2019-01-10
+---------------------
+##### Fixed
+- Loading a form with a readonly file input throws an exception.
+- Times and datetimes with meridian notation are set to empty in the model for times between 12:00 AM and 1:00 AM, and between 12:00 PM and 1:00 PM.
+
 [1.74.2] - 2019-01-07
 --------------------
 ##### Changed
