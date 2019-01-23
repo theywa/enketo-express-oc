@@ -144,11 +144,11 @@ branchModule.deactivate = function( $branchNode ) {
 
     } else if ( $branchNode.is( '.or-group, .or-group-data' ) ) {
         name = this.form.input.getName( $branchNode );
-        index = this.form.input.getIndex( $branchNode );
         /*
          * We need to check if any of the fields with a form control or calculations
          * (ie. excl discrepancy note questions) has a value.
          * The best way is to do this in the model.
+         * Note that we need to check ALL repeats if the repeat parent (with the same /path/to/repeat) has a relevant!
          * 
          * First get all the leaf nodes (nodes without children) and then check if there is a calculation 
          * or dn question for this node.
@@ -158,27 +158,29 @@ branchModule.deactivate = function( $branchNode ) {
          * 
          * If the result has length > 0, one form control in the group has a value.
          */
-        var dataEl = this.form.model.node( name, index ).getElement();
+        var dataEls = this.form.model.node( name ).getElements();
 
-        if ( !dataEl ) {
-            value = '';
+        if ( !dataEls.length ) {
+            value = false;
         } else {
-            value = Array.prototype.slice.call( dataEl.querySelectorAll( '*' ) )
-                .filter( function( el ) {
-                    if ( el.children.length === 0 ) {
-                        var path = that.form.model.getXPath( el, 'instance' );
-                        var n = that.form.view.html.querySelector( '.calculation > [name="' + path + '"], .or-appearance-dn > [name="' + path + '"]' );
-                        return !n;
-                    }
-                    return false;
-                } )
-                .map( function( el ) {
-                    return el.textContent ? el.textContent.trim() : '';
-                } )
-                .join( '' );
+            value = dataEls.some( function( dataEl ) {
+                return Array.prototype.slice.call( dataEl.querySelectorAll( '*' ) )
+                    .filter( function( el ) {
+                        if ( el.children.length === 0 ) {
+                            var path = that.form.model.getXPath( el, 'instance' );
+                            var n = that.form.view.html.querySelector( '.calculation > [name="' + path + '"], .or-appearance-dn > [name="' + path + '"]' );
+                            return !n;
+                        }
+                        return false;
+                    } )
+                    .map( function( el ) {
+                        return el.textContent ? el.textContent.trim() : '';
+                    } )
+                    .join( '' );
+            } );
         }
 
-        if ( value.length ) {
+        if ( value ) {
             this.form.setInvalid( $branchNode, 'relevant' );
         } else {
             this.form.setValid( $branchNode, 'relevant' );
