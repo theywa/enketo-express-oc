@@ -7,6 +7,7 @@ var FormModel = require( './Form-model' );
 var $ = require( 'jquery' );
 var gui = require( './gui' );
 var settings = require( './settings' );
+var events = require( 'enketo-core/src/js/event' );
 
 require( './relevant' );
 require( './required' );
@@ -185,7 +186,11 @@ Form.prototype.strictRequiredCheckHandler = function( evt, input ) {
         // Cancel propagation input
         evt.stopImmediatePropagation();
         var currentModelValue = that.model.node( n.path, n.ind ).getVal();
-        that.input.setVal( $( input ), currentModelValue ).dispatchEvent( new Event( 'change' ) );
+        that.input.setVal( $( input ), currentModelValue );
+        // When changing this make sure that the radio picker's change
+        // listener picks this event up.
+        // https://github.com/OpenClinica/enketo-express-oc/issues/168
+        input.dispatchEvent( events.Change() );
         question.scrollIntoView();
     }
 };
@@ -235,7 +240,11 @@ Form.prototype.strictConstraintCheckHandler = function( evt, input ) {
         // Cancel propagation input
         evt.stopImmediatePropagation();
         var currentModelValue = that.model.node( n.path, n.ind ).getVal();
-        that.input.setVal( $( input ), currentModelValue ).dispatchEvent( new Event( 'change' ) );
+        that.input.setVal( $( input ), currentModelValue );
+        // When changing this make sure that the radio picker's change
+        // listener picks this event up.
+        // https://github.com/OpenClinica/enketo-express-oc/issues/168
+        input.dispatchEvent( events.Change() );
         question.scrollIntoView();
     }
 };
