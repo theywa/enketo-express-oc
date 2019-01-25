@@ -99,7 +99,9 @@
     "confirm": {
         "print": {
             "queries": "Show History",
-            "queryShow": "show"
+            "queryShow": "show",
+            "heading": "Options",
+            "msg": "To prepare an optimized print, please select the options below"
         }
     },
     "constraint": {

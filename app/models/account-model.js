@@ -1,11 +1,11 @@
 const utils = require( '../lib/utils' );
 const config = require( './config-model' ).server;
 const customGetAccount = config[ 'account lib' ] ? require( config[ 'account lib' ] ).getAccount : undefined;
-var pending = {};
-var client = require( 'redis' ).createClient( config.redis.main.port, config.redis.main.host, {
+const pending = {};
+const client = require( 'redis' ).createClient( config.redis.main.port, config.redis.main.host, {
     auth_pass: config.redis.main.password
 } );
-// var debug = require( 'debug' )( 'account-model' );
+// const debug = require( 'debug' )( 'account-model' );
 
 // in test environment, switch to different db
 if ( process.env.NODE_ENV === 'test' ) {
@@ -62,11 +62,11 @@ function get( survey ) {
  * @return {[type]}        [description]
  */
 function set( account ) {
-    var error;
-    var dbKey;
-    var hardcodedAccount = _getHardcodedAccount();
+    let error;
+    let dbKey;
+    const hardcodedAccount = _getHardcodedAccount();
 
-    return new Promise( function( resolve, reject ) {
+    return new Promise( ( resolve, reject ) => {
         if ( !account.linkedServer || !account.key ) {
             error = new Error( 'Bad Request. Server URL and/or API key missing' );
             error.status = 400;
@@ -80,7 +80,7 @@ function set( account ) {
             error.status = 400;
             reject( error );
         } else {
-            dbKey = 'ac:' + utils.cleanUrl( account.linkedServer );
+            dbKey = `ac:${utils.cleanUrl( account.linkedServer )}`;
             if ( pending[ dbKey ] ) {
                 error = new Error( 'Conflict. Busy handling pending request for same account' );
                 error.status = 409;
@@ -93,13 +93,13 @@ function set( account ) {
                 // to avoid issues with fast subsequent requests
                 pending[ dbKey ] = true;
 
-                client.hgetall( dbKey, function( error, obj ) {
+                client.hgetall( dbKey, ( error, obj ) => {
                     if ( error ) {
                         delete pending[ dbKey ];
                         reject( error );
                     } else if ( !obj || obj.openRosaServer ) {
                         // also update if deprecated openRosaServer property is present
-                        client.hmset( dbKey, account, function( error ) {
+                        client.hmset( dbKey, account, error => {
                             delete pending[ dbKey ];
                             if ( error ) {
                                 reject( error );
@@ -133,11 +133,11 @@ function set( account ) {
  * @return {[type]}        [description]
  */
 function update( account ) {
-    var error;
-    var dbKey;
-    var hardcodedAccount = _getHardcodedAccount();
+    let error;
+    let dbKey;
+    const hardcodedAccount = _getHardcodedAccount();
 
-    return new Promise( function( resolve, reject ) {
+    return new Promise( ( resolve, reject ) => {
         if ( !account.linkedServer ) {
             error = new Error( 'Bad Request. Server URL missing' );
             error.status = 400;
@@ -154,8 +154,8 @@ function update( account ) {
             if ( hardcodedAccount && _isAllowed( hardcodedAccount, account.linkedServer ) ) {
                 resolve( account );
             } else {
-                dbKey = 'ac:' + utils.cleanUrl( account.linkedServer );
-                client.hgetall( dbKey, function( error, obj ) {
+                dbKey = `ac:${utils.cleanUrl( account.linkedServer )}`;
+                client.hgetall( dbKey, ( error, obj ) => {
                     if ( error ) {
                         reject( error );
                     } else if ( !obj ) {
@@ -166,7 +166,7 @@ function update( account ) {
                         account.status = 200;
                         resolve( account );
                     } else {
-                        client.hmset( dbKey, account, function( error ) {
+                        client.hmset( dbKey, account, error => {
                             if ( error ) {
                                 reject( error );
                             }
@@ -190,11 +190,11 @@ function update( account ) {
  * @return {[type]}        [description]
  */
 function remove( account ) {
-    var error;
-    var dbKey;
-    var hardcodedAccount = _getHardcodedAccount();
+    let error;
+    let dbKey;
+    const hardcodedAccount = _getHardcodedAccount();
 
-    return new Promise( function( resolve, reject ) {
+    return new Promise( ( resolve, reject ) => {
         if ( !account.linkedServer ) {
             error = new Error( 'Bad Request. Server URL missing' );
             error.status = 400;
@@ -208,8 +208,8 @@ function remove( account ) {
             error.status = 405;
             reject( error );
         } else {
-            dbKey = 'ac:' + utils.cleanUrl( account.linkedServer );
-            client.hgetall( dbKey, function( error, obj ) {
+            dbKey = `ac:${utils.cleanUrl( account.linkedServer )}`;
+            client.hgetall( dbKey, ( error, obj ) => {
                 if ( error ) {
                     reject( error );
                 } else if ( !obj ) {
@@ -217,7 +217,7 @@ function remove( account ) {
                     error.status = 404;
                     reject( error );
                 } else {
-                    client.del( dbKey, function( error ) {
+                    client.del( dbKey, error => {
                         if ( error ) {
                             reject( error );
                         } else {
@@ -235,10 +235,9 @@ function remove( account ) {
  * @return {[type]} [description]
  */
 function getList() {
-    var hardcodedAccount;
-    var multi;
-    var list = [];
-    var app = app || require( '../../config/express' );
+    let hardcodedAccount;
+    let multi;
+    const list = [];
 
     hardcodedAccount = _getHardcodedAccount();
 
@@ -246,8 +245,8 @@ function getList() {
         list.push( hardcodedAccount );
     }
 
-    return new Promise( function( resolve, reject ) {
-        client.keys( 'ac:*', function( error, accounts ) {
+    return new Promise( ( resolve, reject ) => {
+        client.keys( 'ac:*', ( error, accounts ) => {
             if ( error ) {
                 reject( error );
             } else if ( accounts.length === 0 ) {
@@ -255,11 +254,11 @@ function getList() {
             } else if ( accounts.length > 0 ) {
                 multi = client.multi();
 
-                accounts.forEach( function( account ) {
+                accounts.forEach( account => {
                     multi.hgetall( account );
                 } );
 
-                multi.exec( function( errors, replies ) {
+                multi.exec( ( errors, replies ) => {
                     if ( errors ) {
                         reject( errors[ 0 ] );
                     }
@@ -328,8 +327,8 @@ function _getAccount( serverUrl ) {
         return customGetAccount( serverUrl, config[ 'account api url' ] );
     }
 
-    return new Promise( function( resolve, reject ) {
-        client.hgetall( 'ac:' + utils.cleanUrl( serverUrl ), ( error, obj ) => {
+    return new Promise( ( resolve, reject ) => {
+        client.hgetall( `ac:${utils.cleanUrl( serverUrl )}`, ( error, obj ) => {
             if ( error ) {
                 reject( error );
             }

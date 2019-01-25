@@ -7,7 +7,7 @@ section.form-footer
             .option-wrapper: label.select 
               input.ignore(type='checkbox', name='draft')
               span.option-label= t('formfooter.savedraft.label')
-        if type === 'fs' || type === 'view'
+        if type === 'fieldsubmission' || type === 'view'
           button(id=`close-form-${closeButtonIdSuffix}`, class=`btn ${completeButton ? 'btn-default' : 'btn-primary'}`) #{t('alert.default.button')}
           if completeButton
             button#finish-form.btn.btn-primary

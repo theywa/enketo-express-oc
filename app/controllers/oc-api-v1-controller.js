@@ -10,7 +10,7 @@ const utils = require( '../lib/utils' );
 const keys = require( '../lib/router-utils' ).idEncryptionKeys;
 const router = express.Router();
 const quotaErrorMessage = 'Forbidden. No quota left';
-// var debug = require( 'debug' )( 'oc-api-controller-v1' );
+// const debug = require( 'debug' )( 'oc-api-controller-v1' );
 
 module.exports = app => {
     app.use( `${app.get( 'base path' )}/oc/api/v1`, router );

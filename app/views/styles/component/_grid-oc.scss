@@ -17,7 +17,8 @@
     }
 }
 
-.or-comment-widget__content__user__dn-assignee select {
+.or-comment-widget__content__user__dn-assignee select,
+.or-comment-widget__content__type select {
     border: 0;
     outline: 1px solid black;
 }

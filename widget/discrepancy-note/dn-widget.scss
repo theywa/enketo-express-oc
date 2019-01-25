@@ -19,7 +19,7 @@ $padding: 30px;
         }
 
         // override Draw widget rule
-        input[type="text"][name="dn-comment"]{
+        input[type="text"][name="dn-comment"] {
             display: block;
         }
 
@@ -35,9 +35,11 @@ $padding: 30px;
             white-space: nowrap;
             justify-content: flex-end;
             align-items: center;
+
             .btn {
                 height: 40px;
             }
+
             .btn+.btn {
                 margin-left: 20px;
             }
@@ -63,6 +65,7 @@ $padding: 30px;
             @include flex-wrap(wrap);
 
             margin-bottom: 10px; // push down Close/Update button on small screens
+
             &__dn-assignee {
                 @include flex(1);
 
@@ -82,6 +85,15 @@ $padding: 30px;
                 display: inline-block;
                 margin-right: -10px;
                 margin-left: -10px;
+            }
+        }
+
+        &__type {
+            select {
+                display: inline-block;
+                margin-left: 10px;
+                margin-right: 20px;
+                max-width: 100px;
             }
         }
 
@@ -139,7 +151,7 @@ $padding: 30px;
             }
 
             td {
-                padding: 3px 10px 3px 0;
+                padding: 3px 7px 3px 0;
                 border-bottom: 1px solid $gray;
                 white-space: nowrap;
                 overflow: hidden;
@@ -202,6 +214,7 @@ $padding: 30px;
                 border: 1px solid $state-info-border;
                 background-color: $state-info-bg;
             }
+
             &.username[data-title]:hover::after {
                 margin-left: -200px;
             }

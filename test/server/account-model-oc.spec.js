@@ -1,24 +1,21 @@
 /* global describe, require, it, beforeEach, afterEach*/
-'use strict';
-
 // safer to ensure this here (in addition to grunt:env:test)
 process.env.NODE_ENV = 'test';
 
-var Promise = require( 'lie' );
-var chai = require( 'chai' );
-var expect = chai.expect;
-var chaiAsPromised = require( 'chai-as-promised' );
-var config = require( '../../app/models/config-model' ).server;
+const chai = require( 'chai' );
+const expect = chai.expect;
+const chaiAsPromised = require( 'chai-as-promised' );
+const config = require( '../../app/models/config-model' ).server;
 config[ 'account lib' ] = undefined;
 config[ 'linked form and data server' ][ 'server url' ] = 'http://some.unused.url.com';
-var model = require( '../../app/models/account-model' );
-var app = require( '../../config/express' );
+const model = require( '../../app/models/account-model' );
+const app = require( '../../config/express' );
 
 chai.use( chaiAsPromised );
 
-describe( 'OC Account Model', function() {
+describe( 'OC Account Model', () => {
 
-    afterEach( function( done ) {
+    afterEach( done => {
         // remove the test accounts
         Promise.all( [
                 model.remove( {
@@ -38,66 +35,62 @@ describe( 'OC Account Model', function() {
                 } )
             ] )
             .then( done )
-            .catch( function() {
+            .catch( () => {
                 done();
             } );
     } );
 
-    describe( 'Some setup checks', function() {
-        it( 'We are in the "test" environment', function() {
+    describe( 'Some setup checks', () => {
+        it( 'We are in the "test" environment', () => {
             expect( app.get( 'env' ) ).to.equal( 'test' );
         } );
     } );
 
-    describe( 'set: when attempting to store new accounts', function() {
+    describe( 'set: when attempting to store new accounts', () => {
 
-        var account;
+        let account;
 
-        beforeEach( function() {
+        beforeEach( () => {
             account = {
                 linkedServer: 'https://octest1.com/client2',
                 key: 'abcde'
             };
         } );
 
-        it( 'returns an error if the linked Server is missing', function() {
+        it( 'returns an error if the linked Server is missing', () => {
             delete account.linkedServer;
             return expect( model.set( account ) ).to.eventually.be.rejected;
         } );
 
-        it( 'returns an error if the OpenRosa Form ID is missing', function() {
+        it( 'returns an error if the OpenRosa Form ID is missing', () => {
             delete account.key;
             return expect( model.set( account ) ).to.eventually.be.rejected;
         } );
 
-        it( 'returns an error if the OpenRosa Form ID is an empty string', function() {
+        it( 'returns an error if the OpenRosa Form ID is an empty string', () => {
             account.key = '';
             return expect( model.set( account ) ).to.eventually.be.rejected;
         } );
 
-        it( 'returns an error if the OpenRosa Server is an empty string', function() {
+        it( 'returns an error if the OpenRosa Server is an empty string', () => {
             account.linkedServer = '';
             return expect( model.set( account ) ).to.eventually.be.rejected;
         } );
 
-        it( 'returns an object with api key if succesful', function() {
-            return expect( model.set( account ) ).to.eventually.have.property( 'key' ).and.to.equal( 'abcde' );
-        } );
+        it( 'returns an object with api key if succesful', () => expect( model.set( account ) ).to.eventually.have.property( 'key' ).and.to.equal( 'abcde' ) );
 
-        it( 'drops nearly simultaneous set requests to avoid db corruption', function() {
-            return Promise.all( [
-                expect( model.set( account ) ).to.eventually.have.property( 'key' ).and.to.equal( 'abcde' ),
-                expect( model.set( account ) ).to.eventually.be.rejected,
-                expect( model.set( account ) ).to.eventually.be.rejected
-            ] );
-        } );
+        it( 'drops nearly simultaneous set requests to avoid db corruption', () => Promise.all( [
+            expect( model.set( account ) ).to.eventually.have.property( 'key' ).and.to.equal( 'abcde' ),
+            expect( model.set( account ) ).to.eventually.be.rejected,
+            expect( model.set( account ) ).to.eventually.be.rejected
+        ] ) );
 
     } );
 
-    describe( 'get: when attempting to obtain an account', function() {
+    describe( 'get: when attempting to obtain an account', () => {
 
-        it( 'returns the account object when the account exists in db', function() {
-            var account = {
+        it( 'returns the account object when the account exists in db', () => {
+            const account = {
                     key: '2342',
                     linkedServer: 'https://octest1.com/client2'
                 },
@@ -110,14 +103,14 @@ describe( 'OC Account Model', function() {
 
     } );
 
-    describe( 'update: when updating an existing account', function() {
+    describe( 'update: when updating an existing account', () => {
 
-        it( 'it returns an error when the parameters are incorrect', function() {
-            var account = {
+        it( 'it returns an error when the parameters are incorrect', () => {
+            const account = {
                     key: 'test',
                     linkedServer: 'https://octest1.com/client3'
                 },
-                promise = model.set( account ).then( function( acc ) {
+                promise = model.set( account ).then( acc => {
                     acc.key = '';
                     return model.update( acc );
                 } );
@@ -126,12 +119,12 @@ describe( 'OC Account Model', function() {
             ] );
         } );
 
-        it( 'returns the edited account object when succesful', function() {
-            var account = {
+        it( 'returns the edited account object when succesful', () => {
+            const account = {
                     key: 'test',
                     linkedServer: 'https://octest1.com/client4'
                 },
-                promise = model.set( account ).then( function() {
+                promise = model.set( account ).then( () => {
                     //change to http
                     account.linkedServer = 'http://octest1.com/client4';
                     return model.update( account );
@@ -142,12 +135,12 @@ describe( 'OC Account Model', function() {
             ] );
         } );
 
-        it( 'returns the edited account object when succesful and called via update()', function() {
-            var account = {
+        it( 'returns the edited account object when succesful and called via update()', () => {
+            const account = {
                     key: 'test',
                     linkedServer: 'https://octest1.com/client5'
                 },
-                promise = model.set( account ).then( function() {
+                promise = model.set( account ).then( () => {
                     // change key
                     account.key = 'something else';
                     // set again
@@ -161,10 +154,10 @@ describe( 'OC Account Model', function() {
 
     } );
 
-    describe( 'delete: when deleting an account', function() {
+    describe( 'delete: when deleting an account', () => {
 
-        it( 'it returns an error when the parameters are incorrect', function() {
-            var account = {
+        it( 'it returns an error when the parameters are incorrect', () => {
+            const account = {
                     key: 'test',
                     linkedServer: 'https://octest1/client3'
                 },
@@ -174,8 +167,8 @@ describe( 'OC Account Model', function() {
             ] );
         } );
 
-        it( 'returns the account object when succesful', function() {
-            var account = {
+        it( 'returns the account object when succesful', () => {
+            const account = {
                     key: 'test',
                     linkedServer: 'https://octest1.com/client4'
                 },
@@ -188,8 +181,8 @@ describe( 'OC Account Model', function() {
             ] );
         } );
 
-        it( 'it returns an error if the account does not exist', function() {
-            var account = {
+        it( 'it returns an error if the account does not exist', () => {
+            const account = {
                     key: 'test',
                     linkedServer: 'https://octest1.com/nonexisting'
                 },
@@ -201,10 +194,10 @@ describe( 'OC Account Model', function() {
 
     } );
 
-    describe( 'getList: getting a list of all accounts', function() {
+    describe( 'getList: getting a list of all accounts', () => {
 
-        it( 'it returns the list correctly', function() {
-            var account = {
+        it( 'it returns the list correctly', () => {
+            const account = {
                     key: 'test',
                     linkedServer: 'https://octest1.com/client3'
                 },
@@ -214,11 +207,7 @@ describe( 'OC Account Model', function() {
             return Promise.all( [
                 expect( hardcodedAccounts ).to.have.length( 1 ),
                 expect( promise ).to.eventually.have.length( hardcodedAccounts.length + 1 ),
-                expect( promise ).to.eventually.satisfy( function( accounts ) {
-                    return accounts.every( function( account ) {
-                        return account.linkedServer && account.key;
-                    } );
-                } )
+                expect( promise ).to.eventually.satisfy( accounts => accounts.every( account => account.linkedServer && account.key ) )
             ] );
         } );
 

@@ -1,17 +1,15 @@
-'use strict';
+const account = require( '../models/account-model' );
+const auth = require( 'basic-auth' );
+const express = require( 'express' );
+const router = express.Router();
+//const debug = require( 'debug' )( 'account-controller' );
 
-var account = require( '../models/account-model' );
-var auth = require( 'basic-auth' );
-var express = require( 'express' );
-var router = express.Router();
-//var debug = require( 'debug' )( 'account-controller' );
-
-module.exports = function( app ) {
+module.exports = app => {
     app.use( '/accounts/api/v1', router );
 };
 
 router
-    .all( '*', function( req, res, next ) {
+    .all( '*', ( req, res, next ) => {
         // set content-type to json to provide appropriate json Error responses
         res.set( 'Content-Type', 'application/json' );
         next();
@@ -23,17 +21,18 @@ router
     .delete( '/account', removeAccount )
     .get( '/list', getList )
     .post( '/list', getList )
-    .all( '*', function( req, res, next ) {
-        var error = new Error( 'Not allowed' );
+    .all( '*', ( req, res, next ) => {
+        const error = new Error( 'Not allowed' );
         error.status = 405;
         next( error );
     } );
 
 function authCheck( req, res, next ) {
     // check authentication and account
-    var error,
-        creds = auth( req ),
-        key = ( creds ) ? creds.name : undefined;
+    let error;
+
+    const creds = auth( req );
+    const key = ( creds ) ? creds.name : undefined;
 
     if ( !key || ( key !== req.app.get( 'account manager api key' ) ) ) {
         error = new Error( 'Not Allowed. Invalid API key.' );
@@ -52,7 +51,7 @@ function getExistingAccount( req, res, next ) {
             linkedServer: req.query.server_url,
             key: req.query.api_key
         } )
-        .then( function( account ) {
+        .then( account => {
             _render( 200, account, res );
         } )
         .catch( next );
@@ -63,7 +62,7 @@ function getNewOrExistingAccount( req, res, next ) {
             linkedServer: req.body.server_url || req.query.server_url,
             key: req.body.api_key || req.query.api_key
         } )
-        .then( function( account ) {
+        .then( account => {
             _render( account.status || 201, account, res );
         } )
         .catch( next );
@@ -74,7 +73,7 @@ function updateExistingAccount( req, res, next ) {
             linkedServer: req.body.server_url || req.query.server_url,
             key: req.body.api_key || req.query.api_key
         } )
-        .then( function( account ) {
+        .then( account => {
             _render( account.status || 201, account, res );
         } )
         .catch( next );
@@ -84,7 +83,7 @@ function removeAccount( req, res, next ) {
     return account.remove( {
             linkedServer: req.body.server_url || req.query.server_url,
             key: req.body.api_key || req.query.api_key
-        } ).then( function() {
+        } ).then( () => {
             _render( 204, null, res );
         } )
         .catch( next );
@@ -92,7 +91,7 @@ function removeAccount( req, res, next ) {
 
 function getList( req, res, next ) {
     return account.getList()
-        .then( function( list ) {
+        .then( list => {
             _render( 200, list, res );
         } )
         .catch( next );
@@ -109,9 +108,7 @@ function _render( status, body, res ) {
                 message: body
             };
         } else if ( Array.isArray( body ) ) {
-            body = body.map( function( account ) {
-                return _renameProps( account );
-            } );
+            body = body.map( account => _renameProps( account ) );
         } else if ( typeof body === 'object' ) {
             body = _renameProps( body );
         }

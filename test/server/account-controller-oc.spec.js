@@ -1,46 +1,43 @@
 /* global describe, require, it, beforeEach, afterEach */
-'use strict';
-
 // safer to ensure this here (in addition to grunt:env:test)
 process.env.NODE_ENV = 'test';
 
-var Promise = require( 'lie' );
-var chai = require( 'chai' );
-var expect = chai.expect;
-var chaiAsPromised = require( 'chai-as-promised' );
-var request = require( 'supertest' );
-var app = require( '../../config/express' );
-var config = require( '../../app/models/config-model' ).server;
+const chai = require( 'chai' );
+const expect = chai.expect;
+const chaiAsPromised = require( 'chai-as-promised' );
+const request = require( 'supertest' );
+const app = require( '../../config/express' );
+const config = require( '../../app/models/config-model' ).server;
 config[ 'account lib' ] = undefined;
-var accountModel = require( '../../app/models/account-model' );
+const accountModel = require( '../../app/models/account-model' );
 
 chai.use( chaiAsPromised );
 
-describe( 'OC Account manager API', function() {
-    var validAccountManagerApiKey = config[ 'account manager api key' ];
-    var invalidAccountManagerApiKey = 'bad';
-    var validAuth = {
-        'Authorization': 'Basic ' + new Buffer( validAccountManagerApiKey + ':' ).toString( 'base64' )
+describe( 'OC Account manager API', () => {
+    const validAccountManagerApiKey = config[ 'account manager api key' ];
+    const invalidAccountManagerApiKey = 'bad';
+    const validAuth = {
+        'Authorization': `Basic ${new Buffer( `${validAccountManagerApiKey}:` ).toString( 'base64' )}`
     };
-    var invalidAuth = {
-        'Authorization': 'Basic ' + new Buffer( invalidAccountManagerApiKey + ':' ).toString( 'base64' )
+    const invalidAuth = {
+        'Authorization': `Basic ${new Buffer( `${invalidAccountManagerApiKey}:` ).toString( 'base64' )}`
     };
-    var validServer1 = 'https://octestserver1.com';
-    var validServer2 = 'https://octestserver2.com';
-    var invalidServer = 'octestserver1.com';
-    var validApiKey1 = 'abcde';
+    const validServer1 = 'https://octestserver1.com';
+    const validServer2 = 'https://octestserver2.com';
+    const invalidServer = 'octestserver1.com';
+    const validApiKey1 = 'abcde';
 
-    beforeEach( function( done ) {
+    beforeEach( done => {
         // add survey if it doesn't exist in the db
         accountModel.set( {
             linkedServer: validServer1,
             key: validApiKey1,
-        } ).then( function() {
+        } ).then( () => {
             done();
         } );
     } );
 
-    afterEach( function( done ) {
+    afterEach( done => {
         // remove the test accounts
         Promise.all( [
             accountModel.remove( {
@@ -49,20 +46,20 @@ describe( 'OC Account manager API', function() {
             accountModel.remove( {
                 linkedServer: validServer2
             } )
-        ] ).then( function() {
+        ] ).then( () => {
             done();
-        } ).catch( function() {
+        } ).catch( () => {
             done();
         } );
     } );
 
-    describe( 'Some setup checks', function() {
-        it( 'We are in the "test" environment', function() {
+    describe( 'Some setup checks', () => {
+        it( 'We are in the "test" environment', () => {
             expect( app.get( 'env' ) ).to.equal( 'test' );
         } );
     } );
 
-    describe( '', function() {
+    describe( '', () => {
         [
             // valid key, existing account
             {
@@ -236,16 +233,15 @@ describe( 'OC Account manager API', function() {
                 status: 204,
                 key: ''
             }
-        ].forEach( function( test ) {
-            var authDesc = test.auth === true ? 'valid' : ( test.auth === false ? 'invalid' : 'empty' );
-            var auth = test.auth === true ? validAuth : ( test.auth === false ? invalidAuth : {} );
-            var accountServer = ( typeof test.server !== 'undefined' ) ? test.server : validServer1;
-            var accountKey = ( typeof test.key !== 'undefined' ) ? test.key : validApiKey1;
-            var dataSendMethod = ( test.method === 'get' ) ? 'query' : 'send';
+        ].forEach( test => {
+            const authDesc = test.auth === true ? 'valid' : ( test.auth === false ? 'invalid' : 'empty' );
+            const auth = test.auth === true ? validAuth : ( test.auth === false ? invalidAuth : {} );
+            const accountServer = ( typeof test.server !== 'undefined' ) ? test.server : validServer1;
+            const accountKey = ( typeof test.key !== 'undefined' ) ? test.key : validApiKey1;
+            const dataSendMethod = ( test.method === 'get' ) ? 'query' : 'send';
 
-            it( test.method.toUpperCase() + ' /accounts/api/v1/account with ' + authDesc + ' authentication and ' + accountServer +
-                ', ' + accountKey + ' responds with ' + test.status,
-                function( done ) {
+            it( `${test.method.toUpperCase()} /accounts/api/v1/account with ${authDesc} authentication and ${accountServer}, ${accountKey} responds with ${test.status}`,
+                done => {
                     request( app )[ test.method ]( '/accounts/api/v1/account' )
                         .set( auth )[ dataSendMethod ]( {
                             server_url: accountServer,

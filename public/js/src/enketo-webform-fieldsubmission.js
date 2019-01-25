@@ -1,34 +1,33 @@
-'use strict';
+import './module/radio-tab';
+import $ from 'jquery';
+import gui from './module/gui';
+import controller from './module/controller-webform-fieldsubmission';
+import settings from './module/settings';
+import connection from './module/connection';
+import { init as initTranslator, t, localize } from './module/translator';
+import calculationModule from 'enketo-core/src/js/calculate';
+import preloadModule from 'enketo-core/src/js/preload';
 
-require( './module/radio-tab' );
-
-var $ = require( 'jquery' );
-var gui = require( './module/gui' );
-var controller = require( './module/controller-webform-fieldsubmission' );
-var settings = require( './module/settings' );
-var connection = require( './module/connection' );
-var translator = require( './module/translator' );
-var t = translator.t;
-var $loader = $( 'body > .main-loader' );
-var $formheader = $( '.main > .paper > .form-header' );
-var oc = require( './module/custom' );
-var $footer = $( '.form-footer' );
-var survey = {
+const $loader = $( 'body > .main-loader' );
+const $formheader = $( '.main > .paper > .form-header' );
+import oc from './module/custom';
+const $footer = $( '.form-footer' );
+const survey = {
     enketoId: settings.enketoId,
     serverUrl: settings.serverUrl,
     xformId: settings.xformId,
     xformUrl: settings.xformUrl,
     instanceId: settings.instanceId
 };
-var loadWarnings = [];
+const loadWarnings = [];
 
-translator.init( survey )
+initTranslator( survey )
     .then( connection.getFormParts )
-    .then( function( formParts ) {
+    .then( formParts => {
         if ( location.pathname.indexOf( '/edit/' ) > -1 || location.pathname.indexOf( '/view/' ) > -1 ) {
             if ( survey.instanceId ) {
                 return connection.getExistingInstance( survey )
-                    .then( function( response ) {
+                    .then( response => {
                         formParts.instance = response.instance;
                         formParts.instanceAttachments = response.instanceAttachments;
                         // TODO: this will fail massively if instanceID is not populated (will use POST instead of PUT). Maybe do a check?
@@ -40,14 +39,14 @@ translator.init( survey )
         }
         return formParts;
     } )
-    .then( function( formParts ) {
+    .then( formParts => {
         if ( formParts.form && formParts.model ) {
             return gui.swapTheme( formParts );
         } else {
             throw new Error( t( 'error.unknown' ) );
         }
     } )
-    .then( function( formParts ) {
+    .then( formParts => {
         if ( /\/fs\/dnc?\//.test( window.location.pathname ) ) {
             return _readonlify( formParts, true );
         } else if ( settings.type === 'view' ) {
@@ -71,7 +70,7 @@ function _updateMaxSizeSetting( maxSize ) {
 function _showErrorOrAuthenticate( error ) {
     $loader.addClass( 'fail' );
     if ( error.status === 401 ) {
-        window.location.href = '/login?return_url=' + encodeURIComponent( window.location.href );
+        window.location.href = `/login?return_url=${encodeURIComponent( window.location.href )}`;
     } else {
         gui.alert( error.message, t( 'alert.loaderror.heading' ) );
     }
@@ -90,7 +89,6 @@ function _readonlify( formParts, notesEnabled ) {
 
     // Partially disable calculations in Enketo Core
     console.log( 'Calculations restricted to clinicaldata only.' );
-    var calculationModule = require( 'enketo-core/src/js/calculate' );
     calculationModule.originalUpdate = calculationModule.update;
     calculationModule.update = function( updated ) {
         return calculationModule.originalUpdate.call( this, updated, '[oc-external="clinicaldata"]' );
@@ -98,7 +96,7 @@ function _readonlify( formParts, notesEnabled ) {
 
     // Completely disable preload items
     console.log( 'Preloaders disabled.' );
-    require( 'enketo-core/src/js/preload' ).init = function() {};
+    preloadModule.init = () => {};
     // change status message
     $( '<div class="fieldsubmission-status readonly"/>' ).prependTo( '.form-header' )
         .add( $( '<div class="form-footer__feedback fieldsubmission-status readonly"/>' ).prependTo( $footer ) )
@@ -127,17 +125,17 @@ function _readonlify( formParts, notesEnabled ) {
 
 function _init( formParts ) {
     $formheader.after( formParts.form );
-    $( document ).ready( function() {
-        translator.localize( document.querySelector( 'form.or' ) );
+    $( document ).ready( () => {
+        localize( document.querySelector( 'form.or' ) );
         controller.init( 'form.or', {
             modelStr: formParts.model,
             instanceStr: formParts.instance,
             external: formParts.externalData,
             instanceAttachments: formParts.instanceAttachments
-        }, loadWarnings ).then( function( form ) {
+        }, loadWarnings ).then( form => {
             // Note: be careful, "form" param returned by controller.init is undefined if there were loadErrors (in fs view).
-            var $title = $( '#form-title' );
-            var title = ( settings.pid ) ? settings.pid + ': ' + $title.text() : $title.text();
+            const $title = $( '#form-title' );
+            const title = ( settings.pid ) ? `${settings.pid}: ${$title.text()}` : $title.text();
             $title.text( title );
             $( 'head>title' ).text( title );
             if ( formParts.instance ) {

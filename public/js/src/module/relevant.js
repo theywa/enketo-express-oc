@@ -1,16 +1,15 @@
 // Modify the Enketo Core branch module.
 
-'use strict';
+import branchModule from 'enketo-core/src/js/relevant';
 
-var branchModule = require( 'enketo-core/src/js/relevant' );
-var $ = require( 'jquery' );
+import $ from 'jquery';
 
 /**
  * Overwrite core functionality by **always** adding 
  * .or-group.invalid-relevant and .or-group-data.invalid-relevant.
  */
 branchModule.update = function( updated, forceClearIrrelevant ) {
-    var $nodes;
+    let $nodes;
 
     if ( !this.form ) {
         throw new Error( 'Branch module not correctly instantiated with form property.' );
@@ -90,8 +89,8 @@ branchModule.clear = function( $branchNode, path ) {
 
 
 branchModule.activate = function( $branchNode ) {
-    var $control;
-    var required;
+    let $control;
+    let required;
 
     this.setDisabledProperty( $branchNode, false );
     if ( $branchNode.is( '.question' ) ) {
@@ -117,11 +116,11 @@ branchModule.originalDeactivate = branchModule.deactivate;
 
 // Overwrite deactivate function
 branchModule.deactivate = function( $branchNode ) {
-    var name;
-    var index = 0;
-    var value;
-    var $control;
-    var that = this;
+    let name;
+    let index = 0;
+    let value;
+    let $control;
+    const that = this;
 
     if ( $branchNode.is( '.question' ) ) {
         $control = $( $branchNode[ 0 ].querySelector( 'input, select, textarea' ) );
@@ -158,14 +157,14 @@ branchModule.deactivate = function( $branchNode ) {
          * 
          * If the result has length > 0, one form control in the group has a value.
          */
-        var dataEls = this.form.model.node( name ).getElements();
+        const dataEls = this.form.model.node( name ).getElements();
 
         if ( !dataEls.length ) {
             value = false;
         } else {
-            value = dataEls.some( function( dataEl ) {
-                return Array.prototype.slice.call( dataEl.querySelectorAll( '*' ) )
-                    .filter( function( el ) {
+            value = dataEls.some( dataEl => {
+                return [ ...dataEl.querySelectorAll( '*' ) ]
+                    .filter( el => {
                         if ( el.children.length === 0 ) {
                             var path = that.form.model.getXPath( el, 'instance' );
                             var n = that.form.view.html.querySelector( '.calculation > [name="' + path + '"], .or-appearance-dn > [name="' + path + '"]' );
@@ -173,10 +172,7 @@ branchModule.deactivate = function( $branchNode ) {
                         }
                         return false;
                     } )
-                    .map( function( el ) {
-                        return el.textContent ? el.textContent.trim() : '';
-                    } )
-                    .join( '' );
+                    .map( el => el.textContent ? el.textContent.trim() : '' );
             } );
         }
 

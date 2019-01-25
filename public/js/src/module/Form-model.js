@@ -1,18 +1,17 @@
 // Extend the Enketo Core Form Model, and expose it for local testing.
 
-'use strict';
-
-var Model = require( 'enketo-core/src/js/Form-model' );
-var XPathJS = require( 'enketo-xpathjs' );
-var $ = require( 'jquery' );
+import { FormModel as Model } from 'enketo-core';
+import XPathJS from 'enketo-xpathjs';
+import $ from 'jquery';
 
 // Add OC custom XPath functions
-require( 'enketo-xpath-extensions-oc' )( XPathJS );
+import extendXPath from 'enketo-xpath-extensions-oc';
+extendXPath( XPathJS );
 
 Model.prototype.getUpdateEventData = function( el, type ) {
-    var fullPath;
-    var xmlFragment;
-    var file;
+    let fullPath;
+    let xmlFragment;
+    let file;
 
     if ( !el ) {
         console.error( new Error( 'XML Node not found. Form probably contains reference to non-existing XML node.' ) );
@@ -22,29 +21,29 @@ Model.prototype.getUpdateEventData = function( el, type ) {
     xmlFragment = this.getXmlFragmentStr( el );
     file = ( type === 'binary' ) ? el.textContent : undefined;
     return {
-        fullPath: fullPath,
-        xmlFragment: xmlFragment,
-        file: file
+        fullPath,
+        xmlFragment,
+        file
     };
 };
 
 Model.prototype.getRemovalEventData = function( el ) {
-    var xmlFragment = this.getXmlFragmentStr( el );
+    const xmlFragment = this.getXmlFragmentStr( el );
     return {
-        xmlFragment: xmlFragment
+        xmlFragment
     };
 };
 
 Model.prototype.getXmlFragmentStr = function( node ) {
-    var clone;
-    var n;
-    var dataStr;
-    var tempAttrName = 'temp-id';
-    var id = Math.floor( Math.random() * 100000000 );
+    let clone;
+    let n;
+    let dataStr;
+    const tempAttrName = 'temp-id';
+    const id = Math.floor( Math.random() * 100000000 );
     node.setAttribute( tempAttrName, id );
     clone = this.rootElement.cloneNode( true );
     node.removeAttribute( tempAttrName );
-    n = clone.querySelector( '[' + tempAttrName + '="' + id + '"]' );
+    n = clone.querySelector( `[${tempAttrName}="${id}"]` );
     n.removeAttribute( tempAttrName );
 
     $( n ).children().remove();
@@ -76,4 +75,4 @@ Model.prototype.isMarkedComplete = function() {
     return this.evaluate( '/node()/@oc:complete = "true"', 'boolean', null, null, true );
 };
 
-module.exports = Model;
+export default Model;
