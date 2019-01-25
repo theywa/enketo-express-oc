@@ -281,7 +281,7 @@ FieldSubmissionQueue.prototype._uploadStatus = {
             ongoing: t( 'fieldsubmission.feedback.ongoing' ),
             success: t( 'fieldsubmission.feedback.success' ),
             fail: t( 'fieldsubmission.feedback.fail' )
-        } [ status ];
+        }[ status ];
     },
     _updateClass( status ) {
         this._getBox().removeClass( 'ongoing success error fail' ).addClass( status ).text( this._getText( status ) );
