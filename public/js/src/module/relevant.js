@@ -172,7 +172,8 @@ branchModule.deactivate = function( $branchNode ) {
                         }
                         return false;
                     } )
-                    .map( el => el.textContent ? el.textContent.trim() : '' );
+                    .map( el => el.textContent ? el.textContent.trim() : '' )
+                    .join( '' );
             } );
         }
 
