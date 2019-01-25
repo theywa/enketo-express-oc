@@ -1,4 +1,3 @@
-/* global describe, require, beforeAll, afterAll, it */
 import Model from '../../public/js/src/module/Form-model';
 
 describe( 'getting XML fragments', () => {
@@ -42,10 +41,10 @@ describe( 'getting XML fragments', () => {
 
     // TODO: add nested_repeats.xml, to enable this test
     xit( 'works for models that include tricky text nodes with carriage returns', () => {
-        const model = getModel( 'nested_repeats.xml' );
-        model.init();
-        expect( model.getXmlFragmentStr( model.xml.querySelector( 'kids_details' ) ).replace( />\s+</g, '><' ) ).to.equal(
-            '<nested_repeats xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms/" id="nested_repeats"><kids><kids_details></kids_details></kids></nested_repeats>' );
+        //const model = getModel( 'nested_repeats.xml' );
+        //model.init();
+        //expect( model.getXmlFragmentStr( model.xml.querySelector( 'kids_details' ) ).replace( />\s+</g, '><' ) ).to.equal(
+        //    '<nested_repeats xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms/" id="nested_repeats"><kids><kids_details></kids_details></kids></nested_repeats>' );
     } );
 
 } );
