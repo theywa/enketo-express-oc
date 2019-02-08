@@ -229,139 +229,160 @@ function _headlessCloseComplete() {
 
 /**
  * Closes the form after checking that the queue is empty.
- *
- * TODO: I think this can probably be reorganized to avoid the bypassAutoQuery parameter. 
- * See the _closeCompleteRecord for example.
  * 
  * @return {Promise} [description]
  */
-function _closeRegular( bypassAutoQuery ) {
-    let msg = '';
-    const tAlertCloseMsg = t( 'fieldsubmission.alert.close.msg1' );
-    const tAlertCloseHeading = t( 'fieldsubmission.alert.close.heading1' );
-    const authLink = `<a href="/login" target="_blank">${t( 'here' )}</a>`;
-    const $violated = form.view.$.find( '.invalid-constraint' );
-
-    // First check if any constraints have been violated and prompt option to generate automatic queries
-    if ( !bypassAutoQuery && $violated.length ) {
-        return gui.confirm( {
-                heading: t( 'alert.default.heading' ),
-                errorMsg: t( 'fieldsubmission.confirm.autoquery.msg1' ),
-                msg: t( 'fieldsubmission.confirm.autoquery.msg2' )
-            }, {
-                posButton: t( 'fieldsubmission.confirm.autoquery.automatic' ),
-                negButton: t( 'fieldsubmission.confirm.autoquery.manual' ),
-            } )
-            .then( confirmed => {
-                if ( confirmed ) {
-                    _autoAddQueries( $violated );
+function _closeRegular() {
+    return form.validate()
+        .then( valid => {
+            if ( !valid ) {
+                const strictViolation = form.view.html
+                    .querySelector( '.oc-strict.invalid-required, .oc-strict.invalid-constraint' );
+                if ( strictViolation ) {
+                    return gui.alertStrictBlock();
                 }
-                return confirmed;
-            } );
-    }
-
-    // Start with actually closing, but only proceed once the queue is emptied.
-    gui.alert( `${tAlertCloseMsg}<br/><div class="loader-animation-small" style="margin: 40px auto 0 auto;"/>`, tAlertCloseHeading, 'bare' );
-
-    return fieldSubmissionQueue.submitAll()
-        .then( () => {
-            if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
-                throw new Error( t( 'fieldsubmission.alert.close.msg2' ) );
-            } else {
-                // this event is used in communicating back to iframe parent window
-                $( document ).trigger( 'close' );
-
-                msg += t( 'alert.submissionsuccess.redirectmsg' );
-                gui.alert( msg, t( 'alert.submissionsuccess.heading' ), 'success' );
-                _redirect();
             }
-        } )
-        .catch( error => {
-            let errorMsg;
-            error = error || {};
+            const $violated = form.view.$.find( '.invalid-constraint' );
+            let msg = '';
+            const tAlertCloseMsg = t( 'fieldsubmission.alert.close.msg1' );
+            const tAlertCloseHeading = t( 'fieldsubmission.alert.close.heading1' );
+            const authLink = `<a href="/login" target="_blank">${t( 'here' )}</a>`;
 
-            console.error( 'close error', error );
-            if ( error.status === 401 ) {
-                errorMsg = t( 'alert.submissionerror.authrequiredmsg', {
-                    here: authLink
-                } );
-                gui.alert( errorMsg, t( 'alert.submissionerror.heading' ) );
-            } else {
-                errorMsg = error.message || gui.getErrorResponseMsg( error.status );
-                gui.confirm( {
+            // First check if any constraints have been violated and prompt option to generate automatic queries
+            if ( $violated.length ) {
+                return gui.confirm( {
                         heading: t( 'alert.default.heading' ),
-                        errorMsg,
-                        msg: t( 'fieldsubmission.confirm.leaveanyway.msg' )
+                        errorMsg: t( 'fieldsubmission.confirm.autoquery.msg1' ),
+                        msg: t( 'fieldsubmission.confirm.autoquery.msg2' )
                     }, {
-                        posButton: t( 'confirm.default.negButton' ),
-                        negButton: t( 'fieldsubmission.confirm.leaveanyway.button' )
+                        posButton: t( 'fieldsubmission.confirm.autoquery.automatic' ),
+                        negButton: t( 'fieldsubmission.confirm.autoquery.manual' ),
                     } )
                     .then( confirmed => {
                         if ( !confirmed ) {
-                            $( document ).trigger( 'close' );
-                            _redirect( 100 );
+                            return false;
                         }
+                        _autoAddQueries( $violated );
+                        return _closeRegular();
                     } );
             }
 
+            // Start with actually closing, but only proceed once the queue is emptied.
+            gui.alert( `${tAlertCloseMsg}<br/><div class="loader-animation-small" style="margin: 40px auto 0 auto;"/>`, tAlertCloseHeading, 'bare' );
+
+            return fieldSubmissionQueue.submitAll()
+                .then( () => {
+                    if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
+                        throw new Error( t( 'fieldsubmission.alert.close.msg2' ) );
+                    } else {
+                        // this event is used in communicating back to iframe parent window
+                        $( document ).trigger( 'close' );
+
+                        msg += t( 'alert.submissionsuccess.redirectmsg' );
+                        gui.alert( msg, t( 'alert.submissionsuccess.heading' ), 'success' );
+                        _redirect();
+                    }
+                } )
+                .catch( error => {
+                    let errorMsg;
+                    error = error || {};
+
+                    console.error( 'close error', error );
+                    if ( error.status === 401 ) {
+                        errorMsg = t( 'alert.submissionerror.authrequiredmsg', {
+                            here: authLink
+                        } );
+                        gui.alert( errorMsg, t( 'alert.submissionerror.heading' ) );
+                    } else {
+                        errorMsg = error.message || gui.getErrorResponseMsg( error.status );
+                        gui.confirm( {
+                                heading: t( 'alert.default.heading' ),
+                                errorMsg,
+                                msg: t( 'fieldsubmission.confirm.leaveanyway.msg' )
+                            }, {
+                                posButton: t( 'confirm.default.negButton' ),
+                                negButton: t( 'fieldsubmission.confirm.leaveanyway.button' )
+                            } )
+                            .then( confirmed => {
+                                if ( !confirmed ) {
+                                    $( document ).trigger( 'close' );
+                                    _redirect( 100 );
+                                }
+                            } );
+                    }
+
+                } );
         } );
+
+
 }
 
 function _closeSimple() {
-    let msg = '';
-    const tAlertCloseMsg = t( 'fieldsubmission.alert.close.msg1' );
-    const tAlertCloseHeading = t( 'fieldsubmission.alert.close.heading1' );
-    const authLink = `<a href="/login" target="_blank">${t( 'here' )}</a>`;
 
-    // Start with actually closing, but only proceed once the queue is emptied.
-    gui.alert( `${tAlertCloseMsg}<br/><div class="loader-animation-small" style="margin: 40px auto 0 auto;"/>`, tAlertCloseHeading, 'bare' );
-
-    return fieldSubmissionQueue.submitAll()
-        .then( () => {
-            if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
-                throw new Error( t( 'fieldsubmission.alert.close.msg2' ) );
-            } else {
-                // this event is used in communicating back to iframe parent window
-                $( document ).trigger( 'close' );
-
-                msg += t( 'alert.submissionsuccess.redirectmsg' );
-                gui.alert( msg, t( 'alert.submissionsuccess.heading' ), 'success' );
-                _redirect();
+    return form.validate()
+        .then( valid => {
+            if ( !valid ) {
+                const strictViolation = form.view.html
+                    .querySelector( '.oc-strict.invalid-required, .oc-strict.invalid-constraint' );
+                if ( strictViolation ) {
+                    return gui.alertStrictBlock();
+                }
             }
-        } )
-        .catch( error => {
-            let errorMsg;
-            error = error || {};
+            let msg = '';
+            const tAlertCloseMsg = t( 'fieldsubmission.alert.close.msg1' );
+            const tAlertCloseHeading = t( 'fieldsubmission.alert.close.heading1' );
+            const authLink = `<a href="/login" target="_blank">${t( 'here' )}</a>`;
 
-            console.error( 'close error', error );
-            if ( error.status === 401 ) {
-                errorMsg = t( 'alert.submissionerror.authrequiredmsg', {
-                    here: authLink
+            // Start with actually closing, but only proceed once the queue is emptied.
+            gui.alert( `${tAlertCloseMsg}<br/><div class="loader-animation-small" style="margin: 40px auto 0 auto;"/>`, tAlertCloseHeading, 'bare' );
+
+            return fieldSubmissionQueue.submitAll()
+                .then( () => {
+                    if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
+                        throw new Error( t( 'fieldsubmission.alert.close.msg2' ) );
+                    } else {
+                        // this event is used in communicating back to iframe parent window
+                        $( document ).trigger( 'close' );
+
+                        msg += t( 'alert.submissionsuccess.redirectmsg' );
+                        gui.alert( msg, t( 'alert.submissionsuccess.heading' ), 'success' );
+                        _redirect();
+                    }
+                } )
+                .catch( error => {
+                    let errorMsg;
+                    error = error || {};
+
+                    console.error( 'close error', error );
+                    if ( error.status === 401 ) {
+                        errorMsg = t( 'alert.submissionerror.authrequiredmsg', {
+                            here: authLink
+                        } );
+                        gui.alert( errorMsg, t( 'alert.submissionerror.heading' ) );
+                    } else {
+                        errorMsg = error.message || gui.getErrorResponseMsg( error.status );
+                        gui.confirm( {
+                                heading: t( 'alert.default.heading' ),
+                                errorMsg,
+                                msg: t( 'fieldsubmission.confirm.leaveanyway.msg' )
+                            }, {
+                                posButton: t( 'confirm.default.negButton' ),
+                                negButton: t( 'fieldsubmission.confirm.leaveanyway.button' )
+                            } )
+                            .then( confirmed => {
+                                if ( !confirmed ) {
+                                    $( document ).trigger( 'close' );
+                                    _redirect( 100 );
+                                }
+                            } );
+                    }
                 } );
-                gui.alert( errorMsg, t( 'alert.submissionerror.heading' ) );
-            } else {
-                errorMsg = error.message || gui.getErrorResponseMsg( error.status );
-                gui.confirm( {
-                        heading: t( 'alert.default.heading' ),
-                        errorMsg,
-                        msg: t( 'fieldsubmission.confirm.leaveanyway.msg' )
-                    }, {
-                        posButton: t( 'confirm.default.negButton' ),
-                        negButton: t( 'fieldsubmission.confirm.leaveanyway.button' )
-                    } )
-                    .then( confirmed => {
-                        if ( !confirmed ) {
-                            $( document ).trigger( 'close' );
-                            _redirect( 100 );
-                        }
-                    } );
-            }
         } );
+
 }
 
 // This is conceptually a Complete function that has some pre-processing.
 function _closeCompletedRecord() {
-    let $violated;
 
     if ( !reasons.validate() ) {
         const firstInvalidInput = reasons.getFirstInvalidField();
@@ -378,11 +399,14 @@ function _closeCompletedRecord() {
             if ( valid ) {
                 // do not show confirmation dialog
                 return _complete( true );
-            } else if ( form.view.$.find( '.invalid-relevant' ).length ) {
+            } else if ( form.view.html.querySelector( '.oc-strict.invalid-required, .oc-strict.invalid-constraint' ) ) {
+                gui.alertStrictBlock();
+            } else if ( form.view.html.querySelector( '.invalid-relevant' ) ) {
                 gui.alert( t( 'fieldsubmission.alert.relevantvalidationerror.msg' ) );
                 return false;
             } else {
-                $violated = form.view.$.find( '.invalid-constraint, .invalid-required' );
+                const $violations = form.view.$.find( '.invalid-constraint, .invalid-required' );
+
                 // Note that unlike _close this also looks at .invalid-required.
                 return gui.confirm( {
                         heading: t( 'alert.default.heading' ),
@@ -396,7 +420,7 @@ function _closeCompletedRecord() {
                         if ( !confirmed ) {
                             return false;
                         }
-                        _autoAddQueries( $violated );
+                        _autoAddQueries( $violations );
                         return _closeCompletedRecord();
                     } );
             }
@@ -441,19 +465,9 @@ function _redirect( msec ) {
 
 /**
  * Finishes a submission
- *
- * TODO: I think this can probably be reorganized to avoid the bypassConfirmation parameter. 
- * See the _closeCompleteRecord for example.
- * 
  */
 function _complete( bypassConfirmation ) {
-    let beforeMsg;
-    let authLink;
-    let instanceId;
-    let deprecatedId;
-    let msg = '';
 
-    // First check if any constraints have been violated and prompt option to generate automatic queries
     if ( !bypassConfirmation ) {
         return gui.confirm( {
             heading: t( 'fieldsubmission.confirm.complete.heading' ),
@@ -461,44 +475,66 @@ function _complete( bypassConfirmation ) {
         } );
     }
 
-    form.view.$.trigger( 'beforesave' );
-
-    beforeMsg = t( 'alert.submission.redirectmsg' );
-    authLink = `<a href="/login" target="_blank">${t( 'here' )}</a>`;
-
-    gui.alert( `${beforeMsg}<div class="loader-animation-small" style="margin: 40px auto 0 auto;"/>`, t( 'alert.submission.msg' ), 'bare' );
-
-    return fieldSubmissionQueue.submitAll()
-        .then( () => {
-            const queueLength = Object.keys( fieldSubmissionQueue.get() ).length;
-
-            if ( queueLength === 0 ) {
-                instanceId = form.instanceID;
-                deprecatedId = form.deprecatedID;
-                return fieldSubmissionQueue.complete( instanceId, deprecatedId );
+    // form.validate() will trigger fieldsubmissions for timeEnd before it resolves
+    return form.validate()
+        .then( valid => {
+            if ( !valid ) {
+                const strictViolations = form.view.html
+                    .querySelector( '.oc-strict.invalid-required, .oc-strict.invalid-constraint' );
+                if ( strictViolations ) {
+                    gui.alertStrictBlock();
+                } else if ( form.view.html.querySelector( '.invalid-relevant' ) ) {
+                    gui.alert( t( 'fieldsubmission.alert.relevantvalidationerror.msg' ) );
+                } else {
+                    gui.alert( t( 'fieldsubmission.alert.validationerror.msg' ) );
+                }
             } else {
-                throw new Error( t( 'fieldsubmission.alert.complete.msg' ) );
-            }
-        } )
-        .then( () => {
-            // this event is used in communicating back to iframe parent window
-            $( document ).trigger( 'submissionsuccess' );
+                let beforeMsg;
+                let authLink;
+                let instanceId;
+                let deprecatedId;
+                let msg = '';
 
-            msg += t( 'alert.submissionsuccess.redirectmsg' );
-            gui.alert( msg, t( 'alert.submissionsuccess.heading' ), 'success' );
-            _redirect();
-        } )
-        .catch( result => {
-            result = result || {};
-            console.error( 'submission failed' );
-            if ( result.status === 401 ) {
-                msg = t( 'alert.submissionerror.authrequiredmsg', {
-                    here: authLink
-                } );
-            } else {
-                msg = result.message || gui.getErrorResponseMsg( result.status );
+                form.view.$.trigger( 'beforesave' );
+
+                beforeMsg = t( 'alert.submission.redirectmsg' );
+                authLink = `<a href="/login" target="_blank">${t( 'here' )}</a>`;
+
+                gui.alert( `${beforeMsg}<div class="loader-animation-small" style="margin: 40px auto 0 auto;"/>`, t( 'alert.submission.msg' ), 'bare' );
+
+                return fieldSubmissionQueue.submitAll()
+                    .then( () => {
+                        const queueLength = Object.keys( fieldSubmissionQueue.get() ).length;
+
+                        if ( queueLength === 0 ) {
+                            instanceId = form.instanceID;
+                            deprecatedId = form.deprecatedID;
+                            return fieldSubmissionQueue.complete( instanceId, deprecatedId );
+                        } else {
+                            throw new Error( t( 'fieldsubmission.alert.complete.msg' ) );
+                        }
+                    } )
+                    .then( () => {
+                        // this event is used in communicating back to iframe parent window
+                        $( document ).trigger( 'submissionsuccess' );
+
+                        msg += t( 'alert.submissionsuccess.redirectmsg' );
+                        gui.alert( msg, t( 'alert.submissionsuccess.heading' ), 'success' );
+                        _redirect();
+                    } )
+                    .catch( result => {
+                        result = result || {};
+                        console.error( 'submission failed' );
+                        if ( result.status === 401 ) {
+                            msg = t( 'alert.submissionerror.authrequiredmsg', {
+                                here: authLink
+                            } );
+                        } else {
+                            msg = result.message || gui.getErrorResponseMsg( result.status );
+                        }
+                        gui.alert( msg, t( 'alert.submissionerror.heading' ) );
+                    } );
             }
-            gui.alert( msg, t( 'alert.submissionerror.heading' ) );
         } );
 }
 
@@ -657,22 +693,10 @@ function _setButtonEventHandlers() {
     $( 'button#finish-form' ).click( function() {
         const $button = $( this ).btnBusyState( true );
 
-        // form.validate() will trigger fieldsubmissions for timeEnd before it resolves
-        form.validate()
-            .then( valid => {
-                if ( valid ) {
-                    return _complete()
-                        .then( again => {
-                            if ( again ) {
-                                return _complete( again );
-                            }
-                        } );
-                } else {
-                    if ( form.view.$.find( '.invalid-relevant' ).length ) {
-                        gui.alert( t( 'fieldsubmission.alert.relevantvalidationerror.msg' ) );
-                    } else {
-                        gui.alert( t( 'fieldsubmission.alert.validationerror.msg' ) );
-                    }
+        _complete()
+            .then( again => {
+                if ( again ) {
+                    return _complete( again );
                 }
             } )
             .catch( e => {

@@ -106,11 +106,11 @@ settings.printRelevantOnly = !( ( settings.type === 'view' && !settings.instance
 // Reason for change functionality
 settings.reasonForChange = /\/rfc\//.test( window.location.pathname );
 
-// Strict validation functionality for Participate
+// Strict validation functionality (now true for everything but used to be specific to certain views)
+settings.strictCheckEnabled = true;
+// For Participate only
 if ( /\/participant\//.test( window.location.pathname ) ) {
-    settings.strictCheckEnabled = true;
-    // override validatePage in enketo/config
-    config.validatePage = true;
+    config.relevantIsStrict = true;
 }
 
 function _getEnketoId( prefix, haystack ) {

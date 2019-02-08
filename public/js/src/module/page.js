@@ -56,7 +56,8 @@ pageModule._next = function() {
         .then( valid => {
             // for strict-validation navigation-blocking, we ignore some errors (compared to Enketo Core module)
             if ( !valid && settings.strictCheckEnabled ) {
-                const selector = '.oc-strict.invalid-required, .oc-strict.invalid-constraint, .oc-strict.invalid-relevant';
+                let selector = '.oc-strict.invalid-required, .oc-strict.invalid-constraint';
+                selector += settings.relevantIsStrict ? ', .oc-strict.invalid-relevant' : '';
                 const strictViolations = that.$current[ 0 ].matches( selector ) || !!that.$current[ 0 ].querySelector( selector );
 
                 if ( !strictViolations ) {
