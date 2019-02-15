@@ -354,6 +354,16 @@ class Comment extends Widget {
             `<section class="widget or-comment-widget">
                 <div class="or-comment-widget__overlay"></div>
                 <form onsubmit="return false;" class="or-comment-widget__content" autocomplete="off">
+                    <div class="or-comment-widget__content__tabs">
+                        <label>
+                            <input type="radio"  class="ignore" name="dn-type" value="comment" checked />
+                            <span>query</span>
+                        </label>
+                        <label>
+                            <input type="radio" class="ignore" name="dn-type" value="annotation" />
+                            <span>annotation</span>
+                        </label>
+                    </div>
                     <div class="or-comment-widget__content__user">
                         <label class="or-comment-widget__content__user__dn-assignee">
                             <span>${assignText}</span>
@@ -366,13 +376,6 @@ class Comment extends Widget {
                             </label>
                         </div>
                     </div>
-                    <label class="or-comment-widget__content__type">
-                        <span>Type:</span>
-                        <select name="dn-type">
-                            <option value="comment" selected>comment</option>
-                            <option value="annotation">annotation</option>
-                        </select>
-                    </label>
                     ${closeButtonHtml}
                     ${btnGroupHtml}
                     <div class="or-comment-widget__content__history closed">
@@ -383,7 +386,7 @@ class Comment extends Widget {
             </form>`
         );
 
-        fragment.querySelector( 'form' ).prepend( comment );
+        fragment.querySelector( '.or-comment-widget__content__tabs' ).after( comment );
 
         const oldWidget = this.$linkedQuestion[ 0 ].querySelector( '.or-comment-widget' );
         if ( oldWidget ) {
@@ -423,7 +426,7 @@ class Comment extends Widget {
                     const comment = input.value;
                     const assignee = widget.querySelector( 'select[name="dn-assignee"]' ).value;
                     const notify = widget.querySelector( 'input[name="dn-notify"]' ).checked;
-                    const type = widget.querySelector( 'select[name="dn-type"]' ).value;
+                    const type = widget.querySelector( 'input[name="dn-type"]:checked' ).value;
                     const status = type !== 'annotation' ? event.target.getAttribute( 'name' ) : undefined;
                     this._addQuery( comment, status, assignee, notify, null, type );
                     input.value = '';

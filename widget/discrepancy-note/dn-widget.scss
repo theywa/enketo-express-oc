@@ -23,6 +23,37 @@ $padding: 30px;
             display: block;
         }
 
+        &__tabs {
+            margin-bottom: 20px;
+
+            input[type=radio] {
+
+                margin-right: 0 !important;
+                width: 0 !important;
+                border: none !important;
+
+                &:focus {
+                    box-shadow: none !important;
+
+                    +span {
+                        @include tab-focus;
+                    }
+                }
+
+                &:not(:checked)+span {
+                    color: $gray-light;
+                }
+
+                +span {
+                    padding: 5px;
+
+                    &:hover {
+                        color: $gray-darker;
+                    }
+                }
+            }
+        }
+
         &__query-btns {
             @include display-flex;
 
