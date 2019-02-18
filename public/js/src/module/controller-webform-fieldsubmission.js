@@ -629,7 +629,7 @@ function _setFormEventHandlers( selector ) {
             reasons.clearAll();
             return true;
         } );
-    } 
+    }
 }
 
 function _setButtonEventHandlers() {
