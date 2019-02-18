@@ -71,10 +71,6 @@
         "prompt": {
             "reason": {
                 "msg": "If so, please enter a reason for deleting the group."
-            },
-            "repeatdelete": {
-                "heading": "Delete this group of responses?",
-                "msg": "This action is irreversible (it will be recorded in the audit trail). Are you sure you want to proceed?"
             }
         },
         "feedback": {
@@ -102,6 +98,9 @@
             "queryShow": "show",
             "heading": "Options",
             "msg": "To prepare an optimized print, please select the options below"
+        },
+        "repeatremove": {
+            "msg": "This action is irreversible (it will be recorded in the audit trail). Are you sure you want to proceed?"
         }
     },
     "constraint": {

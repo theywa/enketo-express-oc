@@ -2,6 +2,7 @@ import Widget from 'enketo-core/src/js/widget';
 import $ from 'jquery';
 import { t } from '../../public/js/src/module/translator';
 import settings from '../../public/js/src/module/settings';
+import events from '../../public/js/src/module/event';
 let usersOptionsHtml;
 let currentUser;
 let users;
@@ -252,9 +253,9 @@ class Comment extends Widget {
     _setRepeatRemovalReasonChangeHandler() {
         const that = this;
         if ( settings.reasonForChange && !that.linkedQuestionReadonly ) {
-            this.$linkedQuestion.on( 'reasonchange.enketo', function( evt, data ) {
-                if ( data.reason ) {
-                    that._addReason( data.reason );
+            this.$linkedQuestion[ 0 ].addEventListener( events.ReasonChange().type, function( event ) {
+                if ( event.detail && event.detail.reason ) {
+                    that._addReason( event.detail.reason );
                     reasons.removeField( this );
                 } else {
                     console.error( 'no reason provided' );

@@ -8,6 +8,7 @@ import events from 'enketo-core/src/js/event';
 import './relevant';
 import './required';
 import './page';
+import './repeat';
 
 /**
  * This function doesn't actually evaluate constraints. It triggers

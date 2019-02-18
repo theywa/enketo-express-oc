@@ -618,40 +618,6 @@ function _setFormEventHandlers( selector ) {
 
     // Before repeat removal from view and model
     if ( settings.reasonForChange ) {
-        // We need to catch the click before repeat.js does. So 
-        // we attach the handler to a lower level DOM element and make sure it's only attached once.
-        $( '.or-repeat-info' ).parent( '.or-group, .or-group-data' ).on( 'click.propagate', 'button.remove:enabled', ( evt, data ) => {
-            if ( data && data.propagate ) {
-                return true;
-            }
-            // Any form controls inside the repeat need a Reason for Change
-            // TODO: exclude controls that have no value?
-            const $questions = $( evt.currentTarget ).closest( '.or-repeat' ).find( '.question:not(.disabled)' );
-            const texts = {
-                heading: t( 'fieldsubmission.prompt.repeatdelete.heading' ),
-                msg: `${t( 'fieldsubmission.prompt.repeatdelete.msg' )} ${t( 'fieldsubmission.prompt.reason.msg' )}`
-            };
-            const inputs = '<p><label><input name="reason" type="text"/></label></p>';
-
-            gui.prompt( texts, {}, inputs )
-                .then( values => {
-                    if ( !values ) {
-                        return;
-                    } else if ( !values.reason || !values.reason.trim() ) {
-                        // TODO: something
-                        return;
-                    } else {
-                        $questions.trigger( 'reasonchange.enketo', values );
-                        // Propagate to repeat.js
-                        $( evt.currentTarget ).trigger( 'click', {
-                            propagate: true
-                        } );
-                        reasons.updateNumbering();
-                    }
-                } );
-
-            return false;
-        } );
 
         $( '.form-footer' ).find( '.next-page, .last-page, .previous-page, .first-page' ).on( 'click', evt => {
             const valid = reasons.validate();
@@ -663,30 +629,7 @@ function _setFormEventHandlers( selector ) {
             reasons.clearAll();
             return true;
         } );
-    } else {
-        // We need to catch the click before repeat.js does. So 
-        // we attach the handler to a lower level DOM element and make sure it's only attached once.
-        $( '.or-repeat-info' ).parent( '.or-group, .or-group-data' ).on( 'click.propagate', 'button.remove:enabled', ( evt, data ) => {
-            if ( data && data.propagate ) {
-                return true;
-            }
-            const texts = {
-                heading: t( 'fieldsubmission.prompt.repeatdelete.heading' ),
-                msg: t( 'fieldsubmission.prompt.repeatdelete.msg' )
-            };
-            gui.confirm( texts )
-                .then( confirmed => {
-                    if ( confirmed ) {
-                        // Propagate to repeat.js
-                        $( evt.currentTarget ).trigger( 'click', {
-                            propagate: true
-                        } );
-                    }
-                } );
-
-            return false;
-        } );
-    }
+    } 
 }
 
 function _setButtonEventHandlers() {
