@@ -8,7 +8,7 @@ import { init as initTranslator, t, localize } from './module/translator';
 import calculationModule from 'enketo-core/src/js/calculate';
 import preloadModule from 'enketo-core/src/js/preload';
 
-const $loader = $( 'body > .main-loader' );
+const $loader = $( '.main-loader' );
 const $formheader = $( '.main > .paper > .form-header' );
 import oc from './module/custom';
 const $footer = $( '.form-footer' );

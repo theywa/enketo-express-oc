@@ -109,7 +109,7 @@ function init( selector, data, loadWarnings ) {
             // Remove loader. This will make the form visible.
             // In order to aggregate regular loadErrors and GoTo loaderrors,
             // this is placed in between form.init() and form.goTo().
-            $( 'body > .main-loader' ).remove();
+            $( '.main-loader' ).remove();
 
             if ( settings.goTo && location.hash ) {
                 // form.goTo returns an array of 1 error if it has error. We're using our special
