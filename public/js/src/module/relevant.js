@@ -1,6 +1,7 @@
 // Modify the Enketo Core branch module.
 
 import branchModule from 'enketo-core/src/js/relevant';
+import events from 'enketo-core/src/js/event';
 
 import $ from 'jquery';
 
@@ -77,7 +78,7 @@ branchModule.clear = function( $branchNode, path ) {
     $branchNode
         .find( 'input[readonly]:not(.ignore), select[readonly]:not(.ignore), textarea[readonly]:not(.ignore)' )
         .closest( '.question' )
-        .clearInputs( 'change', 'inputupdate.enketo' );
+        .clearInputs( 'change', events.InputUpdate().type );
 
     // Unchanged from Enketo Core:
     if ( $branchNode.is( '.or-group, .or-group-data' ) ) {

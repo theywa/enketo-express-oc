@@ -9,7 +9,7 @@ import gui from './gui';
 import settings from './settings';
 import Form from './Form'; // modified for OC
 import fileManager from './file-manager';
-import Promise from 'lie';
+import events from 'enketo-core/src/js/event';
 import { t } from './translator';
 import $ from 'jquery';
 import FieldSubmissionQueue from './field-submission-queue';
@@ -19,7 +19,7 @@ import reasons from './reasons';
 const DEFAULT_THANKS_URL = '/thanks';
 let form;
 let formSelector;
-let $formprogress;
+let formprogress;
 let ignoreBeforeUnload = false;
 
 const formOptions = {
@@ -32,7 +32,7 @@ function init( selector, data, loadWarnings ) {
     let loadErrors = [].concat( loadWarnings );
 
     formSelector = selector;
-    $formprogress = $( '.form-progress' );
+    formprogress = document.querySelector( '.form-progress' );
 
     return new Promise( resolve => {
             const goToErrorLink = settings.goToErrorUrl ? `<a href="${settings.goToErrorUrl}">${settings.goToErrorUrl}</a>` : '';
@@ -69,10 +69,10 @@ function init( selector, data, loadWarnings ) {
             }
 
             // set form eventhandlers before initializing form
-            _setFormEventHandlers( selector );
+            _setFormEventHandlers();
 
             // listen for "gotohidden.enketo" event and add error
-            $( formSelector ).on( 'gotohidden.enketo', e => {
+            $( formSelector ).on( 'gotohidden', e => {
                 // In OC hidden go_to fields should show loadError except if go_to field is a disrepancy_note
                 // as those are always hidden upon load.
                 if ( !e.target.classList.contains( 'or-appearance-dn' ) ) {
@@ -556,65 +556,67 @@ function _doNotSubmit( fullPath ) {
     return !!form.view.$.get( 0 ).querySelector( `input[oc-external="clinicaldata"][name="${pathWithoutPositions}"]` );
 }
 
-function _setFormEventHandlers( selector ) {
-    const $doc = $( document );
-    $doc
-        .on( 'progressupdate.enketo', selector, ( event, status ) => {
-            if ( $formprogress.length > 0 ) {
-                $formprogress.css( 'width', `${status}%` );
-            }
-        } )
-        // After repeat removal from view (before removal from model)
-        .on( 'removed.enketo', ( event, updated ) => {
-            const instanceId = form.instanceID;
-            if ( !updated.xmlFragment ) {
-                console.error( 'Could not submit repeat removal fieldsubmission. XML fragment missing.' );
-                return;
-            }
-            if ( !instanceId ) {
-                console.error( 'Could not submit repeat removal fieldsubmission. InstanceID missing' );
-            }
+function _setFormEventHandlers() {
 
-            fieldSubmissionQueue.addRepeatRemoval( updated.xmlFragment, instanceId, form.deprecatedID );
-            fieldSubmissionQueue.submitAll();
-        } )
-        // Field is changed
-        .on( 'dataupdate.enketo', selector, ( event, updated ) => {
-            const instanceId = form.instanceID;
-            let file;
+    form.view.html.addEventListener( events.ProgressUpdate().type, event => {
+        if ( event.target.classList.contains( 'or' ) && formprogress && event.detail ) {
+            formprogress.style.width = `${event.detail}%`;
+        }
+    } );
 
-            if ( updated.cloned ) {
-                // This event is fired when a repeat is cloned. It does not trigger
-                // a fieldsubmission.
-                return;
-            }
-            if ( !updated.xmlFragment ) {
-                console.error( 'Could not submit field. XML fragment missing. (If repeat was deleted, this is okay.)' );
-                return;
-            }
-            if ( !instanceId ) {
-                console.error( 'Could not submit field. InstanceID missing' );
-                return;
-            }
-            if ( !updated.fullPath ) {
-                console.error( 'Could not submit field. Path missing.' );
-            }
-            if ( _doNotSubmit( updated.fullPath ) ) {
-                return;
-            }
-            if ( updated.file ) {
-                file = fileManager.getCurrentFile( updated.file );
-            }
+    // After repeat removal from view (before removal from model)
+    form.view.html.addEventListener( events.Removed().type, event => {
+        const updated = event.detail || {};
+        const instanceId = form.instanceID;
+        if ( !updated.xmlFragment ) {
+            console.error( 'Could not submit repeat removal fieldsubmission. XML fragment missing.' );
+            return;
+        }
+        if ( !instanceId ) {
+            console.error( 'Could not submit repeat removal fieldsubmission. InstanceID missing' );
+        }
 
-            // remove the Participate class that shows a Close button on every page
-            form.view.html.classList.remove( 'empty-untouched' );
+        fieldSubmissionQueue.addRepeatRemoval( updated.xmlFragment, instanceId, form.deprecatedID );
+        fieldSubmissionQueue.submitAll();
+    } );
+    // Field is changed
+    form.view.html.addEventListener( events.DataUpdate().type, event => {
+        const updated = event.detail || {};
+        const instanceId = form.instanceID;
+        let file;
 
-            // Only now will we check for the deprecatedID value, which at this point should be (?) 
-            // populated at the time the instanceID dataupdate event is processed and added to the fieldSubmission queue.
-            fieldSubmissionQueue.addFieldSubmission( updated.fullPath, updated.xmlFragment, instanceId, form.deprecatedID, file );
-            fieldSubmissionQueue.submitAll();
+        if ( updated.cloned ) {
+            // This event is fired when a repeat is cloned. It does not trigger
+            // a fieldsubmission.
+            return;
+        }
+        if ( !updated.xmlFragment ) {
+            console.error( 'Could not submit field. XML fragment missing. (If repeat was deleted, this is okay.)' );
+            return;
+        }
+        if ( !instanceId ) {
+            console.error( 'Could not submit field. InstanceID missing' );
+            return;
+        }
+        if ( !updated.fullPath ) {
+            console.error( 'Could not submit field. Path missing.' );
+        }
+        if ( _doNotSubmit( updated.fullPath ) ) {
+            return;
+        }
+        if ( updated.file ) {
+            file = fileManager.getCurrentFile( updated.file );
+        }
 
-        } );
+        // remove the Participate class that shows a Close button on every page
+        form.view.html.classList.remove( 'empty-untouched' );
+
+        // Only now will we check for the deprecatedID value, which at this point should be (?) 
+        // populated at the time the instanceID dataupdate event is processed and added to the fieldSubmission queue.
+        fieldSubmissionQueue.addFieldSubmission( updated.fullPath, updated.xmlFragment, instanceId, form.deprecatedID, file );
+        fieldSubmissionQueue.submitAll();
+
+    } );
 
     // Before repeat removal from view and model
     if ( settings.reasonForChange ) {

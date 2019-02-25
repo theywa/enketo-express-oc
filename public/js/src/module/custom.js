@@ -10,7 +10,7 @@ function addSignedStatus( form ) {
         $status = $( `<div class="record-signed-status">${signature.replace( /\\n/g, '<br/>' ).replace( /\n/g, '<br/>' )}</div>` );
         $( '#form-title' )
             .before( $status )
-            .closest( 'form.or' ).one( 'valuechange.enketo', '.question:not(.or-appearance-dn)', () => {
+            .closest( 'form.or' ).one( 'valuechange', '.question:not(.or-appearance-dn)', () => {
                 $status.remove();
             } );
     }

@@ -118,7 +118,7 @@ class Comment extends Widget {
         const that = this;
 
         // Update query icon if query question is invalid.
-        this.$commentQuestion.on( 'invalidated.enketo', () => {
+        this.$commentQuestion[ 0 ].addEventListener( events.Invalidated().type, () => {
             that._setCommentButtonState( that.element.value, true );
         } );
     }
@@ -147,7 +147,7 @@ class Comment extends Widget {
 
     _setFocusHandler() {
         const that = this;
-        $( this.element ).on( 'applyfocus', () => {
+        this.element.addEventListener( events.ApplyFocus().type, () => {
             if ( that.$commentButton.is( ':visible' ) ) {
                 that.$commentButton.click();
             } else {
@@ -206,7 +206,7 @@ class Comment extends Widget {
         const that = this;
         let previousValue = this.options.helpers.getModelValue( $( this.$linkedQuestion.get( 0 ).querySelector( 'input, select, textarea' ) ) );
 
-        this.$linkedQuestion.on( 'valuechange.enketo inputupdate.enketo', evt => {
+        this.$linkedQuestion.on( 'valuechange inputupdate', evt => {
             let comment;
             const currentValue = that.options.helpers.getModelValue( $( evt.target ) );
             const currentStatus = that._getCurrentStatus( that.notes );
