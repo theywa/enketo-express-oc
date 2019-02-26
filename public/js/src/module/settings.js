@@ -107,10 +107,11 @@ settings.printRelevantOnly = !( ( settings.type === 'view' && !settings.instance
 settings.reasonForChange = /\/rfc\//.test( window.location.pathname );
 
 // Strict validation functionality (now true for everything but used to be specific to certain views)
-settings.strictCheckEnabled = true;
+settings.strictViolationSelector = '.oc-strict-constraint.invalid-constraint, .oc-strict-required.invalid-required, .oc-strict-relevant.invalid-relevant';
+
 // For Participate only
 if ( /\/participant\//.test( window.location.pathname ) ) {
-    config.relevantIsStrict = true;
+    settings.relevantIsStrict = true;
 }
 
 function _getEnketoId( prefix, haystack ) {

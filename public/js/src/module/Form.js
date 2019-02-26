@@ -77,8 +77,7 @@ Form.prototype.init = function() {
     let initialized = false;
 
     // Before any other change handlers, add the "strict check" handlers
-    if ( settings.strictCheckEnabled ) {
-        console.log( 'setting strict check handlers' );
+    if ( settings.strictViolationSelector ) {
         this.view.$
             .on( 'change.file',
                 'input:not(.ignore)[data-required][oc-required-type="strict"], select:not(.ignore)[data-required][oc-required-type="strict"], textarea:not(.ignore)[data-required][oc-required-type="strict"]',
@@ -168,7 +167,7 @@ Form.prototype.strictRequiredCheckHandler = function( evt, input ) {
     };
 
     // No need to validate.
-    if ( n.readonly || n.inputType === 'hidden' ) {
+    if ( n.readonly || n.inputType === 'hidden' || input.closest( '.invalid-relevant' ) ) {
         return;
     }
 
@@ -203,7 +202,7 @@ Form.prototype.strictConstraintCheckHandler = function( evt, input ) {
     };
 
     // No need to validate.
-    if ( n.readonly || n.inputType === 'hidden' ) {
+    if ( n.readonly || n.inputType === 'hidden' || input.closest( '.invalid-relevant' ) ) {
         return;
     }
 

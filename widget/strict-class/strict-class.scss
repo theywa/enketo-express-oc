@@ -5,13 +5,10 @@ $c: #f58220;
     background-color: lighten($c, 30%);
 }
 
-.oc-strict {
-
-    &.invalid-constraint,
-    &.invalid-required,
-    &.invalid-relevant {
-        @include oc-strict-error;
-    }
+.oc-strict-constraint.invalid-constraint,
+.oc-strict-required.invalid-required,
+.oc-strict-relevant.invalid-relevant {
+    @include oc-strict-error;
 }
 
 .alert-box.oc-strict-error {

@@ -56,11 +56,11 @@ function init( selector, data, loadWarnings ) {
             }
 
             // For Participant emtpy-form view in order to show Close button on all pages
-            if ( settings.strictCheckEnabled && settings.type !== 'edit' ) {
+            if ( settings.strictViolationSelector && settings.type !== 'edit' ) {
                 form.view.html.classList.add( 'empty-untouched' );
             }
             // For all Participant views, use a hacky solution to change the default relevant message
-            if ( settings.strictCheckEnabled ) {
+            if ( settings.strictViolationSelector ) {
                 const list = form.view.html.querySelectorAll( '[data-i18n="constraint.relevant"]' );
                 for ( let i = 0; i < list.length; i++ ) {
                     const relevantErrorMsg = t( 'constraint.relevantparticipant' );
@@ -237,7 +237,7 @@ function _closeRegular() {
         .then( valid => {
             if ( !valid ) {
                 const strictViolation = form.view.html
-                    .querySelector( '.oc-strict.invalid-required, .oc-strict.invalid-constraint' );
+                    .querySelector( STRICT_VIOLATION_SELECTOR );
                 if ( strictViolation ) {
                     return gui.alertStrictBlock();
                 }
@@ -323,7 +323,7 @@ function _closeSimple() {
         .then( valid => {
             if ( !valid ) {
                 const strictViolation = form.view.html
-                    .querySelector( '.oc-strict.invalid-required, .oc-strict.invalid-constraint' );
+                    .querySelector( STRICT_VIOLATION_SELECTOR );
                 if ( strictViolation ) {
                     return gui.alertStrictBlock();
                 }
@@ -399,7 +399,7 @@ function _closeCompletedRecord() {
             if ( valid ) {
                 // do not show confirmation dialog
                 return _complete( true );
-            } else if ( form.view.html.querySelector( '.oc-strict.invalid-required, .oc-strict.invalid-constraint' ) ) {
+            } else if ( form.view.html.querySelector( STRICT_VIOLATION_SELECTOR ) ) {
                 gui.alertStrictBlock();
             } else if ( form.view.html.querySelector( '.invalid-relevant' ) ) {
                 gui.alert( t( 'fieldsubmission.alert.relevantvalidationerror.msg' ) );
@@ -445,7 +445,7 @@ function _closeParticipant() {
         .then( valid => {
             if ( !valid ) {
                 const strictViolations = form.view.html
-                    .querySelector( '.oc-strict.invalid-required, .oc-strict.invalid-constraint, .oc-strict.invalid-relevant' );
+                    .querySelector( STRICT_VIOLATION_SELECTOR );
 
                 valid = !strictViolations;
             }
@@ -480,7 +480,7 @@ function _complete( bypassConfirmation ) {
         .then( valid => {
             if ( !valid ) {
                 const strictViolations = form.view.html
-                    .querySelector( '.oc-strict.invalid-required, .oc-strict.invalid-constraint' );
+                    .querySelector( STRICT_VIOLATION_SELECTOR );
                 if ( strictViolations ) {
                     gui.alertStrictBlock();
                 } else if ( form.view.html.querySelector( '.invalid-relevant' ) ) {
