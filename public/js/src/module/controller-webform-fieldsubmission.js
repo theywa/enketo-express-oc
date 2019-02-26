@@ -9,7 +9,7 @@ import gui from './gui';
 import settings from './settings';
 import Form from './Form'; // modified for OC
 import fileManager from './file-manager';
-import events from 'enketo-core/src/js/event';
+import events from './event';
 import { t } from './translator';
 import $ from 'jquery';
 import FieldSubmissionQueue from './field-submission-queue';
@@ -576,6 +576,7 @@ function _setFormEventHandlers() {
             console.error( 'Could not submit repeat removal fieldsubmission. InstanceID missing' );
         }
 
+        postHeartbeat();
         fieldSubmissionQueue.addRepeatRemoval( updated.xmlFragment, instanceId, form.deprecatedID );
         fieldSubmissionQueue.submitAll();
     } );
@@ -613,6 +614,7 @@ function _setFormEventHandlers() {
 
         // Only now will we check for the deprecatedID value, which at this point should be (?) 
         // populated at the time the instanceID dataupdate event is processed and added to the fieldSubmission queue.
+        postHeartbeat();
         fieldSubmissionQueue.addFieldSubmission( updated.fullPath, updated.xmlFragment, instanceId, form.deprecatedID, file );
         fieldSubmissionQueue.submitAll();
 
@@ -721,7 +723,13 @@ function _setButtonEventHandlers() {
     } );
 
     if ( rc.inIframe() && settings.parentWindowOrigin ) {
-        $( document ).on( 'submissionsuccess edited.enketo close', rc.postEventAsMessageToParentWindow );
+        document.addEventListener( events.SubmissionSuccess().type, rc.postEventAsMessageToParentWindow );
+        document.addEventListener( events.Edited().type, rc.postEventAsMessageToParentWindow );
+        document.addEventListener( events.Close().type, rc.postEventAsMessageToParentWindow );
+
+        form.view.html.addEventListener( events.PageFlip().type, postHeartbeat );
+        form.view.html.addEventListener( events.AddRepeat().type, postHeartbeat );
+        form.view.html.addEventListener( events.Heartbeat().type, postHeartbeat );
     }
 
     window.onbeforeunload = () => {
@@ -733,6 +741,12 @@ function _setButtonEventHandlers() {
             }
         }
     };
+}
+
+function postHeartbeat() {
+    if ( rc.inIframe() && settings.parentWindowOrigin ) {
+        rc.postEventAsMessageToParentWindow( events.Heartbeat() );
+    }
 }
 
 export default {

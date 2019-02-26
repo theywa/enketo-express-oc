@@ -331,6 +331,8 @@ class Comment extends Widget {
         const status = this._getCurrentStatus( this.notes );
         const readOnlyAttr = this.readOnly ? 'readonly ' : '';
 
+        this.element.closest( 'form' ).dispatchEvent( events.Heartbeat() );
+
         let btnsHtml;
         if ( status === 'new' || status === 'updated' || status === 'closed-modified' ) {
             btnsHtml = updateQueryButtonHtml + closeQueryButtonHtml;
@@ -450,6 +452,7 @@ class Comment extends Widget {
     }
 
     _hideCommentModal( linkedQuestion ) {
+        this.element.closest( 'form' ).dispatchEvent( events.Heartbeat() );
         linkedQuestion.querySelector( '.or-comment-widget' ).remove();
     }
 

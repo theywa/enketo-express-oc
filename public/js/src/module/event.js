@@ -4,6 +4,10 @@ events.ReasonChange = function( detail ) {
     return new CustomEvent( 'reasonchange', { detail } );
 };
 
+events.Heartbeat = function() {
+    return new CustomEvent( 'heartbeat' );
+};
+
 events.QueueSubmissionSuccess = function( detail ) {
     return new CustomEvent( 'queuesubmissionsuccess', { detail, bubbles: true } );
 };
