@@ -24,6 +24,8 @@ $padding: 30px;
         }
 
         &__tabs {
+            // temporarily made invisible
+            display: none;
             margin-bottom: 20px;
 
             input[type=radio] {
