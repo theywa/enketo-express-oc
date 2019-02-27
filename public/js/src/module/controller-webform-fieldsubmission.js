@@ -237,7 +237,7 @@ function _closeRegular() {
         .then( valid => {
             if ( !valid ) {
                 const strictViolation = form.view.html
-                    .querySelector( STRICT_VIOLATION_SELECTOR );
+                    .querySelector( settings.strictViolationSelector );
                 if ( strictViolation ) {
                     return gui.alertStrictBlock();
                 }
@@ -323,7 +323,7 @@ function _closeSimple() {
         .then( valid => {
             if ( !valid ) {
                 const strictViolation = form.view.html
-                    .querySelector( STRICT_VIOLATION_SELECTOR );
+                    .querySelector( settings.strictViolationSelector );
                 if ( strictViolation ) {
                     return gui.alertStrictBlock();
                 }
@@ -399,7 +399,7 @@ function _closeCompletedRecord() {
             if ( valid ) {
                 // do not show confirmation dialog
                 return _complete( true );
-            } else if ( form.view.html.querySelector( STRICT_VIOLATION_SELECTOR ) ) {
+            } else if ( form.view.html.querySelector( settings.strictViolationSelector ) ) {
                 gui.alertStrictBlock();
             } else if ( form.view.html.querySelector( '.invalid-relevant' ) ) {
                 gui.alert( t( 'fieldsubmission.alert.relevantvalidationerror.msg' ) );
@@ -445,7 +445,7 @@ function _closeParticipant() {
         .then( valid => {
             if ( !valid ) {
                 const strictViolations = form.view.html
-                    .querySelector( STRICT_VIOLATION_SELECTOR );
+                    .querySelector( settings.strictViolationSelector );
 
                 valid = !strictViolations;
             }
@@ -480,7 +480,7 @@ function _complete( bypassConfirmation ) {
         .then( valid => {
             if ( !valid ) {
                 const strictViolations = form.view.html
-                    .querySelector( STRICT_VIOLATION_SELECTOR );
+                    .querySelector( settings.strictViolationSelector );
                 if ( strictViolations ) {
                     gui.alertStrictBlock();
                 } else if ( form.view.html.querySelector( '.invalid-relevant' ) ) {
