@@ -516,7 +516,7 @@ function _complete( bypassConfirmation ) {
                     } )
                     .then( () => {
                         // this event is used in communicating back to iframe parent window
-                        $( document ).trigger( 'submissionsuccess' );
+                        document.dispatchEvent( events.SubmissionSuccess() );
 
                         msg += t( 'alert.submissionsuccess.redirectmsg' );
                         gui.alert( msg, t( 'alert.submissionsuccess.heading' ), 'success' );
