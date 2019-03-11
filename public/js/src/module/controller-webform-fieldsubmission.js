@@ -276,7 +276,7 @@ function _closeRegular() {
                         throw new Error( t( 'fieldsubmission.alert.close.msg2' ) );
                     } else {
                         // this event is used in communicating back to iframe parent window
-                        $( document ).trigger( 'close' );
+                        document.dispatchEvent( events.Close() );
 
                         msg += t( 'alert.submissionsuccess.redirectmsg' );
                         gui.alert( msg, t( 'alert.submissionsuccess.heading' ), 'success' );
@@ -305,7 +305,7 @@ function _closeRegular() {
                             } )
                             .then( confirmed => {
                                 if ( !confirmed ) {
-                                    $( document ).trigger( 'close' );
+                                    document.dispatchEvent( events.Close() );
                                     _redirect( 100 );
                                 }
                             } );
@@ -342,7 +342,7 @@ function _closeSimple() {
                         throw new Error( t( 'fieldsubmission.alert.close.msg2' ) );
                     } else {
                         // this event is used in communicating back to iframe parent window
-                        $( document ).trigger( 'close' );
+                        document.dispatchEvent( events.Close() );
 
                         msg += t( 'alert.submissionsuccess.redirectmsg' );
                         gui.alert( msg, t( 'alert.submissionsuccess.heading' ), 'success' );
@@ -371,7 +371,7 @@ function _closeSimple() {
                             } )
                             .then( confirmed => {
                                 if ( !confirmed ) {
-                                    $( document ).trigger( 'close' );
+                                    document.dispatchEvent( events.Close() );
                                     _redirect( 100 );
                                 }
                             } );
@@ -436,7 +436,7 @@ function _closeParticipant() {
             .then( () => {
                 gui.alert( t( 'alert.submissionsuccess.redirectmsg' ), null, 'success' );
                 // this event is used in communicating back to iframe parent window
-                $( document ).trigger( 'close' );
+                document.dispatchEvent( events.Close() );
                 _redirect( 600 );
             } );
     }
