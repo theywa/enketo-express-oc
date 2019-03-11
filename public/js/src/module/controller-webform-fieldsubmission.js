@@ -324,7 +324,7 @@ function _closeSimple() {
             if ( !valid ) {
                 const strictViolation = form.view.html
                     .querySelector( settings.strictViolationSelector );
-                if ( strictViolation ) {
+                if ( strictViolation && settings.strictViolationBlocksNavigation ) {
                     return gui.alertStrictBlock();
                 }
             }

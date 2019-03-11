@@ -59,7 +59,7 @@ pageModule._next = function() {
 
                 const strictViolations = that.$current[ 0 ].matches( settings.strictViolationSelector ) || !!that.$current[ 0 ].querySelector( settings.strictViolationSelector );
 
-                if ( !strictViolations ) {
+                if ( !strictViolations || !settings.strictViolationBlocksNavigation ) {
                     const currentIndex = that._getCurrentIndex();
                     const next = that._getNext( currentIndex );
                     if ( next ) {

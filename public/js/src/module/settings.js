@@ -109,6 +109,8 @@ settings.reasonForChange = /\/rfc\//.test( window.location.pathname );
 // Strict validation functionality (now true for everything but used to be specific to certain views)
 settings.strictViolationSelector = '.oc-strict-constraint.invalid-constraint, .oc-strict-required.invalid-required, .oc-strict-relevant.invalid-relevant';
 
+settings.strictViolationBlocksNavigation = settings.type !== 'view' && !( /\/fs\/dnc?\//.test( window.location.pathname ) );
+
 // For Participate only
 if ( /\/participant\//.test( window.location.pathname ) ) {
     settings.relevantIsStrict = true;
