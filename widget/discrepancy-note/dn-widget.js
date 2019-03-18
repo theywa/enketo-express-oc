@@ -3,6 +3,7 @@ import $ from 'jquery';
 import { t } from '../../public/js/src/module/translator';
 import settings from '../../public/js/src/module/settings';
 import events from '../../public/js/src/module/event';
+import fileManager from '../../public/js/src/module/file-manager';
 let usersOptionsHtml;
 let currentUser;
 let users;
@@ -733,6 +734,29 @@ class Comment extends Widget {
         } );
     }
 
+    _linkify( comment ) {
+        // This relies on a auto-generated string with 2 filenames surrounded by quotation marks, e.g.
+        // Value changed from "img1.jpg" to "img2.jpg".
+        const reg = /"([^"]+)"/g;
+        let linkifiedComment = comment;
+        let i = 0;
+        let results;
+
+        // for first 0, 1, or 2 matches:
+        while ( ( results = reg.exec( comment ) ) !== null && i < 2 ) {
+            const filename = results[ 1 ];
+            if ( filename ) {
+                const fileUrl = fileManager.getInstanceAttachmentUrl( filename );
+                if ( fileUrl ) {
+                    linkifiedComment = linkifiedComment.replace( filename, `<a target="_blank" rel="noreferrer" href="${fileUrl}">${filename}</a>` );
+                }
+            }
+            i++;
+        }
+
+        return linkifiedComment;
+    }
+
     _getRows( item, options ) {
         const types = {
             comment: '<span class="icon tooltip fa-comment-o" data-title="Query/Comment"> </span>',
@@ -746,7 +770,7 @@ class Comment extends Widget {
         if ( typeof options !== 'object' ) {
             options = {};
         }
-        const msg = item.comment || item.message;
+        const msg = this._linkify( item.comment || item.message );
         const rdDatetime = this._getReadableDateTime( item.date_time );
         const time = ( options.timestamp === 'datetime' ) ? rdDatetime : this._getParsedElapsedTime( item.date_time );
 
