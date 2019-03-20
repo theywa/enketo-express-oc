@@ -770,7 +770,8 @@ class Comment extends Widget {
         if ( typeof options !== 'object' ) {
             options = {};
         }
-        const msg = this._linkify( item.comment || item.message );
+        //const msg = this._linkify( item.comment || item.message );
+        const msg = item.comment || item.message;
         const rdDatetime = this._getReadableDateTime( item.date_time );
         const time = ( options.timestamp === 'datetime' ) ? rdDatetime : this._getParsedElapsedTime( item.date_time );
 
