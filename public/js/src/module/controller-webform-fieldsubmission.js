@@ -63,7 +63,7 @@ function init( selector, data, loadWarnings ) {
             if ( settings.strictViolationSelector ) {
                 const list = form.view.html.querySelectorAll( '[data-i18n="constraint.relevant"]' );
                 for ( let i = 0; i < list.length; i++ ) {
-                    const relevantErrorMsg = t( 'constraint.relevantparticipant' );
+                    const relevantErrorMsg = t( 'constraint.relevant' );
                     list[ i ].textContent = relevantErrorMsg;
                 }
             }

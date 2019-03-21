@@ -104,8 +104,7 @@
         }
     },
     "constraint": {
-        "relevant": "Response(s) in related field(s) make this data invalid. This must be corrected to mark the form complete.",
-        "relevantparticipant": "Response(s) in related field(s) make this data invalid. This must be corrected before proceeding."
+        "relevant": "An answer has changed to another question that requires this question to be hidden, but we cannot hide it while it has data. Please clear out the data or modify the dependent answers."
     },
     "alert": {
         "goto": {
