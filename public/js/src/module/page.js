@@ -47,23 +47,30 @@ pageModule.setRepeatHandlers = function() {
         } );
 };
 
-const originalPageModuleNext = pageModule._next;
+// const originalPageModuleNext = pageModule._next;
 
+// We don't use the original call, because OC only wants to (sometimes) block strict validation (not regular non-strict)
 pageModule._next = function() {
     const that = this;
-    // the original call takes care of all the validations
-    originalPageModuleNext.call( this )
+
+    this.form.validateContent( this.$current )
         .then( valid => {
+            const currentIndex = that._getCurrentIndex();
+            const next = that._getNext( currentIndex );
+            const newIndex = currentIndex + 1;
+
+            if ( valid ) {
+                that._flipTo( next, newIndex );
+            }
+
             // for strict-validation navigation-blocking, we ignore some errors (compared to Enketo Core module)
             if ( !valid && settings.strictViolationSelector ) {
 
                 const strictViolations = that.$current[ 0 ].matches( settings.strictViolationSelector ) || !!that.$current[ 0 ].querySelector( settings.strictViolationSelector );
 
                 if ( !strictViolations || !settings.strictViolationBlocksNavigation ) {
-                    const currentIndex = that._getCurrentIndex();
-                    const next = that._getNext( currentIndex );
+
                     if ( next ) {
-                        const newIndex = currentIndex + 1;
                         that._flipTo( next, newIndex );
                         //return newIndex;
                     }
