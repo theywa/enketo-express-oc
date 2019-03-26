@@ -186,7 +186,7 @@ Form.prototype.strictRequiredCheckHandler = function( evt, input ) {
         // When changing this make sure that the radio picker's change
         // listener picks this event up.
         // https://github.com/OpenClinica/enketo-express-oc/issues/168
-        input.dispatchEvent( events.Change() );
+        input.dispatchEvent( events.InputUpdate() );
         question.scrollIntoView();
     }
 };
@@ -240,7 +240,7 @@ Form.prototype.strictConstraintCheckHandler = function( evt, input ) {
         // When changing this make sure that the radio picker's change
         // listener picks this event up.
         // https://github.com/OpenClinica/enketo-express-oc/issues/168
-        input.dispatchEvent( events.Change() );
+        input.dispatchEvent( events.InputUpdate() );
         question.scrollIntoView();
     }
 };
