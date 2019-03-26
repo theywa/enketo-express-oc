@@ -71,8 +71,8 @@ function init( selector, data, loadWarnings ) {
             // set form eventhandlers before initializing form
             _setFormEventHandlers();
 
-            // listen for "gotohidden.enketo" event and add error
-            $( formSelector ).on( 'gotohidden', e => {
+            // listen for "gotohidden" event and add error
+            form.view.html.addEventListener( events.GoToHidden().type, e => {
                 // In OC hidden go_to fields should show loadError except if go_to field is a disrepancy_note
                 // as those are always hidden upon load.
                 if ( !e.target.classList.contains( 'or-appearance-dn' ) ) {
