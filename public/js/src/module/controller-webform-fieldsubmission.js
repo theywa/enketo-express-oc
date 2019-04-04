@@ -542,8 +542,8 @@ function _complete( bypassConfirmation ) {
  * Triggers autoqueries. 
  * @param {*} $questions 
  */
-function _autoAddQueries( $questions ) {
-    $questions.trigger( 'addquery.oc' );
+function _autoAddQueries( questions ) {
+    questions.forEach( q => q.dispatchEvent( events.AddQuery() ) );
 }
 
 function _autoAddReasonQueries( $rfcInputs ) {
