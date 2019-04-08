@@ -131,15 +131,14 @@ class Comment extends Widget {
     }
 
     _setCloseHandler() {
-        const that = this;
-
-        this.$linkedQuestion.on( 'addquery.oc', function() {
-            const currentStatus = that._getCurrentStatus( that.notes );
-            const errorType = this.classList.contains( 'invalid-constraint' ) ? 'constraint' : ( this.classList.contains( 'invalid-required' ) ? 'required' : ( this.classList.contains( 'invalid-relevant' ) ? 'relevant' : null ) );
+        this.$linkedQuestion[ 0 ].addEventListener( events.AddQuery().type, event => {
+            const q = event.target;
+            const currentStatus = this._getCurrentStatus( this.notes );
+            const errorType = q.classList.contains( 'invalid-constraint' ) ? 'constraint' : ( q.classList.contains( 'invalid-required' ) ? 'required' : ( q.classList.contains( 'invalid-relevant' ) ? 'relevant' : null ) );
             if ( errorType && currentStatus !== 'updated' && currentStatus !== 'new' ) {
                 const status = ( currentStatus === '' ) ? 'new' : 'updated';
-                const errorMsg = $( this ).find( `.or-${errorType}-msg.active` ).text();
-                that._addQuery( t( 'widget.dn.autoconstraint', {
+                const errorMsg = q.querySelector( `.or-${errorType}-msg.active` ).textContent;
+                this._addQuery( t( 'widget.dn.autoconstraint', {
                     errorMsg
                 } ), status, '', false, SYSTEM_USER );
             }

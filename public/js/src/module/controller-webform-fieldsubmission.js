@@ -178,16 +178,16 @@ function init( selector, data, loadWarnings ) {
 
 function _headlessValidateAndAutoQuery( valid ) {
     const markedAsComplete = form.model.isMarkedComplete();
-    let $invalid = $();
+    let invalid;
 
     if ( !valid ) {
         if ( markedAsComplete ) {
-            $invalid = form.view.$.find( '.invalid-relevant, .invalid-constraint, .invalid-required' );
+            invalid = form.view.html.querySelectorAll( '.invalid-relevant, .invalid-constraint, .invalid-required' );
         } else {
-            $invalid = form.view.$.find( '.invalid-relevant, .invalid-constraint' );
+            invalid = form.view.html.querySelectorAll( '.invalid-relevant, .invalid-constraint' );
         }
         // Trigger auto-queries for relevant, constraint and required (handled in DN widget)
-        _autoAddQueries( $invalid );
+        _autoAddQueries( invalid );
         // Not efficient but robust, and not relying on validateContinuously: true, we just validate again.
         return form.validate();
     }
@@ -234,15 +234,15 @@ function _headlessCloseComplete() {
  */
 function _closeRegular() {
     return form.validate()
-        .then( valid => {
-            const $violated = form.view.$.find( '.invalid-constraint' );
+        .then( () => {
+            const violated = form.view.html.querySelectorAll( '.invalid-constraint' );
             let msg = '';
             const tAlertCloseMsg = t( 'fieldsubmission.alert.close.msg1' );
             const tAlertCloseHeading = t( 'fieldsubmission.alert.close.heading1' );
             const authLink = `<a href="/login" target="_blank">${t( 'here' )}</a>`;
 
             // First check if any constraints have been violated and prompt option to generate automatic queries
-            if ( $violated.length ) {
+            if ( violated.length ) {
                 return gui.confirm( {
                         heading: t( 'alert.default.heading' ),
                         errorMsg: t( 'fieldsubmission.confirm.autoquery.msg1' ),
@@ -255,7 +255,7 @@ function _closeRegular() {
                         if ( !confirmed ) {
                             return false;
                         }
-                        _autoAddQueries( $violated );
+                        _autoAddQueries( violated );
                         return _closeRegular();
                     } );
             }
@@ -388,7 +388,7 @@ function _closeCompletedRecord() {
                 gui.alert( t( 'fieldsubmission.alert.relevantvalidationerror.msg' ) );
                 return false;
             } else {
-                const $violations = form.view.$.find( '.invalid-constraint, .invalid-required' );
+                const violations = form.view.html.querySelectorAll( '.invalid-constraint, .invalid-required' );
 
                 // Note that unlike _close this also looks at .invalid-required.
                 return gui.confirm( {
@@ -403,7 +403,7 @@ function _closeCompletedRecord() {
                         if ( !confirmed ) {
                             return false;
                         }
-                        _autoAddQueries( $violations );
+                        _autoAddQueries( violations );
                         return _closeCompletedRecord();
                     } );
             }
@@ -525,8 +525,8 @@ function _complete( bypassConfirmation ) {
  * Triggers autoqueries. 
  * @param {*} $questions 
  */
-function _autoAddQueries( $questions ) {
-    $questions.trigger( 'addquery.oc' );
+function _autoAddQueries( questions ) {
+    questions.forEach( q => q.dispatchEvent( events.AddQuery() ) );
 }
 
 function _autoAddReasonQueries( $rfcInputs ) {
@@ -717,7 +717,7 @@ function _setButtonEventHandlers() {
 
     window.onbeforeunload = () => {
         if ( !ignoreBeforeUnload ) {
-            _autoAddQueries( form.view.$.find( '.invalid-constraint' ) );
+            _autoAddQueries( form.view.html.querySelectorAll( '.invalid-constraint' ) );
             _autoAddReasonQueries( reasons.getInvalidFields() );
             if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
                 return 'Any unsaved data will be lost';

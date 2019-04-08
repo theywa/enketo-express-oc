@@ -20,4 +20,8 @@ events.Close = function() {
     return new CustomEvent( 'close', { bubbles: true } );
 };
 
+events.AddQuery = function() {
+    return new CustomEvent( 'addquery', { bubbles: true } );
+};
+
 export default events;
