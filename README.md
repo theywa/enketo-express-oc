@@ -77,6 +77,7 @@ OpenClinica users, in addition to the above, may want to take special note of th
 5. Set `"validate continuously": true`
 6. Set `"validate page": false` (though some applications may wish to use `true`)
 7. Set `"default theme": "oc"`
+8. Set `"text field character limit": 3999`
 
 --------
 
