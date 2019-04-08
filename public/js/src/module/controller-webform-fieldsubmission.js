@@ -235,13 +235,6 @@ function _headlessCloseComplete() {
 function _closeRegular() {
     return form.validate()
         .then( valid => {
-            if ( !valid ) {
-                const strictViolation = form.view.html
-                    .querySelector( settings.strictViolationSelector );
-                if ( strictViolation ) {
-                    return gui.alertStrictBlock();
-                }
-            }
             const $violated = form.view.$.find( '.invalid-constraint' );
             let msg = '';
             const tAlertCloseMsg = t( 'fieldsubmission.alert.close.msg1' );
@@ -320,14 +313,7 @@ function _closeRegular() {
 function _closeSimple() {
 
     return form.validate()
-        .then( valid => {
-            if ( !valid ) {
-                const strictViolation = form.view.html
-                    .querySelector( settings.strictViolationSelector );
-                if ( strictViolation && settings.strictViolationBlocksNavigation ) {
-                    return gui.alertStrictBlock();
-                }
-            }
+        .then( () => {
             let msg = '';
             const tAlertCloseMsg = t( 'fieldsubmission.alert.close.msg1' );
             const tAlertCloseHeading = t( 'fieldsubmission.alert.close.heading1' );
@@ -353,7 +339,6 @@ function _closeSimple() {
                     let errorMsg;
                     error = error || {};
 
-                    console.error( 'close error', error );
                     if ( error.status === 401 ) {
                         errorMsg = t( 'alert.submissionerror.authrequiredmsg', {
                             here: authLink
@@ -399,8 +384,6 @@ function _closeCompletedRecord() {
             if ( valid ) {
                 // do not show confirmation dialog
                 return _complete( true );
-            } else if ( form.view.html.querySelector( settings.strictViolationSelector ) ) {
-                gui.alertStrictBlock();
             } else if ( form.view.html.querySelector( '.invalid-relevant' ) ) {
                 gui.alert( t( 'fieldsubmission.alert.relevantvalidationerror.msg' ) );
                 return false;
