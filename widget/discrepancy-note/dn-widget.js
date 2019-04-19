@@ -151,16 +151,7 @@ class Comment extends Widget {
             if ( that.$commentButton.is( ':visible' ) ) {
                 that.$commentButton.click();
             } else {
-                let err = `${t( 'alert.goto.hidden' )} `;
-                const goToErrorLink = settings.goToErrorUrl ? `<a href="${settings.goToErrorUrl}">${settings.goToErrorUrl}</a>` : '';
-                err += goToErrorLink ? t( 'alert.goto.msg2', {
-                    miniform: goToErrorLink,
-                    // switch off escaping
-                    interpolation: {
-                        escapeValue: false
-                    }
-                } ) : t( 'alert.goto.msg1' );
-                throw new Error( err );
+                throw new Error( 'Attempted to go to irrelevant discrepancy note.' );
             }
         } );
     }

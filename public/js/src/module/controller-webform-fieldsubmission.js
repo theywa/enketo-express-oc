@@ -73,11 +73,25 @@ function init( selector, data, loadWarnings ) {
 
             // listen for "gotohidden" event and add error
             form.view.html.addEventListener( events.GoToHidden().type, e => {
-                // In OC hidden go_to fields should show loadError except if go_to field is a disrepancy_note
-                // as those are always hidden upon load.
+                let err;
+                // In OC hidden go_to fields should show loadError 
+                // regular questions:
                 if ( !e.target.classList.contains( 'or-appearance-dn' ) ) {
-                    loadErrors.push( t( 'alert.goto.hidden' ) );
+                    err = t( 'alert.goto.hidden' );
                 }
+                // Discrepancy notes
+                else {
+                    err = `${t( 'alert.goto.hidden' )} `;
+                    const goToErrorLink = settings.goToErrorUrl ? `<a href="${settings.goToErrorUrl}">${settings.goToErrorUrl}</a>` : '';
+                    err += goToErrorLink ? t( 'alert.goto.msg2', {
+                        miniform: goToErrorLink,
+                        // switch off escaping
+                        interpolation: {
+                            escapeValue: false
+                        }
+                    } ) : t( 'alert.goto.msg1' );
+                }
+                loadErrors.push( err );
             } );
 
             loadErrors = loadErrors.concat( form.init() );
@@ -150,14 +164,13 @@ function init( selector, data, loadWarnings ) {
             advice = ( data.instanceStr ) ? t( 'alert.loaderror.editadvice' ) : t( 'alert.loaderror.entryadvice' );
             gui.alertLoadErrors( loadErrors, advice );
         } )
-        .then( form => {
+        .then( () => {
             if ( settings.headless ) {
                 console.log( 'doing headless things' );
                 const $result = $( '<div id="headless-result" style="position: fixed; background: pink; top: 0; left: 50%;"/>' );
                 if ( loadErrors.length ) {
                     $result.append( `<span id="error">${loadErrors[ 0 ]}</span>` );
                     $( 'body' ).append( $result );
-                    return form;
                 }
                 return _headlessCloseComplete()
                     .then( fieldsubmissions => {
@@ -168,12 +181,11 @@ function init( selector, data, loadWarnings ) {
                     } )
                     .then( () => {
                         $( 'body' ).append( $result );
-                        return form;
                     } );
             }
         } )
-        .then( form => // OC will return even if there were errors.
-            form );
+        // OC will return even if there were errors
+        .then( () => form );
 }
 
 function _headlessValidateAndAutoQuery( valid ) {

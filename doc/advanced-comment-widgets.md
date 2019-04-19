@@ -19,28 +19,51 @@ The advanced comment widgets extend the generic comment feature by: populating t
   "queries": [
     { 
       "type": "comment",
-      "id": "",
+      "id": "23",
+      "user": "jen",
       "date_time": "2016-09-01 15:01.123 -06:00",
       "comment": "This value seems impossible.",
       "status": "new",
       "assigned_to": "moss",
       "notify": false
-    }
-  ],
-  "logs": [
+    }, 
+    {
+      "type": "reason",
+      "id": "101",
+      "date_time": "2016-04-22 14:44:20.123 -06:00",
+      "comment": "No reason.", 
+    },
     {
       "type": "comment",
+      "id": "24",
       "assigned_to": "jen",
       "date_time": "2016-04-22 14:44:20.123 -06:00",
       "comment": "This is an older comment.", 
       "status": "updated",
       "user": "moss"
     },
+    {
+      "type": "comment",
+      "id": "29",
+      "assigned_to": "jen",
+      "date_time": "2016-04-26 14:44:20.123 -06:00",
+      "comment": "Comment", 
+      "status": "updated",
+      "user": "moss"
+    },
+  ],
+  "logs": [
     { 
       "type": "audit",  
-      "message": "Item data value updated from old_value to new_value.",  
+      "comment": "Item data value updated from old_value to new_value.",  
       "date_time" : "2016-05-18 12:44:20.456 -06:00",
       "user" : "jen",
+    },
+    { 
+      "type": "audit",  
+      "comment": "Item data value updated from old_value to new_value.",  
+      "date_time" : "2017-05-19 12:44:20.456 -06:00",
+      "user" : "moss",
     }
   ]
 }
@@ -57,7 +80,7 @@ To add a discrepancy note to a question, the following needs to be defined in th
 In XLSForm on the settings sheet, add a column `namespaces` and populate this with `enk=http://enketo.org/xforms`.
 
 | form_title | namespaces                     |
-|------------|--------------------------------|
+| ---------- | ------------------------------ |
 | My Form    | enk="http://enketo.org/xforms" |
 
 
@@ -66,7 +89,7 @@ In XLSForm on the settings sheet, add a column `namespaces` and populate this wi
 Add a question of type `text`, optionally with appearance `multiline`, preferably immediately after the question node it refers to.
 
 | type | name      | label           | appearance |
-|------|-----------|-----------------|------------|
+| ---- | --------- | --------------- | ---------- |
 | text | a         | Enter text      |            |
 | text | a_comment | Enter a comment | multiline  |
 
@@ -75,7 +98,7 @@ Add a question of type `text`, optionally with appearance `multiline`, preferabl
 Give this question the appearance `dn` to ensure the question will be displayed as a Discrepancy Note widget. You could have multiple complex comment widget appearances (space-separated) here.
 
 | type | name      | label           | appearance   |
-|------|-----------|-----------------|--------------|
+| ---- | --------- | --------------- | ------------ |
 | text | a         | Enter text      |              |
 | text | a_comment | Enter a comment | multiline dn |
 
@@ -85,7 +108,7 @@ Give this question the appearance `dn` to ensure the question will be displayed 
 For each discrepancy note question, add a reference to the question node it refers to in the `bind::enk:for` column, e.g. `${a}`. The prefix `enk` corresponds with the namespace prefix added on the settings sheet.
 
 | type | name      | label           | appearance   | bind::enk:for |
-|------|-----------|-----------------|--------------|---------------|
+| ---- | --------- | --------------- | ------------ | ------------- |
 | text | a         | Enter text      |              |               |
 | text | a_comment | Enter a comment | multiline dn | ${a}          |
 
@@ -94,7 +117,7 @@ For each discrepancy note question, add a reference to the question node it refe
 Optionally, if you'd like to make question "a" required depending on whether there is a comment, you could use the regular XLSForm/XPath syntax. Nothing new here. You could do the same for relevant and constraint logic too.
 
 | type | name      | label           | appearance   | bind::enk:for | required        |
-|------|-----------|-----------------|--------------|---------------|-----------------|
+| ---- | --------- | --------------- | ------------ | ------------- | --------------- |
 | text | a         | Enter text      |              |               | $a_comment = '' |
 | text | a_comment | Enter a comment | multiline dn | ${a}          |                 |
 
