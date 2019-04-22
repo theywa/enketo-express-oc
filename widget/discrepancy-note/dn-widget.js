@@ -202,42 +202,46 @@ class Comment extends Widget {
             let comment;
             const currentValue = that.options.helpers.getModelValue( $( evt.target ) );
             const currentStatus = that._getCurrentStatus( that.notes );
-            // Note obtaining the values like this does not work for file input types, but since have a different
-            // change comment for those that doesn't mention the filename, we don't need to fix that.
 
-            if ( evt.target.type !== 'file' ) {
-                comment = t( 'widget.dn.valuechange', {
-                    'new': `"${currentValue}"`,
-                    'previous': `"${previousValue}"`
-                } );
-            } else {
-                comment = currentValue ? t( 'widget.dn.newfile' ) : t( 'widget.dn.fileremoved' );
-            }
-
-            that._addAudit( comment, '', false );
-
-            if ( settings.reasonForChange && !that.linkedQuestionReadonly ) {
-                reasons.addField( that.$linkedQuestion[ 0 ] )
-                    .on( 'change', evt => {
-                        // Also for empty onchange values
-                        // TODO: exclude empty values if RFC field never had a value?
-                        that._addReason( evt.target.value );
-                        reasons.setSubmitted( evt.target );
-                    } )
-                    .on( 'input', evt => {
-                        if ( evt.target.value && evt.target.value.trim() ) {
-                            reasons.setEdited( evt.target );
-                        }
+            if ( previousValue !== currentValue ) {
+                // Note obtaining the values like this does not work for file input types, but since have a different
+                // change comment for those that doesn't mention the filename, we don't need to fix that.
+                if ( evt.target.type !== 'file' ) {
+                    comment = t( 'widget.dn.valuechange', {
+                        'new': `"${currentValue}"`,
+                        'previous': `"${previousValue}"`
                     } );
+                } else {
+                    comment = currentValue ? t( 'widget.dn.newfile' ) : t( 'widget.dn.fileremoved' );
+                }
 
-                reasons.applyToAll();
-            }
+                console.log( `valuechange or inputupdate, comment:"${comment}", "${currentValue}", "${previousValue}"` );
 
-            previousValue = currentValue;
+                that._addAudit( comment, '', false );
 
-            if ( currentStatus === 'closed' ) {
-                comment = t( 'widget.dn.closedmodified' );
-                that._addQuery( comment, 'closed-modified', '', false, SYSTEM_USER );
+                if ( settings.reasonForChange && !that.linkedQuestionReadonly ) {
+                    reasons.addField( that.$linkedQuestion[ 0 ] )
+                        .on( 'change', evt => {
+                            // Also for empty onchange values
+                            // TODO: exclude empty values if RFC field never had a value?
+                            that._addReason( evt.target.value );
+                            reasons.setSubmitted( evt.target );
+                        } )
+                        .on( 'input', evt => {
+                            if ( evt.target.value && evt.target.value.trim() ) {
+                                reasons.setEdited( evt.target );
+                            }
+                        } );
+
+                    reasons.applyToAll();
+                }
+
+                previousValue = currentValue;
+
+                if ( currentStatus === 'closed' ) {
+                    comment = t( 'widget.dn.closedmodified' );
+                    that._addQuery( comment, 'closed-modified', '', false, SYSTEM_USER );
+                }
             }
         } );
     }
