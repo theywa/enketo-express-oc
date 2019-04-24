@@ -244,32 +244,35 @@ function _headlessCloseComplete() {
  * 
  * @return {Promise} [description]
  */
-function _closeRegular() {
+function _closeRegular( offerAutoqueries = true ) {
     return form.validate()
         .then( () => {
-            const violated = form.view.html.querySelectorAll( '.invalid-constraint' );
             let msg = '';
             const tAlertCloseMsg = t( 'fieldsubmission.alert.close.msg1' );
             const tAlertCloseHeading = t( 'fieldsubmission.alert.close.heading1' );
             const authLink = `<a href="/login" target="_blank">${t( 'here' )}</a>`;
 
-            // First check if any constraints have been violated and prompt option to generate automatic queries
-            if ( violated.length ) {
-                return gui.confirm( {
-                        heading: t( 'alert.default.heading' ),
-                        errorMsg: t( 'fieldsubmission.confirm.autoquery.msg1' ),
-                        msg: t( 'fieldsubmission.confirm.autoquery.msg2' )
-                    }, {
-                        posButton: t( 'fieldsubmission.confirm.autoquery.automatic' ),
-                        negButton: t( 'fieldsubmission.confirm.autoquery.manual' ),
-                    } )
-                    .then( confirmed => {
-                        if ( !confirmed ) {
-                            return false;
-                        }
-                        _autoAddQueries( violated );
-                        return _closeRegular();
-                    } );
+            if ( offerAutoqueries ) {
+                const violated = form.view.html.querySelectorAll( '.invalid-constraint' );
+
+                // First check if any constraints have been violated and prompt option to generate automatic queries
+                if ( violated.length ) {
+                    return gui.confirm( {
+                            heading: t( 'alert.default.heading' ),
+                            errorMsg: t( 'fieldsubmission.confirm.autoquery.msg1' ),
+                            msg: t( 'fieldsubmission.confirm.autoquery.msg2' )
+                        }, {
+                            posButton: t( 'fieldsubmission.confirm.autoquery.automatic' ),
+                            negButton: t( 'fieldsubmission.confirm.autoquery.manual' ),
+                        } )
+                        .then( confirmed => {
+                            if ( !confirmed ) {
+                                return false;
+                            }
+                            _autoAddQueries( violated );
+                            return _closeRegular( false );
+                        } );
+                }
             }
 
             // Start with actually closing, but only proceed once the queue is emptied.
