@@ -253,7 +253,8 @@ function _closeRegular( offerAutoqueries = true ) {
             const authLink = `<a href="/login" target="_blank">${t( 'here' )}</a>`;
 
             if ( offerAutoqueries ) {
-                const violated = form.view.html.querySelectorAll( '.invalid-constraint' );
+                const violated = [ ...form.view.html.querySelectorAll( '.invalid-constraint' ) ]
+                    .filter( question => !question.querySelector( '.btn-comment.new, .btn-comment.updated' ) );
 
                 // First check if any constraints have been violated and prompt option to generate automatic queries
                 if ( violated.length ) {
