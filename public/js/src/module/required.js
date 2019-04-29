@@ -22,7 +22,7 @@ requiredModule.update = function( updated ) {
     let $nodes = this.form.getRelatedNodes( 'data-required', '', updated );
     // Here we add the changed node itself as well (not in Enketo Core, because in Enketo Core we don't take a value into consideration 
     // to determine when to show the asterisk.
-    $nodes = $nodes.add( this.form.getRelatedNodes( 'name', '[data-required]', updated ) );
+    $nodes = $nodes.add( this.form.getRelatedNodes( 'name', '[data-required]', updated ) ).add( this.form.getRelatedNodes( 'data-name', '[data-required]', updated ) );
 
     const repeatClonesPresent = this.form.repeatsPresent && this.form.view.$.find( '.or-repeat.clone' ).length > 0;
 
