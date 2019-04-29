@@ -458,7 +458,7 @@ function _generateWebformUrls( id, req ) {
         case 'edit-participant':
             {
                 const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.defaultsQueryParam, req.returnQueryParam, req.parentWindowOriginParam ] );
-                url = `${BASEURL}edit/${FSPATH}participant/${IFRAMEPATH}${idFsParticipant}${queryString}`;
+                url = `${BASEURL}edit/${FSPATH}participant/${IFRAMEPATH}${idFsParticipant}${queryString}${hash}`;
                 break;
             }
         case 'view':
