@@ -146,12 +146,11 @@ class Comment extends Widget {
     }
 
     _setFocusHandler() {
-        const that = this;
         this.element.addEventListener( events.ApplyFocus().type, () => {
-            if ( that.$commentButton.is( ':visible' ) ) {
-                that.$commentButton.click();
+            if ( this.$commentButton.is( ':visible' ) ) {
+                this.$commentButton.click();
             } else {
-                throw new Error( 'Attempted to go to irrelevant discrepancy note.' );
+                this.question.dispatchEvent( events.GoToHidden() );
             }
         } );
     }
