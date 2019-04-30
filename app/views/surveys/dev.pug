@@ -34,3 +34,11 @@ block content
       console.log('origin of message', event.origin);
       console.log('source of message', event.source);
     }
+  script. 
+    const iframe = document.querySelector( 'iframe' );
+    const enketoUrl = iframe.src
+    // Send message once the iframe has completely finished loading.
+    // Pass an object with a `token` property
+    iframe.contentWindow.addEventListener( 'load' , () => {
+      iframe.contentWindow.postMessage( { 'authToken': 'abc123456' }, enketoUrl );
+    });

@@ -13,6 +13,12 @@ const settingsMap = [
     { q: 'PID', s: 'pid' }, 'completeButton', 'loadWarning', 'goToErrorUrl',
 ];
 
+window.addEventListener( 'message', event => {
+    if ( event.origin === window.parent.location.origin ) {
+        document.cookie = `__authToken=${encodeURIComponent(event.data.authToken)}; path=/; max-age=${24*60*60}; samesite = strict `; // TODO secure=true ?
+    }
+}, false );
+
 // rename query string parameters to settings, but only if they do not exist already
 settingsMap.forEach( obj => {
     if ( typeof obj === 'string' && typeof queryParams[ obj ] !== 'undefined' && typeof settings[ obj ] === 'undefined' ) {
