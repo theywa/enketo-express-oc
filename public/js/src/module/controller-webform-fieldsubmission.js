@@ -71,8 +71,8 @@ function init( selector, data, loadWarnings ) {
             // set form eventhandlers before initializing form
             _setFormEventHandlers();
 
-            // listen for "gotohidden" event and add error
-            form.view.html.addEventListener( events.GoToHidden().type, e => {
+
+            const handleGoToHidden = e => {
                 let err;
                 // In OC hidden go_to fields should show loadError 
                 // regular questions:
@@ -91,8 +91,16 @@ function init( selector, data, loadWarnings ) {
                         }
                     } ) : t( 'alert.goto.msg1' );
                 }
+                // For goto targets that are discrepancy notes and are relevant but their linked question is not,
+                // the gotohidden event will be fired twice. We can safely remove the eventlistener after the first
+                // event is caught (for all cases).
+                form.view.html.removeEventListener( events.GoToHidden().type, handleGoToHidden );
                 loadErrors.push( err );
-            } );
+            };
+
+
+            // listen for "gotohidden" event and add error
+            form.view.html.addEventListener( events.GoToHidden().type, handleGoToHidden );
 
             loadErrors = loadErrors.concat( form.init() );
 
