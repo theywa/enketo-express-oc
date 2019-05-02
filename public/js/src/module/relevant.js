@@ -121,7 +121,6 @@ branchModule.deactivate = function( $branchNode ) {
     let index = 0;
     let value;
     let $control;
-    const that = this;
 
     if ( $branchNode.is( '.question' ) ) {
         $control = $( $branchNode[ 0 ].querySelector( 'input, select, textarea' ) );
@@ -167,9 +166,12 @@ branchModule.deactivate = function( $branchNode ) {
                 return [ ...dataEl.querySelectorAll( '*' ) ]
                     .filter( el => {
                         if ( el.children.length === 0 ) {
-                            var path = that.form.model.getXPath( el, 'instance' );
-                            var n = that.form.view.html.querySelector( '.calculation > [name="' + path + '"], .or-appearance-dn > [name="' + path + '"]' );
-                            return !n;
+                            const path = this.form.model.getXPath( el, 'instance' );
+                            const selector = `.calculation > [name="${path}"], .or-appearance-dn > [name="${path}"]`;
+                            // If a repeat has zero instances, the search for .or-appearance-dn in form.html will result in null, which means the dn-detection would fail.
+                            const searchElements = [ this.form.view.html ].concat( Object.entries( this.form.repeats.templates ).map( entries => entries[ 1 ] ) );
+                            const ignore = searchElements.some( e => !!e.querySelector( selector ) );
+                            return !ignore;
                         }
                         return false;
                     } )
