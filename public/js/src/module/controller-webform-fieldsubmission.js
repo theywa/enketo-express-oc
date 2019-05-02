@@ -71,7 +71,6 @@ function init( selector, data, loadWarnings ) {
             // set form eventhandlers before initializing form
             _setFormEventHandlers();
 
-
             const handleGoToHidden = e => {
                 let err;
                 // In OC hidden go_to fields should show loadError 
@@ -391,7 +390,7 @@ function _closeSimple() {
 }
 
 // This is conceptually a Complete function that has some pre-processing.
-function _closeCompletedRecord() {
+function _closeCompletedRecord( offerAutoqueries = true ) {
 
     if ( !reasons.validate() ) {
         const firstInvalidInput = reasons.getFirstInvalidField();
@@ -405,14 +404,14 @@ function _closeCompletedRecord() {
 
     return form.validate()
         .then( valid => {
-            if ( valid ) {
-                // do not show confirmation dialog
-                return _complete( true );
-            } else if ( form.view.html.querySelector( '.invalid-relevant' ) ) {
+            const relevantViolations = [ ...form.view.html.querySelectorAll( '.invalid-relevant' ) ]
+                .filter( question => !question.querySelector( '.btn-comment.new, .btn-comment.updated' ) );
+            if ( !valid && relevantViolations.length > 0 ) {
                 gui.alert( t( 'fieldsubmission.alert.relevantvalidationerror.msg' ) );
                 return false;
-            } else {
-                const violations = form.view.html.querySelectorAll( '.invalid-constraint, .invalid-required' );
+            } else if ( !valid && offerAutoqueries ) {
+                const violations = [ ...form.view.html.querySelectorAll( '.invalid-constraint, .invalid-required' ) ]
+                    .filter( question => !question.querySelector( '.btn-comment.new, .btn-comment.updated' ) );
 
                 // Note that unlike _close this also looks at .invalid-required.
                 return gui.confirm( {
@@ -428,8 +427,10 @@ function _closeCompletedRecord() {
                             return false;
                         }
                         _autoAddQueries( violations );
-                        return _closeCompletedRecord();
+                        return _closeCompletedRecord( false );
                     } );
+            } else {
+                return _complete( true, true );
             }
         } );
 }
@@ -473,7 +474,7 @@ function _redirect( msec ) {
 /**
  * Finishes a submission
  */
-function _complete( bypassConfirmation ) {
+function _complete( bypassConfirmation = false, bypassChecks = false ) {
 
     if ( !bypassConfirmation ) {
         return gui.confirm( {
@@ -485,7 +486,7 @@ function _complete( bypassConfirmation ) {
     // form.validate() will trigger fieldsubmissions for timeEnd before it resolves
     return form.validate()
         .then( valid => {
-            if ( !valid ) {
+            if ( !valid && !bypassChecks ) {
                 const strictViolations = form.view.html
                     .querySelector( settings.strictViolationSelector );
                 if ( strictViolations ) {
