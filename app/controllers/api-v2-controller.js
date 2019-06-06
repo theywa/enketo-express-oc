@@ -8,6 +8,7 @@ var express = require( 'express' );
 var utils = require( '../lib/utils' );
 var router = express.Router();
 var quotaErrorMessage = 'Forbidden. No quota left';
+var keys = require( '../lib/router-utils' ).idEncryptionKeys;
 // var debug = require( 'debug' )( 'api-controller-v2' );
 
 module.exports = function( app ) {
@@ -357,7 +358,8 @@ function _generateWebformUrls( id, req ) {
     var baseUrl = protocol + '://' + req.headers.host + req.app.get( 'base path' ) + '/';
     var idPartOnline = '::' + id;
     var idPartOffline = '#' + id;
-    var idPartOnce = '::' + utils.insecureAes192Encrypt( id, req.app.get( 'less secure encryption key' ) );
+    var idPartOnce = '::' + utils.insecureAes192Encrypt( id, keys.singleOnce );
+    var idPartPreview = '::' + utils.insecureAes192Encrypt( id, keys.preview );
     var queryParts;
 
     req.webformType = req.webformType || 'default';
@@ -365,7 +367,7 @@ function _generateWebformUrls( id, req ) {
     switch ( req.webformType ) {
         case 'preview':
             queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam ] );
-            obj.preview_url = baseUrl + 'preview/' + iframePart + idPartOnline + queryString;
+            obj.preview_url = baseUrl + 'preview/' + iframePart + idPartPreview + queryString;
             break;
         case 'edit':
             // no defaults query parameter in edit view
@@ -388,7 +390,7 @@ function _generateWebformUrls( id, req ) {
             obj.single_url = baseUrl + idPartOnline + queryString;
             obj.single_once_url = baseUrl + idPartOnce + queryString;
             obj.offline_url = baseUrl + OFFLINEPATH + idPartOffline;
-            obj.preview_url = baseUrl + 'preview/' + idPartOnline + queryString;
+            obj.preview_url = baseUrl + 'preview/' + idPartPreview + queryString;
             // iframe views
             queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam ] );
             obj.iframe_url = baseUrl + IFRAMEPATH + idPartOnline + queryString;

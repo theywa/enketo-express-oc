@@ -17,6 +17,7 @@ module.exports = function( app ) {
 
 router.param( 'enketo_id', routerUtils.enketoId );
 router.param( 'encrypted_enketo_id', routerUtils.encryptedEnketoId );
+router.param( 'encrypted_enketo_id_preview', routerUtils.encryptedEnketoIdPreview );
 
 router.param( 'mod', function( req, rex, next, mod ) {
     if ( mod === 'i' ) {
@@ -34,8 +35,8 @@ router
     .get( '/_/', offlineWebform )
     .get( '/:enketo_id', webform )
     .get( '/:mod/:enketo_id', webform )
-    .get( '/preview/:enketo_id', preview )
-    .get( '/preview/:mod/:enketo_id', preview )
+    .get( '/preview/:encrypted_enketo_id_preview', preview )
+    .get( '/preview/:mod/:encrypted_enketo_id_preview', preview )
     .get( '/preview', preview )
     .get( '/preview/:mod', preview )
     .get( '/single/:enketo_id', single )
