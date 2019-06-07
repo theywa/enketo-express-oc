@@ -21,6 +21,7 @@ let form;
 let formSelector;
 let formprogress;
 let ignoreBeforeUnload = false;
+let clearedForSubmissions = false;
 
 const formOptions = {
     printRelevantOnly: settings.printRelevantOnly
@@ -156,9 +157,12 @@ function init( selector, data, loadWarnings ) {
             rc.setLogoutLinkVisibility();
 
             if ( loadErrors.length > 0 ) {
+                document.querySelectorAll( '.form-footer__content__main-controls button' )
+                    .forEach( button => button.remove() );
                 throw loadErrors;
             }
 
+            clearedForSubmissions = true;
             resolve( form );
         } )
         .catch( error => {
@@ -586,7 +590,9 @@ function _setFormEventHandlers() {
 
         postHeartbeat();
         fieldSubmissionQueue.addRepeatRemoval( updated.xmlFragment, instanceId, form.deprecatedID );
-        fieldSubmissionQueue.submitAll();
+        if ( clearedForSubmissions ) {
+            fieldSubmissionQueue.submitAll();
+        }
     } );
     // Field is changed
     form.view.html.addEventListener( events.DataUpdate().type, event => {
@@ -624,8 +630,9 @@ function _setFormEventHandlers() {
         // populated at the time the instanceID dataupdate event is processed and added to the fieldSubmission queue.
         postHeartbeat();
         fieldSubmissionQueue.addFieldSubmission( updated.fullPath, updated.xmlFragment, instanceId, form.deprecatedID, file );
-        fieldSubmissionQueue.submitAll();
-
+        if ( clearedForSubmissions ) {
+            fieldSubmissionQueue.submitAll();
+        }
     } );
 
     // Before repeat removal from view and model
