@@ -418,21 +418,25 @@ function _closeCompletedRecord( offerAutoqueries = true ) {
                     .filter( question => !question.querySelector( '.btn-comment.new, .btn-comment.updated' ) );
 
                 // Note that unlike _close this also looks at .invalid-required.
-                return gui.confirm( {
-                        heading: t( 'alert.default.heading' ),
-                        errorMsg: t( 'fieldsubmission.confirm.autoquery.msg1' ),
-                        msg: t( 'fieldsubmission.confirm.autoquery.msg2' )
-                    }, {
-                        posButton: t( 'fieldsubmission.confirm.autoquery.automatic' ),
-                        negButton: t( 'fieldsubmission.confirm.autoquery.manual' )
-                    } )
-                    .then( confirmed => {
-                        if ( !confirmed ) {
-                            return false;
-                        }
-                        _autoAddQueries( violations );
-                        return _closeCompletedRecord( false );
-                    } );
+                if ( violations.length ) {
+                    return gui.confirm( {
+                            heading: t( 'alert.default.heading' ),
+                            errorMsg: t( 'fieldsubmission.confirm.autoquery.msg1' ),
+                            msg: t( 'fieldsubmission.confirm.autoquery.msg2' )
+                        }, {
+                            posButton: t( 'fieldsubmission.confirm.autoquery.automatic' ),
+                            negButton: t( 'fieldsubmission.confirm.autoquery.manual' )
+                        } )
+                        .then( confirmed => {
+                            if ( !confirmed ) {
+                                return false;
+                            }
+                            _autoAddQueries( violations );
+                            return _closeCompletedRecord( false );
+                        } );
+                } else {
+                    return _complete( true, true );
+                }
             } else {
                 return _complete( true, true );
             }
