@@ -42,7 +42,7 @@
         "csurf": "1.10.x",
         "db.js": "0.15.0",
         "debug": "4.1.x",
-        "enketo-core": "github:enketo/enketo-core#865904b1",
+        "enketo-core": "5.4.1",
         "enketo-transformer": "1.31.1",
         "enketo-xpath-extensions-oc": "github:OpenClinica/enketo-xpath-extensions-oc#22c6b94",
         "express": "4.x.x",
