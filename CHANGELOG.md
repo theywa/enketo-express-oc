@@ -3,7 +3,18 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]
----------------------
+--------------------
+##### Fixed
+- Disabled analog-scale widget is still visible.
+  
+[1.77.0] - 2019-05-21
+--------------------
+##### Removed
+- Support for appearances "quick" and "quickcompact".
+
+##### Added
+- Support for appearances "columns", "columns-pack", "columns-n" all with an optional "no-buttons" modifier, **WARNING: you may need to change widgets configuration in config.json `"compact" -> "select-media"` and `"horizontal-choices" -> "columns"`)**.
+- 
 ##### Fixed
 - Analog scale widget without current value box, still firing excessive change events.
 - Distress widget mercury is not reset properly.
