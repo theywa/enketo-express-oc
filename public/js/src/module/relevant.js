@@ -90,26 +90,28 @@ branchModule.clear = function( $branchNode, path ) {
 
 
 branchModule.activate = function( $branchNode ) {
-    let $control;
+    const branchNode = $branchNode[ 0 ];
     let required;
 
     this.setDisabledProperty( $branchNode, false );
-    if ( $branchNode.is( '.question' ) ) {
-        $control = $( $branchNode[ 0 ].querySelector( 'input, select, textarea' ) );
-        this.form.setValid( $control, 'relevant' );
+    if ( branchNode.matches( '.question' ) ) {
+        const control = $branchNode[ 0 ].querySelector( 'input, select, textarea' );
+        this.form.setValid( control, 'relevant' );
         // Re-show any constraint error message when the relevant error has been removed.
         // Since validateInput looks at both required and constraint, and we don't want required
         // validation, we use a very dirty trick to bypass it.
-        required = $control.data( 'required' );
+        required = control.dataset.required;
+
         if ( required ) {
-            $control.removeAttr( 'data-required' );
+            delete control.dataset.required;
         }
-        this.form.validateInput( $control );
+        this.form.validateInput( control );
         if ( required ) {
-            $control.attr( 'data-required', required );
+            control.dataset.required = required;
         }
-    } else if ( $branchNode.is( '.or-group, .or-group-data' ) ) {
-        this.form.setValid( $branchNode, 'relevant' );
+
+    } else if ( branchNode.matches( '.or-group, .or-group-data' ) ) {
+        this.form.setValid( branchNode, 'relevant' );
     }
 };
 
@@ -117,32 +119,34 @@ branchModule.originalDeactivate = branchModule.deactivate;
 
 // Overwrite deactivate function
 branchModule.deactivate = function( $branchNode ) {
+    const branchNode = $branchNode[ 0 ];
     let name;
     let index = 0;
     let value;
-    let $control;
+    const $control = $( $branchNode[ 0 ].querySelector( 'input, select, textarea' ) );
+    const control = $control[ 0 ];
 
     if ( $branchNode.is( '.question' ) ) {
-        $control = $( $branchNode[ 0 ].querySelector( 'input, select, textarea' ) );
 
-        name = this.form.input.getName( $control );
-        index = this.form.input.getIndex( $control );
+
+        name = this.form.input.getName( control );
+        index = this.form.input.getIndex( control );
         value = this.form.model.node( name, index ).getVal();
 
         if ( value !== '' ) {
             //$branchNode.removeClass( 'disabled' );
-            this.form.setInvalid( $control, 'relevant' );
+            this.form.setInvalid( control, 'relevant' );
             // After setting invalid-relevant remove any previous errors.
-            this.form.setValid( $control, 'constraint' );
-            this.form.setValid( $control, 'required' );
+            this.form.setValid( control, 'constraint' );
+            this.form.setValid( control, 'required' );
         } else {
-            this.form.setValid( $control, 'relevant' );
+            this.form.setValid( control, 'relevant' );
             this.originalDeactivate( $branchNode );
             $branchNode.trigger( 'hiding.oc' );
         }
 
     } else if ( $branchNode.is( '.or-group, .or-group-data' ) ) {
-        name = this.form.input.getName( $branchNode );
+        name = this.form.input.getName( branchNode );
         /*
          * We need to check if any of the fields with a form control or calculations
          * (ie. excl discrepancy note questions) has a value.
@@ -181,9 +185,9 @@ branchModule.deactivate = function( $branchNode ) {
         }
 
         if ( value ) {
-            this.form.setInvalid( $branchNode, 'relevant' );
+            this.form.setInvalid( branchNode, 'relevant' );
         } else {
-            this.form.setValid( $branchNode, 'relevant' );
+            this.form.setValid( branchNode, 'relevant' );
             this.originalDeactivate( $branchNode );
             // trigger on all questions inside this group that possibly have a discrepancy note attached to them.
             $branchNode.find( '.question' ).trigger( 'hiding.oc' );

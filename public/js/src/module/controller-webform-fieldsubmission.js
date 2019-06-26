@@ -136,7 +136,7 @@ function init( selector, data, loadWarnings ) {
             if ( settings.goTo && location.hash ) {
                 // form.goTo returns an array of 1 error if it has error. We're using our special
                 // knowledge of Enketo Core to replace this error
-                let goToErrors = form.goTo( location.hash.substring( 1 ) );
+                let goToErrors = form.goTo( decodeURIComponent( location.hash.substring( 1 ) ).split( '#' )[ 0 ] );
                 if ( goToErrors.length ) {
                     const replErr = `${t( 'alert.goto.notfound' )} `;
                     goToErrors = goToErrorLink ? [ replErr + t( 'alert.goto.msg2', {

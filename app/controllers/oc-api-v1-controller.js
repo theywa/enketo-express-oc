@@ -317,7 +317,7 @@ function _setDefaultsQueryParam( req, res, next ) {
 
 function _setGoTo( req, res, next ) {
     const goTo = req.body.go_to;
-    req.goTo = goTo ? `#${goTo}` : '';
+    req.goTo = goTo ? `#${encodeURIComponent(goTo)}` : '';
     const goToErrorUrl = req.body.go_to_error_url;
     req.goToErrorUrl = goTo && goToErrorUrl ? `goToErrorUrl=${encodeURIComponent( goToErrorUrl )}` : '';
     next();

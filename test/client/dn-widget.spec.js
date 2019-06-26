@@ -61,11 +61,32 @@ describe( 'DN object', () => {
 
         [
             [ '{}', '' ],
-            [ '{"queries":[], "logs":[{"type": "comment"}]}', '' ],
-            [ '{"queries":[], "logs":[{"type": "comment", "status": "updated"}]}', 'updated' ],
-            [ '{"queries":[], "logs":[{"type": "audit"},{"type": "comment", "status": "updated"}]}', 'updated' ],
-            [ '{"queries":[], "logs":[{"type": "comment", "status":"new"},{"type": "comment", "status": "updated"}]}', 'new' ],
+            [ '{"logs":[], "queries":[{"type": "comment"}]}', '' ],
+            [ '{"logs":[], "queries":[{"type": "comment", "status": "updated"}]}', 'updated' ],
+            [ '{"logs":[], "queries":[{"type": "audit"},{"type": "comment", "status": "updated"}]}', 'updated' ],
+            //[ '{"logs":[], "queries":[{"type": "comment", "status":"new"},{"type": "comment", "status": "updated"}]}', 'new' ],
             [ '{"queries":[{"type": "comment", "status": "closed"}], "logs":[{"type": "comment", "status": "updated"}]}', 'closed' ],
+            //[ '{"logs":[], "queries":[{"type": "comment", "status": "new"},{"type": "comment", "status": "closed"} ]}', 'new' ],
+            [ '{"logs":[], "queries":[{"type": "comment", "status": "new", "date_time": "2016-09-01 15:01 -06:00" },{"type": "comment", "status": "closed", "date_time": "2016-09-01 15:02 -06:00"}]}', 'closed' ],
+            [ '{"logs":[], "queries":[{"type": "comment", "status": "new", "date_time": "2016-09-01 15:02 -06:00" },{"type": "comment", "status": "closed", "date_time": "2016-09-01 15:01 -06:00"}]}', 'new' ],
+            [ '{"logs":[], "queries":[' +
+                '{"type": "comment", "thread_id":"a", "status": "updated", "date_time": "2016-09-01 15:02 -06:00" },' +
+                '{"type": "comment", "thread_id":"a", "status": "closed", "date_time": "2016-09-01 15:01 -06:00"},' +
+                '{"type": "comment", "thread_id":"b", "status": "new", "date_time": "2016-07-01 15:01 -06:00"}' +
+                ']}', 'new'
+            ],
+            [ '{"logs":[], "queries":[' +
+                '{"type": "comment", "thread_id":"a", "status": "updated", "date_time": "2016-09-01 15:02 -06:00" },' +
+                '{"type": "comment", "thread_id":"a", "status": "closed", "date_time": "2016-09-01 15:01 -06:00"},' +
+                '{"type": "comment", "thread_id":"b", "status": "closed-modified", "date_time": "2016-07-01 15:01 -06:00"}' +
+                ']}', 'updated'
+            ],
+            [ '{"logs":[], "queries":[' +
+                '{"type": "comment", "thread_id":"a", "status": "closed", "date_time": "2016-09-01 15:02 -06:00" },' +
+                '{"type": "comment", "thread_id":"a", "status": "updated", "date_time": "2016-09-01 15:01 -06:00"},' +
+                '{"type": "comment", "thread_id":"b", "status": "closed-modified", "date_time": "2016-07-01 15:01 -06:00"}' +
+                ']}', 'closed'
+            ],
         ].forEach( test => {
             it( 'and returns the correct status', () => {
                 const model = dn._parseModelFromString( test[ 0 ] );
@@ -82,7 +103,7 @@ describe( 'DN object', () => {
             []
         ].forEach( test => {
             it( 'returns "error" when an invalid datetime string is provided', () => {
-                expect( dn._getParsedElapsedTime( test ) ).to.equal( 'error' );
+                expect( dn._getParsedElapsedTimeUpTo7Days( test ) ).to.equal( 'error' );
             } );
         } );
     } );
@@ -94,27 +115,31 @@ describe( 'DN object', () => {
             []
         ].forEach( test => {
             it( 'returns "error" when not a number or a negative number is provided', () => {
-                expect( dn._getParsedElapsedTime( test ) ).to.equal( 'error' );
+                expect( dn._getParsedElapsedTimeUpTo7Days( test ) ).to.equal( 'error' );
             } );
         } );
 
         [
-            [ 0, 'widget.dn.zerominutes' ],
-            [ 29999, 'widget.dn.zerominutes' ],
-            [ 30000, '1 minute(s)' ],
-            [ 59.5 * 60 * 1000 - 1, '59 minute(s)' ],
-            [ 59.5 * 60 * 1000, '1 hour(s)' ],
-            [ 1.5 * 60 * 60 * 1000, '2 hour(s)' ],
-            [ 23.5 * 60 * 60 * 1000 - 1, '23 hour(s)' ],
-            [ 23.5 * 60 * 60 * 1000, '1 day(s)' ],
-            [ ( 5 / 12 + 30 - 0.5 ) * 24 * 60 * 60 * 1000 - 1, '30 day(s)' ],
-            [ ( 5 / 12 + 30 - 0.5 ) * 24 * 60 * 60 * 1000, '1 month(s)' ],
-            [ 11.5 * ( 5 / 12 + 30 ) * 24 * 60 * 60 * 1000 - 1, '11 month(s)' ],
-            [ 11.5 * ( 5 / 12 + 30 ) * 24 * 60 * 60 * 1000, '1 year(s)' ],
-            [ 1.5 * 12 * ( 5 / 12 + 30 ) * 24 * 60 * 60 * 1000, '2 year(s)' ],
+            [ 0, 'widget.dn.now' ],
+            [ 29999, 'widget.dn.now' ],
+            [ 30000, 'widget.dn.minute', 1 ],
+            [ 59.5 * 60 * 1000 - 1, 'widget.dn.minute', 59 ],
+            [ 59.5 * 60 * 1000, 'widget.dn.hour', 1 ],
+            [ 1.5 * 60 * 60 * 1000, 'widget.dn.hour', 2 ],
+            [ 23.5 * 60 * 60 * 1000 - 1, 'widget.dn.hour', 23 ],
+            [ 23.5 * 60 * 60 * 1000, 'widget.dn.day', 1 ],
+            [ 7 * 24 * 60 * 60 * 1000, 'widget.dn.day', 7 ],
+            [ 7.01 * 24 * 60 * 60 * 1000, null ],
+            [ ( 5 / 12 + 30 - 0.5 ) * 24 * 60 * 60 * 1000 - 1, null ],
+            //[ ( 5 / 12 + 30 - 0.5 ) * 24 * 60 * 60 * 1000, 'widget.dn.month', 1 ],
+            //[ 11.5 * ( 5 / 12 + 30 ) * 24 * 60 * 60 * 1000 - 1, 'widget.dn.month', 11 ],
+            //[ 11.5 * ( 5 / 12 + 30 ) * 24 * 60 * 60 * 1000, 'widget.dn.year', 1 ],
+            //[ 1.5 * 12 * ( 5 / 12 + 30 ) * 24 * 60 * 60 * 1000, 'widget.dn.year', 2 ],
         ].forEach( test => {
+            // TODO: figure out a way to test the test[2] part of the expected return,
+            // perhaps by spying on the t() function (which I failed to do), or loading the proper translator.
             it( 'returns correct human-readable response', () => {
-                expect( dn._parseElapsedTime( test[ 0 ] ) ).to.equal( test[ 1 ] );
+                expect( dn._parseElapsedTimeUpTo7Days( test[ 0 ] ) ).to.equal( test[ 1 ] );
             } );
         } );
     } );
@@ -162,6 +187,73 @@ describe( 'DN object', () => {
                 expect( test.sort( dn._datetimeDesc.bind( dn ) ) ).to.deep.equal( [ a, b, c, d ] );
             } );
         } );
+    } );
+
+    describe( 'filtering queries by type and thread id and optionally include logs', () => {
+        const dn = new Dn( el );
+
+        it( 'filters by type', () => {
+            const n = {
+                'queries': [
+                    { comment: 'a', type: 'comment' }, { comment: 'b', type: 'reason' }, { comment: 'c', type: 'comment' }
+                ],
+                'logs': [ { comment: 'some log' } ]
+            };
+            expect( dn._filteredNotes( n, 'comment' ) ).to.deep.equal( [ { comment: 'a', type: 'comment' }, { comment: 'c', type: 'comment' }, { comment: 'some log' } ] );
+            expect( dn._filteredNotes( n, 'reason' ) ).to.deep.equal( [ { comment: 'b', type: 'reason' }, { comment: 'some log' } ] );
+            expect( dn._filteredNotes( n, 'nothing' ) ).to.deep.equal( [ { comment: 'some log' } ] );
+            expect( dn._filteredNotes( n, 'comment', undefined, false ) ).to.deep.equal( [ { comment: 'a', type: 'comment' }, { comment: 'c', type: 'comment' } ] );
+            expect( dn._filteredNotes( n, 'reason', undefined, false ) ).to.deep.equal( [ { comment: 'b', type: 'reason' }, ] );
+            expect( dn._filteredNotes( n, 'nothing', undefined, false ) ).to.deep.equal( [] );
+        } );
+
+        it( 'filters by thread', () => {
+            const n = {
+                'queries': [
+                    { comment: 'a', type: 'comment', thread_id: 'abc' }, { comment: 'b', type: 'reason' }, { comment: 'c', type: 'comment', thread_id: 'bef' },
+                    { comment: 'd', type: 'comment', thread_id: 'abc' }
+                ],
+                'logs': []
+            };
+            expect( dn._filteredNotes( n, 'comment', 'abc' ) ).to.deep.equal( [ { comment: 'a', type: 'comment', thread_id: 'abc' }, { comment: 'd', type: 'comment', thread_id: 'abc' } ] );
+        } );
+
+        // old dn data structure without thread_id (NULL)
+        it( 'filters by absence of thread_id if keyword "NULL" is provided', () => {
+            const n = {
+                'queries': [
+                    { comment: 'a', type: 'comment' }, { comment: 'b', type: 'reason' }, { comment: 'c', type: 'comment', thread_id: 'bef' },
+                    { comment: 'd', type: 'comment' }
+                ],
+                'logs': []
+            };
+            expect( dn._filteredNotes( n, 'comment', 'NULL' ) ).to.deep.equal( [ { comment: 'a', type: 'comment' }, { comment: 'd', type: 'comment' } ] );
+            expect( dn._filteredNotes( n, null, 'NULL' ) ).to.deep.equal( [ { comment: 'a', type: 'comment' }, { comment: 'b', type: 'reason' }, { comment: 'd', type: 'comment' } ] );
+        } );
+
+        it( 'disregards thread_id if undefined or "*" is provided as argument', () => {
+            const n = {
+                'queries': [
+                    { comment: 'a', type: 'comment' }, { comment: 'b', type: 'reason' }, { comment: 'c', type: 'comment', thread_id: 'bef' },
+                    { comment: 'd', type: 'comment' }
+                ],
+                'logs': []
+            };
+            expect( dn._filteredNotes( n, 'comment', undefined ) ).to.deep.equal( [ { comment: 'a', type: 'comment' }, { comment: 'c', type: 'comment', thread_id: 'bef' }, { comment: 'd', type: 'comment' } ] );
+            expect( dn._filteredNotes( n, 'comment', '*' ) ).to.deep.equal( [ { comment: 'a', type: 'comment' }, { comment: 'c', type: 'comment', thread_id: 'bef' }, { comment: 'd', type: 'comment' } ] );
+        } );
+
+        it( 'filters by thread_id === "" if "" is provided as argument', () => {
+            const n = {
+                'queries': [
+                    { comment: 'a', type: 'comment' }, { comment: 'b', type: 'reason' }, { comment: 'c', type: 'comment', thread_id: 'bef' },
+                    { comment: 'd', type: 'comment' }
+                ],
+                'logs': []
+            };
+            expect( dn._filteredNotes( n, 'comment', '' ) ).to.deep.equal( [] );
+        } );
+
     } );
 
     describe( 'extracting default assignee', () => {

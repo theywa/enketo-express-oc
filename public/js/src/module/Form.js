@@ -5,10 +5,12 @@ import $ from 'jquery';
 import gui from './gui';
 import settings from './settings';
 import events from 'enketo-core/src/js/event';
+import config from 'enketo/config';
 import './relevant';
 import './required';
 import './page';
 import './repeat';
+
 
 /**
  * This function doesn't actually evaluate constraints. It triggers
@@ -116,14 +118,14 @@ Form.prototype.specialOcLoadValidate = function( includeRequired ) {
     // still needs cleaning, because the engine will validate **all** expressions on the selected question.
 
     $collectionToValidate.each( function() {
-        const $input = $( this );
-        that.validateInput( $input )
+        const control = this;
+        that.validateInput( control )
             .then( passed => {
                 if ( !passed && !includeRequired ) {
                     // Undo the displaying of a required error message upon load.
                     // Note: a failed required means there cannot be a failed constraint, because they are mutually exclusive
                     // in the engine (constraint is only evaluated if question has a value).
-                    that.setValid( $input, 'required' );
+                    that.setValid( control, 'required' );
                 }
             } );
     } );
@@ -136,7 +138,7 @@ Form.prototype.specialOcLoadValidate = function( includeRequired ) {
  * @param  {[type]} $input [description]
  * @return {[type]}        [description]
  */
-Form.prototype.validateInput = function( $input ) {
+Form.prototype.validateInput = function( control ) {
     const that = this;
     // There is a condition where a valuechange results in both an invalid-relevant and invalid-constraint,
     // where the invalid constraint is added *after* the invalid-relevant. I can reproduce in automated test (not manually).
@@ -147,10 +149,10 @@ Form.prototype.validateInput = function( $input ) {
     // we will still run it but then remove any invalid classes.
     // 
     // This is very unfortunate, but these are the kind of acrobatics that are necessary to "fight" the built-in behavior of Enketo's form engine.
-    return originalValidateInput.call( this, $input )
+    return originalValidateInput.call( this, control )
         .then( passed => {
-            if ( !passed && $input.closest( '.question' ).hasClass( 'invalid-relevant' ) ) {
-                that.setValid( $input, 'constraint' );
+            if ( !passed && control.closest( '.question' ).classList.contains( 'invalid-relevant' ) ) {
+                that.setValid( control, 'constraint' );
             }
             return passed;
         } );
@@ -159,11 +161,10 @@ Form.prototype.validateInput = function( $input ) {
 
 Form.prototype.strictRequiredCheckHandler = function( evt, input ) {
     const that = this;
-    const $input = $( input );
     const n = {
-        path: this.input.getName( $input ),
-        required: this.input.getRequired( $input ),
-        val: this.input.getVal( $input )
+        path: this.input.getName( input ),
+        required: this.input.getRequired( input ),
+        val: this.input.getVal( input )
     };
 
     // No need to validate.
@@ -172,7 +173,7 @@ Form.prototype.strictRequiredCheckHandler = function( evt, input ) {
     }
 
     // Only now, will we determine the index (expensive).
-    n.ind = this.input.getIndex( $input );
+    n.ind = this.input.getIndex( input );
 
     // Check required
     if ( n.val === '' && this.model.node( n.path, n.ind ).isRequired( n.required ) ) {
@@ -182,7 +183,7 @@ Form.prototype.strictRequiredCheckHandler = function( evt, input ) {
         // Cancel propagation input
         evt.stopImmediatePropagation();
         const currentModelValue = that.model.node( n.path, n.ind ).getVal();
-        that.input.setVal( $( input ), currentModelValue );
+        that.input.setVal( input, currentModelValue );
         // When changing this make sure that the radio picker's change
         // listener picks this event up.
         // https://github.com/OpenClinica/enketo-express-oc/issues/168
@@ -193,12 +194,11 @@ Form.prototype.strictRequiredCheckHandler = function( evt, input ) {
 
 Form.prototype.strictConstraintCheckHandler = function( evt, input ) {
     const that = this;
-    const $input = $( input );
     const n = {
-        path: this.input.getName( $input ),
-        xmlType: this.input.getXmlType( $input ),
-        constraint: this.input.getConstraint( $input ),
-        val: this.input.getVal( $input )
+        path: this.input.getName( input ),
+        xmlType: this.input.getXmlType( input ),
+        constraint: this.input.getConstraint( input ),
+        val: this.input.getVal( input )
     };
 
     // No need to validate.
@@ -207,7 +207,7 @@ Form.prototype.strictConstraintCheckHandler = function( evt, input ) {
     }
 
     // Only now, will we determine the index (expensive).
-    n.ind = this.input.getIndex( $input );
+    n.ind = this.input.getIndex( input );
 
     // In order to evaluate the constraint, its value has to be set in the model. 
     // This would trigger a fieldsubmission, which is what we're trying to prevent.
@@ -236,13 +236,40 @@ Form.prototype.strictConstraintCheckHandler = function( evt, input ) {
         // Cancel propagation input
         evt.stopImmediatePropagation();
         const currentModelValue = that.model.node( n.path, n.ind ).getVal();
-        that.input.setVal( $( input ), currentModelValue );
+        that.input.setVal( input, currentModelValue );
         // When changing this make sure that the radio picker's change
         // listener picks this event up.
         // https://github.com/OpenClinica/enketo-express-oc/issues/168
         input.dispatchEvent( events.InputUpdate() );
         question.scrollIntoView();
     }
+};
+
+
+// customized to also work on groups
+Form.prototype.setValid = function( node, type ) {
+    const classes = ( type ) ? [ `invalid-${type}` ] : [ 'invalid-constraint', 'invalid-required', 'invalid-relevant' ];
+    node.closest( '.question, .calculation, .or-group, .or-group-data' ).classList.remove( ...classes );
+};
+
+// customized to also work on groups
+Form.prototype.setInvalid = function( node, type ) {
+    type = type || 'constraint';
+
+    if ( config.validatePage === false && this.isValid( node ) ) {
+        this.blockPageNavigation();
+    }
+
+    node.closest( '.question, .calculation, .or-group, .or-group-data' ).classList.add( `invalid-${type}` );
+};
+
+Form.prototype.isValid = function( node ) {
+    if ( node ) {
+        const questionOrGroup = node.closest( '.question, .calculation, .or-group, .or-group-data' );
+        const cls = questionOrGroup.classList;
+        return !cls.contains( 'invalid-required' ) && !cls.contains( 'invalid-constraint' && !cls.contains( 'invalid-relevant' ) );
+    }
+    return this.view.html.querySelector( '.invalid-required, .invalid-constraint, .invalid-relevant' ) === null;
 };
 
 export default Form;

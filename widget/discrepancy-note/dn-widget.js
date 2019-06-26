@@ -26,23 +26,31 @@ class Comment extends Widget {
     }
 
     _init() {
-        this.$linkedQuestion = this._getLinkedQuestion( this.element );
+        this.linkedQuestion = this._getLinkedQuestion( this.element );
 
-        if ( this.$linkedQuestion.length === 1 ) {
-            this.$commentQuestion = $( this.element ).closest( '.question' );
+        if ( this.linkedQuestion ) {
             this.ordinal = 0;
             this.readOnly = this.element.readOnly;
 
-            this.linkedQuestionReadonly = this.$linkedQuestion[ 0 ]
+            this.linkedQuestionReadonly = this.linkedQuestion
                 .querySelector( 'input:not(.ignore), textarea:not(.ignore), select:not(.ignore)' ).readOnly;
+
+            // DEBUG 
+            // const populate = Math.random() < 0.5;
+            // this.element.value = populate ? '{"queries":[{"type":"annotation", "id":"7","date_time":"2019-05-03 11:08:42.242 -06:00","comment":"Source file can be found in the cabin. Forcing ellipsis cut-off hopefully. Forcing ellipsis cut-off hopefully. Forcing ellipsis cut-off hopefully, if all goes very veryveryveryveryveryveryveryverywell.","assigned_to":"","notify":false,"thread_id":"123456"},{"type":"annotation","id":"6","date_time":"2019-05-03 11:08:35.031 -06:00","comment":"The data is out of normal range.","assigned_to":"","notify":false,"thread_id":"123","user":null},{"type":"comment","id":"5", "date_time":"2019-05-03 11:08:31.064 -06:00","comment":"The data should be within 10% of last visit. Please confirm.","status":"updated","assigned_to":"","notify":false,"thread_id":"abc","user":"honoria"},{"type":"comment","id":"4","date_time":"2019-05-03 11:08:26.532 -06:00","comment":"The data is outside normal range. Here is another sentence to force ellipsis cut-off. Please Confirm. Please Confirm. Please Confirm. Please Confirm. Please Confirm.Please confirm.","status":"updated","assigned_to":"","notify":false,"user":null},{"type":"comment","id":"3","date_time":"2019-05-03 11:08:22.892 -06:00","comment":"This field is required.","status":"updated","assigned_to":"honoria","notify":false,"thread_id":"ghi","visible_thread_id": "M001", "user":null},{"type":"comment","id":"2","date_time":"2019-05-03 11:08:16.987 -06:00","comment":"I do not agree.","status":"updated","assigned_to":"honoria","notify":true,"thread_id":"def","user":null},{"type":"comment","id":"1","date_time":"2019-05-03 11:08:06.802 -06:00","comment":"Some outrageous comment.","status":"new","assigned_to":"honoria","notify":false,"thread_id":"abc","user":null}],"logs":[]}' : '';
+
             this.notes = this._parseModelFromString( this.element.value );
+            this.threadNameMap = this._generateThreadNameMap( this.notes );
+
             this.defaultAssignee = this._getDefaultAssignee( this.notes );
-            this.$commentQuestion.addClass( 'hide' ).attr( 'role', 'comment' );
+            this.question.classList.add( 'hide' );
+            this.question.setAttribute( 'role', 'comment' );
             // Any <button> inside a <label> receives click events if the <label> is clicked!
             // See http://codepen.io/MartijnR/pen/rWJeOG?editors=1111
-            this.$commentButton = $( '<a class="btn-icon-only btn-comment btn-dn" tabindex="-1" type="button" href="#"><i class="icon"> </i></a>' );
-            this._setCommentButtonState( this.element.value, '', this._getCurrentStatus( this.notes ) );
-            this.$linkedQuestion.find( '.question-label' ).last().after( this.$commentButton );
+            const commentButton = document.createRange().createContextualFragment( '<a class="btn-icon-only btn-comment btn-dn" tabindex="-1" type="button" href="#"><i class="icon"> </i></a>' );
+            [ ...this.linkedQuestion.querySelectorAll( '.question-label' ) ].slice( -1 )[ 0 ].after( commentButton );
+            this.commentButton = this.linkedQuestion.querySelector( '.btn-dn' );
+            this._setCommentButtonState( this._getCurrentStatus( this.notes ), this._hasAnnotation( this.notes ), this._hasMultipleOpenQueries( this.notes ) );
             this._setUserOptions( this.readOnly );
             this._setCommentButtonHandler();
             this._setValidationHandler();
@@ -75,80 +83,83 @@ class Comment extends Widget {
     }
 
     _getLinkedQuestion( element ) {
-        const $input = $( element );
-        const contextPath = this.options.helpers.input.getName( $input );
+        const contextPath = this.options.helpers.input.getName( element );
         const targetPath = element.dataset.for.trim();
         const absoluteTargetPath = this.options.helpers.pathToAbsolute( targetPath, contextPath );
         // The root is nearest repeat or otherwise nearest form. This avoids having to calculate indices, without
         // diminishing the flexibility in any meaningful way, 
         // as it e.g. wouldn't make sense to place a comment node for a top-level question, inside a repeat.
-        const $root = $( element ).closest( 'form.or, .or-repeat' );
+        const root = element.closest( 'form.or, .or-repeat' );
 
         return this.options.helpers.input
-            .getWrapNodes( $root.find( `[name="${absoluteTargetPath}"], [data-name="${absoluteTargetPath}"]` ) )
-            .eq( 0 );
+            .getWrapNode( root.querySelector( `[name="${absoluteTargetPath}"], [data-name="${absoluteTargetPath}"]` ) );
     }
 
-    _setCommentButtonState( value, error, state ) {
-        this.$commentButton
-            .toggleClass( 'new', state === 'new' )
-            .toggleClass( 'closed', state === 'closed' )
-            .toggleClass( 'closed-modified', state === 'closed-modified' )
-            .toggleClass( 'updated', state === 'updated' )
-            .toggleClass( 'invalid', !!error );
+    _setCommentButtonState( state = '', annotation = false, multi = false, ) {
+        this.commentButton.classList.remove( 'new', 'closed', 'closed-modified', 'updated', 'invalid' );
+        if ( state ) {
+            this.commentButton.classList.add( state );
+        }
+        this.commentButton.classList.toggle( 'multi', state !== 'closed' && state !== 'closed-modified' && multi );
+        this.commentButton.classList.toggle( 'annotation', annotation );
     }
 
     _commentHasError() {
-        return this.$commentQuestion.hasClass( 'invalid-required' ) || this.$commentQuestion.hasClass( 'invalid-constraint' );
+        return this.question.classList.contains( 'invalid-required' ) || this.question.classList.contains( 'invalid-constraint' );
     }
 
     _setCommentButtonHandler() {
-        const that = this;
-        this.$commentButton.click( () => {
-            if ( that._isCommentModalShown( that.$linkedQuestion[ 0 ] ) ) {
-                that._hideCommentModal( that.$linkedQuestion[ 0 ] );
+        this.commentButton.addEventListener( 'click', event => {
+            event.preventDefault();
+            if ( this._isCommentModalShown( this.linkedQuestion ) ) {
+                this._hideCommentModal( this.linkedQuestion );
             } else {
-                const errorMsg = that._getCurrentErrorMsg();
-                that._showCommentModal( errorMsg );
+                this.linkedQuestionErrorMsg = this._getCurrentErrorMsg();
+                this._showCommentModal();
             }
-            return false;
+
         } );
     }
 
     _setValidationHandler() {
-        const that = this;
-
         // Update query icon if query question is invalid.
-        this.$commentQuestion[ 0 ].addEventListener( events.Invalidated().type, () => {
-            that._setCommentButtonState( that.element.value, true );
+        this.question.addEventListener( events.Invalidated().type, () => {
+            this._setCommentButtonState( 'invalid', this._hasAnnotation( this.notes ), this._hasMultipleOpenQueries( this.notes ) );
         } );
     }
 
     _setPrintOptimizationHandler() {
-        this.$commentQuestion
+        $( this.question )
             .on( 'printify.enketo', this._printify.bind( this ) )
             .on( 'deprintify.enketo', this._deprintify.bind( this ) );
     }
 
     _setCloseHandler() {
-        this.$linkedQuestion[ 0 ].addEventListener( events.AddQuery().type, event => {
+        this.linkedQuestion.addEventListener( events.AddQuery().type, event => {
             const q = event.target;
             const currentStatus = this._getCurrentStatus( this.notes );
             const errorType = q.classList.contains( 'invalid-constraint' ) ? 'constraint' : ( q.classList.contains( 'invalid-required' ) ? 'required' : ( q.classList.contains( 'invalid-relevant' ) ? 'relevant' : null ) );
             if ( errorType && currentStatus !== 'updated' && currentStatus !== 'new' ) {
-                const status = ( currentStatus === '' ) ? 'new' : 'updated';
+                // Always a new thread
                 const errorMsg = q.querySelector( `.or-${errorType}-msg.active` ).textContent;
                 this._addQuery( t( 'widget.dn.autoconstraint', {
                     errorMsg
-                } ), status, '', false, SYSTEM_USER );
+                } ), 'new', '', false, SYSTEM_USER );
             }
         } );
     }
 
     _setFocusHandler() {
         this.element.addEventListener( events.ApplyFocus().type, () => {
-            if ( this.$commentButton.is( ':visible' ) ) {
-                this.$commentButton.click();
+            if ( this.commentButton.offsetHeight ) {
+                this.commentButton.click();
+                const threadId = decodeURIComponent( document.location.hash ).substring( 1 ).split( '#' )[ 1 ];
+                if ( threadId ) {
+                    const link = this.nav.querySelector( `a[data-thread="${threadId}"]` );
+                    if ( link ) {
+                        link.click();
+                    }
+                }
             } else {
                 this.question.dispatchEvent( events.GoToHidden() );
             }
@@ -158,34 +169,36 @@ class Comment extends Widget {
     /**
      * Observes the disabled state of the linked question, and automatically generates
      * an audit log if:
-     * 1. The question gets disabled and the query is currently 'open'.
+     * 1. The question gets disabled and any query threads are currently 'open'.
      */
     _setDisabledHandler() {
-        let comment;
-        let status;
-        let currentStatus;
-        let linkedVal;
-        let open;
         const that = this;
-        const target = this.$linkedQuestion.get( 0 ).querySelector( 'input, select, textarea' );
-        const $target = $( target );
+        const target = this.linkedQuestion.querySelector( 'input, select, textarea' );
 
-        this.$linkedQuestion.on( 'hiding.oc', () => {
-            // For now there is no need to doublecheck if this question has a relevant attribute 
+        $( this.linkedQuestion ).on( 'hiding.oc', () => {
+            // For now there is no need to double-check if this question has a relevant attribute 
             // or has an ancestor group with a relevant attribute. This is because we trust that
             // the "hiding.oc" event is sent only for branches or its children when being closed (by the branch module).
-            currentStatus = that._getCurrentStatus( that.notes );
-            open = currentStatus === 'updated' || currentStatus === 'new';
-            linkedVal = that.options.helpers.input.getVal( $target );
+            const linkedVal = that.options.helpers.input.getVal( target );
             // Note that getVal() can return an empty array.
-            if ( open && linkedVal.length === 0 ) {
-                // This will not be triggered if a form is loaded with a value for an irrelevant question and an open query.
-                comment = t( 'widget.dn.autoclosed' );
-                status = 'closed';
-            }
-            if ( comment ) {
-                that._addQuery( comment, status, '', false, SYSTEM_USER );
-            }
+
+            that._getThreadFirsts( that.notes ).forEach( item => {
+                const status = that._getQueryThreadStatus( that.notes, item.thread_id );
+                const open = status === 'updated' || status === 'new';
+                /*
+                 * If during a session a query is closed, and this triggers a contraintUpdate of the linked question,
+                 * we do not want to generate an autoquery.
+                 * 
+                 * updated.fullPath includes positions (of repeats) which we need to strip
+                 */
+                if ( open && linkedVal.length === 0 ) {
+                    // This will not be triggered if a form is loaded with a value for an irrelevant question and an open query.
+                    that._addQuery( t( 'widget.dn.autoclosed' ), 'closed', '', false, SYSTEM_USER, 'comment', item.thread_id || 'NULL' );
+                }
+            } );
+
+
+
         } );
     }
 
@@ -194,12 +207,11 @@ class Comment extends Widget {
      */
     _setValueChangeHandler() {
         const that = this;
-        let previousValue = this.options.helpers.getModelValue( $( this.$linkedQuestion.get( 0 ).querySelector( 'input, select, textarea' ) ) );
+        let previousValue = this.options.helpers.getModelValue( $( this.linkedQuestion.querySelector( 'input, select, textarea' ) ) );
 
-        this.$linkedQuestion.on( 'valuechange inputupdate', evt => {
+        $( this.linkedQuestion ).on( 'valuechange inputupdate', evt => {
             let comment;
             const currentValue = that.options.helpers.getModelValue( $( evt.target ) );
-            const currentStatus = that._getCurrentStatus( that.notes );
 
             if ( previousValue !== currentValue ) {
                 // Note obtaining the values like this does not work for file input types, but since have a different
@@ -213,12 +225,10 @@ class Comment extends Widget {
                     comment = currentValue ? t( 'widget.dn.newfile' ) : t( 'widget.dn.fileremoved' );
                 }
 
-                console.log( `valuechange or inputupdate, comment:"${comment}", "${currentValue}", "${previousValue}"` );
-
                 that._addAudit( comment, '', false );
 
                 if ( settings.reasonForChange && !that.linkedQuestionReadonly ) {
-                    reasons.addField( that.$linkedQuestion[ 0 ] )
+                    reasons.addField( that.linkedQuestion )
                         .on( 'change', evt => {
                             // Also for empty onchange values
                             // TODO: exclude empty values if RFC field never had a value?
@@ -236,10 +246,14 @@ class Comment extends Widget {
 
                 previousValue = currentValue;
 
-                if ( currentStatus === 'closed' ) {
-                    comment = t( 'widget.dn.closedmodified' );
-                    that._addQuery( comment, 'closed-modified', '', false, SYSTEM_USER );
-                }
+                comment = t( 'widget.dn.closedmodified' );
+                that._getThreadFirsts( that.notes ).forEach( item => {
+                    const status = that._getQueryThreadStatus( that.notes, item.thread_id );
+                    if ( status === 'closed' ) {
+                        that._addQuery( comment, 'closed-modified', '', false, SYSTEM_USER, 'comment', item.thread_id || 'NULL' );
+                    }
+                } );
+
             }
         } );
     }
@@ -247,7 +261,7 @@ class Comment extends Widget {
     _setRepeatRemovalReasonChangeHandler() {
         const that = this;
         if ( settings.reasonForChange && !that.linkedQuestionReadonly ) {
-            this.$linkedQuestion[ 0 ].addEventListener( events.ReasonChange().type, function( event ) {
+            this.linkedQuestion.addEventListener( events.ReasonChange().type, function( event ) {
                 if ( event.detail && event.detail.reason ) {
                     that._addReason( event.detail.reason );
                     reasons.removeField( this );
@@ -268,19 +282,20 @@ class Comment extends Widget {
      */
     _setConstraintEvaluationHandler() {
         const that = this;
-        this.$linkedQuestion.on( 'constraintevaluated.oc', ( event, updated ) => {
-            let comment;
-            const currentStatus = that._getCurrentStatus( that.notes );
-            /*
-             * If during a session a query is closed, and this triggers a contraintUpdate of the linked question,
-             * we do not want to generate an autoquery.
-             * 
-             * updated.fullPath includes positions (of repeats) which we need to strip
-             */
-            if ( currentStatus === 'closed' && updated.fullPath.replace( /\[\d+\]/g, '' ) !== that.element.getAttribute( 'name' ) ) {
-                comment = t( 'widget.dn.closedmodified' );
-                that._addQuery( comment, 'closed-modified', '', false, SYSTEM_USER );
-            }
+        $( this.linkedQuestion ).on( 'constraintevaluated.oc', ( event, updated ) => {
+            that._getThreadFirsts( that.notes ).forEach( item => {
+                const status = that._getQueryThreadStatus( that.notes, item.thread_id );
+                /*
+                 * If during a session a query is closed, and this triggers a contraintUpdate of the linked question,
+                 * we do not want to generate an autoquery.
+                 * 
+                 * updated.fullPath includes positions (of repeats) which we need to strip
+                 */
+                if ( status === 'closed' && updated.fullPath.replace( /\[\d+\]/g, '' ) !== that.element.getAttribute( 'name' ) ) {
+                    that._addQuery( t( 'widget.dn.closedmodified' ), 'closed-modified', '', false, SYSTEM_USER, 'comment', item.thread_id || 'NULL' );
+
+                }
+            } );
         } );
     }
 
@@ -294,13 +309,14 @@ class Comment extends Widget {
      * 
      */
     _getFullWidthStyleCorrection() {
-        const $form = this.$linkedQuestion.closest( 'form' );
-        const fullWidth = this.$linkedQuestion.closest( '.or-repeat' ).width() || $form.width();
+        const form = this.linkedQuestion.closest( 'form' );
+        const closestRepeat = this.linkedQuestion.closest( '.or-repeat' );
+        const fullWidth = closestRepeat ? closestRepeat.offsetWidth : form.offsetWidth;
         // select the first question on the current page
-        const firstQuestionOnCurrentPage = $form[ 0 ].querySelector( '[role="page"].current.question, [role="page"].current .question' ) || $form[ 0 ].querySelector( '.question' );
+        const firstQuestionOnCurrentPage = form.querySelector( '[role="page"].current.question, [role="page"].current .question' ) || form.querySelector( '.question' );
         const mostLeft = $( firstQuestionOnCurrentPage ).position().left;
-        const linkedQuestionWidth = this.$linkedQuestion.outerWidth();
-        const linkedQuestionLeft = this.$linkedQuestion.position().left;
+        const linkedQuestionWidth = this.linkedQuestion.offsetWidth;
+        const linkedQuestionLeft = $( this.linkedQuestion ).position().left;
 
         // By correcting the left we can make this function agnostic to themes.
         return {
@@ -309,145 +325,148 @@ class Comment extends Widget {
         };
     }
 
-    _showCommentModal( linkedQuestionErrorMsg ) {
+    _showCommentModal() {
         const range = document.createRange();
-        const comment = this.element.closest( '.question' ).cloneNode( true );
-        const noClose = settings.dnCloseButton !== true;
-        const submitText = t( 'formfooter.submit.btn' ) || 'Submit';
-        const updateText = t( 'widget.comment.update' ) || 'Update';
-        const closeText = t( 'widget.dn.closeQueryText' ) || 'Close Query';
-        const assignText = t( 'widget.dn.assignto' ) || 'Assign To'; // TODO: add string to kobotoolbox/enketo-express
-        const notifyText = t( 'widget.dn.notifyText' ) || 'Email?'; // TODO: add string to kobotoolbox/enketo-express
         const closeButtonHtml = '<button class="btn-icon-only or-comment-widget__content__btn-close-x" type="button">&times;</button>';
-        const newQueryButtonHtml = `<button name="new" class="btn btn-primary or-comment-widget__content__btn-submit" type="button">${submitText}</button>`;
-        const updateQueryButtonHtml = `<button name="updated" class="btn btn-primary or-comment-widget__content__btn-submit" type="button">${updateText}</button>`;
-        const closeQueryButtonHtml = noClose ? '' : `<button name="closed" class="btn btn-default or-comment-widget__content__btn-submit" type="button">${closeText}</button>`;
-        const status = this._getCurrentStatus( this.notes );
-        const readOnlyAttr = this.readOnly ? 'readonly ' : '';
-
         this.element.closest( 'form' ).dispatchEvent( events.Heartbeat() );
-
-        let btnsHtml;
-        if ( status === 'new' || status === 'updated' || status === 'closed-modified' ) {
-            btnsHtml = updateQueryButtonHtml + closeQueryButtonHtml;
-        } else if ( status === 'closed' ) {
-            btnsHtml = updateQueryButtonHtml;
-        } else {
-            btnsHtml = newQueryButtonHtml;
-        }
-        const btnGroupHtml = `<div class="or-comment-widget__content__query-btns">${btnsHtml}</div>`;
-
-        comment.classList.remove( 'hide' );
-        comment.removeAttribute( 'role' );
-
-        const input = comment.querySelector( 'input, textarea' );
-        input.classList.add( 'ignore' );
-        input.removeAttribute( 'data-for' );
-        input.removeAttribute( ' data-type-xml' );
-        input.setAttribute( 'name', 'dn-comment' );
-        input.value = linkedQuestionErrorMsg;
-
         const fragment = range.createContextualFragment(
             `<section class="widget or-comment-widget">
-                <div class="or-comment-widget__overlay"></div>
-                <form onsubmit="return false;" class="or-comment-widget__content" autocomplete="off">
-                    <div class="or-comment-widget__content__tabs">
-                        <label>
-                            <input type="radio"  class="ignore" name="dn-type" value="comment" checked />
-                            <span>query</span>
-                        </label>
-                        <label>
-                            <input type="radio" class="ignore" name="dn-type" value="annotation" />
-                            <span>annotation</span>
-                        </label>
+                <div class="or-comment-widget__overlay--click-preventer"></div>
+                <input class="ignore or-comment-widget__view-toggle" type="checkbox" name="dn-view-toggle"/>
+                <div class="or-comment-widget__nav">
+                    <div class="border">
+                        <h3 class="or-comment-widget__nav__main">
+                            <a id="dn-history" href="#" data-thread="*">${t('widget.dn.allhistory')}</a>
+                        </h3>
+                        <h3 class="or-comment-widget__nav__main"><span class="or-comment-widget__nav__main__title">${t('widget.dn.queries')}</span>
+                            <button class="btn btn-primary small" data-type="comment"><span class="icon icon-plus"> </span> ${t('widget.dn.addnewtext')}</button>
+                        </h3>
+                        <ul>
+                            ${ this._getThreadFirsts(this.notes, 'comment')
+                                .map( item => 
+                                    `<li class="or-comment-widget__nav__item">
+                                        <a href="#"  data-type="comment" data-thread="${item.thread_id || 'NULL'}">
+                                            <span class="or-comment-widget__nav__item__start">
+                                                <span class="or-comment-widget__nav__item__start__icon icon ${this._getQueryThreadStatus(this.notes, item.thread_id)}"> </span>
+                                                <span class="or-comment-widget__nav__item__start__id">${item.visible_thread_id || ''}</span>
+                                            </span>
+                                            <span class="or-comment-widget__nav__item__text ${item.comment.length < 66 ? 'short' : ''}"><span>${item.comment}</span></span>
+                                        </a>
+                                    </li>`)
+                                .join('')}
+                        </ul>
+                        <h3 class="or-comment-widget__nav__main"><span class="or-comment-widget__nav__main__title">${t('widget.dn.annotations')}</span>
+                            <button class="btn btn-primary small" data-type="annotation"><span class="icon icon-plus"> </span> ${t('widget.dn.addnewtext')}</button>
+                        </h3>
+                        <ul>
+                            ${ this._getThreadFirsts(this.notes, 'annotation')
+                                .map( item => 
+                                    `<li  class="or-comment-widget__nav__item">
+                                        <a href="#"  data-type="annotation" data-thread="${item.thread_id || 'NULL'}">
+                                            <span class="or-comment-widget__nav__item__start">
+                                                <span class="or-comment-widget__nav__item__start__icon icon icon-dn-annotation"> </span>
+                                            </span>
+                                            <span class="or-comment-widget__nav__item__text ${item.comment.length < 66 ? 'short' : ''}"><span>${item.comment}</span></span>
+                                        </a>
+                                    </li>`)
+                                .join('')}
+                        </ul>
                     </div>
-                    <div class="or-comment-widget__content__user">
-                        <label class="or-comment-widget__content__user__dn-assignee">
-                            <span>${assignText}</span>
-                            <select name="dn-assignee" class="ignore" >${usersOptionsHtml}</select>
-                        </label>
-                        <div class="or-comment-widget__content__user__dn-notify option-wrapper">
-                            <label>
-                                <input name="dn-notify" class="ignore" value="true" type="checkbox" ${readOnlyAttr}/>
-                                <span class="option-label">${notifyText}</span>
-                            </label>
-                        </div>
-                    </div>
+                </div>
+                <div class="or-comment-widget__content">
                     ${closeButtonHtml}
-                    ${btnGroupHtml}
-                    <div class="or-comment-widget__content__history closed">
-                        <p></p>
-                        <table></table>
+                    <form onsubmit="return false;" class="or-comment-widget__content__form" autocomplete="off"></form>
+                    <div class="or-comment-widget__content__history">
+                        <div class="or-comment-widget__content__history__content"></div> 
+                            <span class="or-comment-widget__content__history__value-change-filler"></span>              
+                            <input id="dn-show-value-changes" class="or-comment-widget__content__history__value-change-toggle ignore" type="checkbox" name="show-value-changes" checked />
+                            <label for="dn-show-value-changes" class="option-label">${t('widget.dn.showvaluechanges')}</span>
+                        </div> 
                     </div>
-                </section>
-            </form>`
+                </div>
+            </section>`
         );
 
-        fragment.querySelector( '.or-comment-widget__content__tabs' ).after( comment );
-
-        const oldWidget = this.$linkedQuestion[ 0 ].querySelector( '.or-comment-widget' );
+        const oldWidget = this.linkedQuestion.querySelector( '.or-comment-widget' );
         if ( oldWidget ) {
             oldWidget.remove();
         }
-        this.$linkedQuestion[ 0 ].prepend( fragment );
+        this.linkedQuestion.prepend( fragment );
 
-        const widget = this.$linkedQuestion[ 0 ].querySelector( '.or-comment-widget' );
+        const overlayFragment = range.createContextualFragment( '<div class="or-comment-widget__overlay--shadow-giver"></div>' );
+        this.linkedQuestion.before( overlayFragment );
+
+        const widget = this.linkedQuestion.querySelector( '.or-comment-widget' );
+        this.history = widget.querySelector( '.or-comment-widget__content__history' );
+
+        const viewToggle = widget.querySelector( '.or-comment-widget__view-toggle' );
+        this.nav = widget.querySelector( '.or-comment-widget__nav' );
+        this.nav.querySelectorAll( 'a, button' ).forEach( el => {
+            el.addEventListener( 'click', event => {
+                event.preventDefault();
+                viewToggle.checked = true;
+                if ( el.classList.contains( 'active' ) ) {
+                    return false;
+                }
+                this.nav.querySelectorAll( 'a, button' ).forEach( el => {
+                    el.classList.remove( 'active' );
+                    el.disabled = false;
+                } );
+                if ( event.currentTarget.nodeName.toLowerCase() === 'a' ) {
+                    event.currentTarget.classList.add( 'active' );
+                } else {
+                    event.currentTarget.disabled = true;
+                }
+                this._switch( event );
+            } );
+        } );
+
+        const openThreadFirsts = this._getThreadFirsts( this.notes )
+            .filter( item => {
+                const status = this._getQueryThreadStatus( this.notes, item.thread_id );
+                return status === 'updated' || status === 'new';
+            } );
+
+        if ( settings.openSingleDnThreadAutomatically && openThreadFirsts.length === 1 ) {
+            const threadId = openThreadFirsts[ 0 ].thread_id || 'NULL';
+            this.nav.querySelector( `a[data-thread="${threadId}"]` ).click();
+        } else {
+            this.nav.querySelector( '#dn-history' ).click();
+        }
+
+        viewToggle.checked = false;
 
         // Display widget in full form width even if its linked question is not a full row (in the Grid theme)
         Object.entries( this._getFullWidthStyleCorrection() ).forEach( o => {
             widget.style[ o[ 0 ] ] = o[ 1 ];
         } );
 
-        this.$history = $( widget.querySelector( '.or-comment-widget__content__history' ) );
-        this._renderHistory();
-
-        const queryButtons = widget.querySelectorAll( '.or-comment-widget__content__query-btns .btn' );
-
-        input.addEventListener( 'input', () => {
-            queryButtons.forEach( el => el.disabled = !input.value.trim() );
-        } );
-        input.dispatchEvent( new Event( 'input' ) );
-        input.focus();
-
-        widget.querySelector( 'form.or-comment-widget__content' ).addEventListener( 'submit', () => {
-            const btn = widget.querySelector( '.btn[name="updated"], .btn[name="new"]' );
-            if ( btn ) {
-                btn.click();
-            }
-        } );
-        widget.scrollIntoView( false );
-
-        queryButtons.forEach( btn => {
-            btn.addEventListener( 'click', event => {
-                if ( input.value ) {
-                    const comment = input.value;
-                    const assignee = widget.querySelector( 'select[name="dn-assignee"]' ).value;
-                    const notify = widget.querySelector( 'input[name="dn-notify"]' ).checked;
-                    const type = widget.querySelector( 'input[name="dn-type"]:checked' ).value;
-                    const status = type !== 'annotation' ? event.target.getAttribute( 'name' ) : undefined;
-                    this._addQuery( comment, status, assignee, notify, null, type );
-                    input.value = '';
-                    this._hideCommentModal( this.$linkedQuestion[ 0 ] );
-                }
-                event.preventDefault();
-                event.stopPropagation();
-            } );
-        } );
+        this.linkedQuestion.scrollIntoView( true );
 
         const closeButton = widget.querySelector( '.or-comment-widget__content__btn-close-x' );
-        const overlay = widget.querySelector( '.or-comment-widget__overlay' );
+        const overlay = widget.querySelector( '.or-comment-widget__overlay--click-preventer' );
         [ closeButton, overlay ].forEach( el => {
             el.addEventListener( 'click', event => {
-                this._hideCommentModal( this.$linkedQuestion[ 0 ] );
+                this._hideCommentModal( this.linkedQuestion );
                 event.preventDefault();
                 event.stopPropagation();
             } );
         } );
+
+    }
+
+    // switches the right pane of the widget that shows the form (optionally) and the thread content
+    _switch( event ) {
+        this.type = event.currentTarget.dataset.type;
+        this.threadId = event.currentTarget.dataset.thread;
+        this._renderForm();
+        this._renderHistory();
     }
 
     _hideCommentModal( linkedQuestion ) {
         this.element.closest( 'form' ).dispatchEvent( events.Heartbeat() );
         linkedQuestion.querySelector( '.or-comment-widget' ).remove();
+        linkedQuestion.closest( '.or, .or-group, .or-group-data' ).querySelector( '.or-comment-widget__overlay--shadow-giver' ).remove();
     }
 
     /**
@@ -484,10 +503,12 @@ class Comment extends Widget {
     }
 
     _getCurrentErrorMsg() {
-        if ( this.$linkedQuestion.hasClass( 'invalid-required' ) ) {
-            return this.$linkedQuestion.find( '.or-required-msg.active' ).text();
-        } else if ( this.$linkedQuestion.hasClass( 'invalid-constraint' ) ) {
-            return this.$linkedQuestion.find( '.or-constraint-msg.active' ).text();
+        if ( this.linkedQuestion.classList.contains( 'invalid-required' ) ) {
+            const el = this.linkedQuestion.querySelector( '.or-required-msg.active' );
+            return el ? el.textContent : '';
+        } else if ( this.linkedQuestion.classList.contains( 'invalid-constraint' ) ) {
+            const el = this.linkedQuestion.querySelector( '.or-constraint-msg.active' );
+            return el ? el.textContent : '';
         } else {
             return '';
         }
@@ -531,13 +552,13 @@ class Comment extends Widget {
         return 0;
     }
 
-    _getParsedElapsedTime( datetimeStr ) {
+    _getParsedElapsedTimeUpTo7Days( datetimeStr ) {
         const dt = new Date( this._getIsoDatetimeStr( datetimeStr ) );
         if ( typeof datetimeStr !== 'string' || dt.toString() === 'Invalid Date' ) {
             console.error( `Could not convert datetime string "${datetimeStr}" to a Date object.` );
             return 'error';
         }
-        return this._parseElapsedTime( new Date() - dt );
+        return this._parseElapsedTimeUpTo7Days( new Date() - dt );
     }
 
     _getReadableDateTime( datetimeStr ) {
@@ -547,12 +568,12 @@ class Comment extends Widget {
             return 'error';
         }
         // 13-Jun-2018 13:58 UTC-04:00
-        return `${pad2( dt.getDate() )}-${dt.toLocaleDateString( 'en', { month: 'short' } )}-${dt.getFullYear()} ${pad2( dt.getHours() )}:${pad2( dt.getMinutes() )} UTC${dt.getTimezoneOffsetAsTime()}`;
+        return `${pad2( dt.getDate() )}-${dt.toLocaleDateString( 'en', { month: 'short' } )}-${dt.getFullYear()} ${pad2( dt.getHours() )}:${pad2( dt.getMinutes() )}:${pad2(dt.getSeconds())} UTC${dt.getTimezoneOffsetAsTime()}`;
         // Date.getTimezoneOffsetAsTime is an extension in enketo-xpathjs
     }
 
-    _parseElapsedTime( elapsedMilliseconds ) {
-        let months;
+    _parseElapsedTimeUpTo7Days( elapsedMilliseconds ) {
+        //let months;
         let days;
         let hours;
         let minutes;
@@ -570,29 +591,25 @@ class Comment extends Widget {
         }
 
         minutes = elapsedMilliseconds / ( 1000 * 60 );
-        // TODO: translateable strings with plural?
+
         if ( minutes < 0.5 ) {
-            return t( 'widget.dn.zerominutes' ) || 'Just now';
+            return t( 'widget.dn.now' );
         }
         if ( minutes < 59.5 ) {
-            return `${Math.round( minutes )} minute(s)`;
+            return t( 'widget.dn.minute', { count: Math.round( minutes ) } );
         }
         hours = minutes / 60;
         if ( hours < 23.5 ) {
-            return `${Math.round( hours )} hour(s)`;
+            return t( 'widget.dn.hour', { count: Math.round( hours ) } );
         }
         days = hours / 24;
-        if ( days < ( 5 / 12 + 30 - 0.5 ) ) {
-            return `${Math.round( days )} day(s)`;
+        if ( days <= 7 ) {
+            return t( 'widget.dn.day', { count: Math.round( days ) } );
         }
-        months = days / ( 5 / 12 + 30 );
-        if ( months < 11.5 ) {
-            return `${Math.round( months )} month(s)`;
-        }
-        return `${Math.round( months / 12 )} year(s)`;
+        return null;
     }
 
-    _addQuery( comment, status, assignee, notify, user, type = 'comment' ) {
+    _addQuery( comment, status, assignee, notify, user, type = 'comment', thread_id = this.options.helpers.evaluate( 'uuid()', 'string' ) ) {
         const that = this;
         const q = {
             type,
@@ -601,8 +618,13 @@ class Comment extends Widget {
             comment,
             status,
             assigned_to: assignee,
-            notify
+            notify,
+            thread_id
         };
+
+        if ( thread_id === 'NULL' ) {
+            delete q.thread_id;
+        }
 
         if ( user ) {
             q.user = user;
@@ -619,7 +641,7 @@ class Comment extends Widget {
         // Update XML Model
         this.originalInputValue = modelDataStr;
         const error = this._commentHasError();
-        this._setCommentButtonState( this.originalInputValue, error, this._getCurrentStatus( this.notes ) );
+        this._setCommentButtonState( error ? 'invalid' : this._getCurrentStatus( this.notes ), this._hasAnnotation( this.notes ), this._hasMultipleOpenQueries( this.notes ) );
     }
 
     _addAudit( comment, assignee, notify ) {
@@ -656,19 +678,47 @@ class Comment extends Widget {
         } );
 
         // update XML Model
-        $( this.element ).val( modelDataStr ).trigger( 'change' );
+        this.element.value = modelDataStr;
+        this.element.dispatchEvent( events.Change() );
     }
 
     _getCurrentStatus( notes ) {
         let status = '';
+        if ( !notes.queries || notes.queries.length === 0 ) {
+            return status;
+        }
 
-        notes.queries.concat( notes.logs ).some( item => {
-            if ( item.status ) {
-                status = item.status;
+        const threads = this._getThreadFirsts( notes );
+
+        [ 'new', 'updated', 'closed', 'closed-modified' ].some( st => {
+            if ( this._existsThreadWithStatus( notes, threads, st ) ) {
+                status = st;
                 return true;
             }
             return false;
         } );
+
+        return status;
+    }
+
+    _existsThreadWithStatus( notes, threads, status ) {
+        return threads.some( item => {
+            // TODO: this is inefficient, this.notes is filtered and sorted constantly
+            return this._getQueryThreadStatus( notes, item.thread_id ) === status;
+        } );
+    }
+
+    _getQueryThreadStatus( notes, threadId ) {
+        let status = '';
+        this._filteredNotes( notes, 'comment', threadId || 'NULL', false )
+            .sort( this._datetimeDesc.bind( this ) )
+            .some( item => {
+                if ( item.status ) {
+                    status = item.status;
+                    return true;
+                }
+                return false;
+            } );
         return status;
     }
 
@@ -695,35 +745,173 @@ class Comment extends Widget {
         return dateTimeStr;
     }
 
+    _generateThreadNameMap( notes ) {
+        return this._filteredNotes( notes, 'comment', '*', false )
+            .reduce( ( map, item ) => {
+                if ( item.thread_id && item.visible_thread_id ) {
+                    map[ item.thread_id ] = item.visible_thread_id;
+                }
+                return map;
+            }, {} );
+    }
+
+    _renderForm() {
+        const form = event.currentTarget.closest( '.or-comment-widget' ).querySelector( 'form' );
+        [ ...form.children ].forEach( el => el.remove() );
+        if ( event.currentTarget.id === 'dn-history' || ( this.type === 'annotation' && this.threadId ) ) {
+            return;
+        }
+        const range = document.createRange();
+        const assignText = t( 'widget.dn.assignto' ) || 'Assign To'; // TODO: add string to kobotoolbox/enketo-express
+        const notifyText = t( 'widget.dn.notifytext' ) || 'Email?'; // TODO: add string to kobotoolbox/enketo-express
+        const comment = this.element.closest( '.question' ).cloneNode( true );
+        const readOnlyAttr = this.readOnly ? 'readonly ' : '';
+
+        const widget = this.linkedQuestion.querySelector( '.or-comment-widget' );
+
+        let reopen = false;
+
+        let btnsHtml;
+        if ( this.type === 'annotation' ) {
+            btnsHtml = `<button name="new" class="btn btn-primary or-comment-widget__content__form__btn-submit" type="button">${t( 'widget.dn.addannotationbutton' )}</button>`;
+        } else {
+            const status = this.type !== 'comment' ? null : ( this.threadId ? this._getQueryThreadStatus( this.notes, this.threadId ) : null );
+            reopen = status === 'closed' || status === 'closed-modified';
+            const newQueryButtonHtml = `<button name="new" class="btn btn-primary or-comment-widget__content__form__btn-submit" type="button">${t( 'widget.dn.addquerybutton' )}</button>`;
+            const closeQueryButtonHtml = settings.dnCloseButton !== true ? '' : `<button name="closed" class="btn btn-default or-comment-widget__content__form__btn-submit" type="button">${t( 'widget.dn.closequerytext' )}</button>`;
+            const updateQueryButtonHtml =
+                `<button name="updated" class="btn btn-primary or-comment-widget__content__form__btn-submit" type="button">
+                    ${reopen ? t('widget.dn.reopen') : t( 'widget.comment.update' )}
+                </button>`;
+
+            if ( status === 'new' || status === 'updated' || status === 'closed-modified' ) {
+                btnsHtml = closeQueryButtonHtml + updateQueryButtonHtml;
+            } else if ( status === 'closed' ) {
+                btnsHtml = updateQueryButtonHtml;
+            } else {
+                btnsHtml = newQueryButtonHtml;
+            }
+        }
+        let labelText = t( 'widget.dn.addnewannotation' );
+        if ( this.type === 'comment' ) {
+            if ( reopen ) {
+                labelText = t( 'widget.dn.reopenlabel' );
+            } else if ( this.threadId ) {
+                labelText = t( 'widget.dn.typeresponse' );
+            } else {
+                labelText = t( 'widget.dn.addnewquery' );
+            }
+        }
+
+        comment.classList.remove( 'hide', 'question' );
+        comment.removeAttribute( 'role' );
+        comment.querySelector( '.question-label' ).textContent = labelText;
+
+        const input = comment.querySelector( 'input, textarea' );
+        input.classList.add( 'ignore' );
+        input.removeAttribute( 'data-for' );
+        input.removeAttribute( ' data-type-xml' );
+        input.setAttribute( 'name', 'dn-comment' );
+        input.value = this.type === 'comment' && !this.threadId ? this.linkedQuestionErrorMsg : '';
+
+        const user = this.type === 'annotation' && !this.threadId ? '' : range.createContextualFragment(
+            `<div class="or-comment-widget__content__form__user">
+                <label class="or-comment-widget__content__form__user__dn-assignee">
+                    <span>${assignText}</span>
+                    <select name="dn-assignee" class="ignore" >${usersOptionsHtml}</select>
+                </label>
+                <div class="or-comment-widget__content__form__user__dn-notify option-wrapper">
+                    <label>
+                        <input name="dn-notify" class="ignore" value="true" type="checkbox" ${readOnlyAttr}/>
+                        <span class="option-label">${notifyText}</span>
+                    </label>
+                </div>
+            </div>` );
+        const buttonGroup = range.createContextualFragment(
+            `<div class="or-comment-widget__content__form__query-btns">${btnsHtml}</div>`
+        );
+
+        form.prepend( comment );
+        form.append( user );
+        form.append( buttonGroup );
+
+        const queryButtons = widget.querySelectorAll( '.or-comment-widget__content__form__query-btns .btn' );
+
+        input.addEventListener( 'input', () => {
+            queryButtons.forEach( el => el.disabled = !input.value.trim() );
+        } );
+        input.dispatchEvent( new Event( 'input' ) );
+        input.focus();
+
+        widget.querySelector( 'form.or-comment-widget__content__form' ).addEventListener( 'submit', () => {
+            const btn = widget.querySelector( '.btn[name="updated"], .btn[name="new"]' );
+            if ( btn ) {
+                btn.click();
+            }
+        } );
+
+        queryButtons.forEach( btn => {
+            btn.addEventListener( 'click', event => {
+                if ( input.value ) {
+                    const comment = input.value;
+                    const assigneeEl = widget.querySelector( 'select[name="dn-assignee"]' );
+                    const assignee = assigneeEl ? assigneeEl.value : undefined;
+                    const notifyEl = widget.querySelector( 'input[name="dn-notify"]' );
+                    const notify = notifyEl ? notifyEl.checked : undefined;
+                    const status = this.type === 'comment' ? event.target.getAttribute( 'name' ) : undefined;
+
+                    this._addQuery( comment, status, assignee, notify, null, this.type, this.threadId );
+                    input.value = '';
+                    this._hideCommentModal( this.linkedQuestion );
+                }
+                event.preventDefault();
+                event.stopPropagation();
+            } );
+        } );
+    }
+
     _renderHistory() {
-        const that = this;
-        const emptyText = t( 'widget.dn.emptyHistoryText' ) || 'No History';
-        const historyText = t( 'widget.dn.historyText' ) || 'History';
-        const user = '<span class="icon fa-user"> </span>';
-        const clock = '<span class="icon fa-clock-o"> </span>';
+        const range = document.createRange();
+        const notesToDisplay = this._filteredNotes( this.notes, this.type, this.threadId || '' );
+        this.history.querySelector( '.or-comment-widget__content__history__content' ).remove();
+        this.history.querySelectorAll( '#dn-show-value-changes, [for="dn-show-value-changes"]' ).forEach( el => el.classList.toggle( 'hide', notesToDisplay.length === 0 ) );
 
-        const over3 = this.notes.queries.concat( this.notes.logs ).length - 3;
-        const $more = over3 > 0 ? $( `<tr><td colspan="4"><span class="over">+${over3}</span><button class="btn-icon-only btn-more-history"><i class="icon"> </i></button></td></tr>` ) : $();
-        const $colGroup = this.notes.queries.concat( this.notes.logs ).length > 0 ? $( '<colgroup><col style="width: 31px;"><col style="width: auto;"></colgroup>' ) : $();
-        this.$history.find( 'table' ).empty()
-            .append( $colGroup )
-            .append( `<thead><tr><th colspan="2" scope="col"><strong>${historyText}</strong></th><th scope="col">${user}</th><th scope="col">${clock}</th></tr></thead>` )
-            .append( `<tbody>${this.notes.queries.concat( this.notes.logs ).sort( this._datetimeDesc.bind( this ) ).map( item => that._getRows( item ) )
-                .join( '' ) || `<tr><td colspan="2">${emptyText}</td><td></td><td></td></tr>`}</tbody>` )
-            .find( 'tbody' )
-            .append( $more );
+        const htmlStr = `<div class="or-comment-widget__content__history__content">${notesToDisplay
+            .sort( this._datetimeDesc.bind( this ) )
+            .map( item => this._getHistoryRow( item ) )
+            .join( '' ) || t('widget.dn.emptyhistorytext')}</div>`;
 
-        this.$history
-            .on( 'click', 'tbody td', function() {
-                $( this ).toggleClass( 'wrapping', this.scrollWidth > this.clientWidth );
-            } )
-            .on( 'mouseenter', 'tbody td', function() {
-                $( this ).toggleClass( 'overflowing', this.scrollWidth > this.clientWidth );
+        this.history.append( range.createContextualFragment( htmlStr ) );
+
+        const widget = this.history.closest( '.or-comment-widget' );
+
+        widget.querySelectorAll( '.tooltip[data-title]' ).forEach( el => {
+
+            el.addEventListener( 'mouseenter', () => {
+                const hoverEl = range.createContextualFragment( `<span class="dn-tooltip-visible">${el.dataset.title}</span>` );
+                const span = hoverEl.querySelector( '.dn-tooltip-visible' );
+                const widgetRect = widget.getBoundingClientRect();
+                const elemRect = el.getBoundingClientRect();
+                const top = elemRect.top - widgetRect.top - 10;
+                span.style.top = `${top}px`;
+
+                widget.append( hoverEl );
+
+                // left can only be calculated after adding tooltip to DOM
+                let left = elemRect.left - widgetRect.left - span.getBoundingClientRect().width - 10;
+                if ( left < 0 ) {
+                    left = elemRect.left - widgetRect.left + el.getBoundingClientRect().width + 10;
+                }
+
+                span.style.left = `${left}px`;
+            } );
+            el.addEventListener( 'mouseleave', () => {
+                const tip = widget.querySelector( '.dn-tooltip-visible' );
+                if ( tip ) {
+                    tip.remove();
+                }
             } );
 
-        $more.find( '.btn-more-history' ).on( 'click', () => {
-            that.$history.toggleClass( 'closed' );
-            return false;
         } );
     }
 
@@ -750,12 +938,12 @@ class Comment extends Widget {
         return linkifiedComment;
     }
 
-    _getRows( item, options ) {
+    _getHistoryRow( item, options = {} ) {
         const types = {
-            comment: '<span class="icon tooltip fa-comment-o" data-title="Query/Comment"> </span>',
-            audit: '<span class="icon tooltip fa-edit" data-title="Audit Event"> </span>',
-            reason: '<span class="icon tooltip icon-delta" data-title="Reason for Change"> </span>',
-            annotation: '<span class="icon tooltip icon-pencil" data-title="Annotation"> </span>'
+            comment: '<span class="icon fa-comment-o"> </span>',
+            audit: '',
+            reason: '<span class="icon icon-delta"> </span>',
+            annotation: '<span class="icon icon-dn-annotation"> </span>'
         };
         if ( typeof item.user === 'undefined' ) {
             item.user = currentUser;
@@ -766,11 +954,47 @@ class Comment extends Widget {
         //const msg = this._linkify( item.comment || item.message );
         const msg = item.comment || item.message;
         const rdDatetime = this._getReadableDateTime( item.date_time );
-        const time = ( options.timestamp === 'datetime' ) ? rdDatetime : this._getParsedElapsedTime( item.date_time );
-
+        const elapsedTime = this._getParsedElapsedTimeUpTo7Days( item.date_time );
+        const time = ( options.timestamp === 'datetime' ) ? rdDatetime : ( elapsedTime ? elapsedTime : rdDatetime.split( ' ' )[ 0 ] );
         const fullName = this._parseFullName( item.user ) || t( 'widget.dn.me' );
+        const initials = this._parseInitials( item.user ) || t( 'widget.dn.me' );
+        const assignee = !item.assigned_to ? ( this.threadNameMap[ item.thread_id ] || '' ) : t( 'widget.dn.assignedto', { id: ( this.threadNameMap[ item.thread_id ] || '' ), assignee: item.assigned_to } ).trim();
+        const status = item.status ? t( 'widget.dn.status', { status: item.status } ) : '';
 
-        return `<tr><td>${types[ item.type ] || ''}</td><td>${msg}</td><td><span class="username tooltip" data-title="${fullName} (${item.user})">${fullName}</span></td><td class="datetime tooltip" data-title="${rdDatetime}">${time}</td></tr>`;
+        return `
+            <div class="or-comment-widget__content__history__row ${item.type === 'audit' ? 'audit' : ''}">
+                <div class="or-comment-widget__content__history__row__start">
+                    <span class="or-comment-widget__content__history__row__start__username tooltip" data-title="${fullName}${item.user ? ' ('+item.user+')' : ''}">${options.username === 'full' ? fullName : initials}</span>
+                    <span class="or-comment-widget__content__history__row__start__datetime tooltip" data-title="${rdDatetime}">${time}</span>
+                </div>
+                <div class="or-comment-widget__content__history__row__main${item.type === 'audit' ? '--audit' : ''}">
+                    <span class="or-comment-widget__content__history__row__main__icon">${types[item.type]}</span>
+                    <span class="or-comment-widget__content__history__row__main__comment">
+                        <span class="or-comment-widget__content__history__row__main__comment__text">${msg}</span>
+                        <span class="or-comment-widget__content__history__row__main__comment__meta">
+                            ${assignee ? assignee[0].toUpperCase() + assignee.substring(1) : ''} ${status}
+                        </span>
+                    </span>
+                </div>
+                <div class="or-comment-widget__content__history__row__filler"></div>
+            </div>`;
+    }
+
+    _parseInitials( user ) {
+        let initials;
+
+        if ( !user ) {
+            return '';
+        }
+
+        users.some( u => {
+            if ( u.userName === user ) {
+                initials = `${u.firstName.substring(0,1).toUpperCase()}${u.lastName.substring(0,1).toUpperCase()}`;
+                return true;
+            }
+        } );
+
+        return initials || user.substring( 0, 1 ).toUpperCase();
     }
 
     _parseFullName( user ) {
@@ -791,38 +1015,96 @@ class Comment extends Widget {
         return fullName || user;
     }
 
+    /**
+     * Returns notes of a particular thread, optionally with logs
+     * @param {object} notes
+     * @param {string} type 
+     * @param {string} threadId 
+     * @param {boolean} includeLogs 
+     */
+    _filteredNotes( notes, type, threadId = '*', includeLogs = true ) {
+        let filtered = !type ? notes.queries : notes.queries.filter( item => item.type === type );
+        // if threadId is '*' or undefined, include everything
+        // if threadId is '', include only those items with that particular empty string value (should be nothing)
+        filtered = filtered.filter( item => threadId === '*' || ( threadId === 'NULL' && !item.thread_id ) || ( item.thread_id === threadId ) );
+        return includeLogs ? filtered.concat( notes.logs ) : filtered;
+    }
+
+    /**
+     * Returns an array of thread objects
+     * @param {string} type 
+     */
+    _getThreadFirsts( notes, type = 'comment' ) {
+        let threads = [];
+        const queries = notes.queries
+            .filter( item => item.type === type )
+            .sort( this._datetimeDesc.bind( this ) );
+
+        // reverse is destructive so we create a copy
+        return [ ...queries ].reverse()
+            .filter( item => {
+                if ( threads.includes( item.thread_id ) ) {
+                    return false;
+                }
+                threads.push( item.thread_id );
+                return true;
+            } );
+    }
+
+    _hasAnnotation( notes ) {
+        return this._filteredNotes( notes, 'annotation', '*', false ).length > 0;
+    }
+
+    /**
+     * Checks if there are more than 1 open queries.
+     * @param {*} notes 
+     * @return {boolean}
+     */
+    _hasMultipleOpenQueries( notes ) {
+        let first = null;
+        return this._getThreadFirsts( notes, 'comment' )
+            .some( comment => {
+                const status = this._getQueryThreadStatus( notes, comment.thread_id );
+                if ( status === 'new' || status === 'updated' ) {
+                    if ( first ) {
+                        return true;
+                    }
+                    first = true;
+                }
+                return false;
+            } );
+    }
+
     // Amend DN question to optimize for printing. Does not have to be undone, as it is not 
-    // use during regular data entry.
+    // used during regular data entry.
     _printify() {
         let labelText;
         const that = this;
 
-        if ( this.$linkedQuestion.is( '.or-appearance-analog-scale' ) ) {
-            const $clone = this.$linkedQuestion.find( '.question-label.widget.active' ).clone();
+        if ( this.linkedQuestion.matches( '.or-appearance-analog-scale' ) ) {
+            const $clone = $( this.linkedQuestion ).find( '.question-label.widget.active' ).clone();
             $clone.find( 'ul, br' ).remove();
             labelText = $clone.text();
         } else {
-            labelText = this.$linkedQuestion.find( '.question-label.active' ).text();
+            labelText = $( this.linkedQuestion ).find( '.question-label.active' ).text();
         }
 
-        this.$commentQuestion
-            .addClass( 'printified' )
-            .append( `<table class="temp-print">${this.notes.queries.concat( this.notes.logs ).sort( this._datetimeDesc.bind( this ) ).map( item => that._getRows( item, { timestamp: 'datetime' } ) ).join( '' )}</table>` );
+        this.question.classList.add( 'printified' );
+        $( this.question ).append( `<div class="dn-temp-print">${this.notes.queries.concat( this.notes.logs ).sort( this._datetimeDesc.bind( this ) ).map( item => that._getHistoryRow( item, { timestamp: 'datetime', username: 'full' } ) ).join( '' )}</div>` );
 
-        const $existingLabel = this.$commentQuestion.find( '.question-label.active' );
+        const existingLabel = this.question.querySelector( '.question-label.active' );
 
-        $existingLabel.attr( 'data-original', $existingLabel.text() );
-        $existingLabel.text( `History for - ${labelText}` );
+        existingLabel.dataset.original = existingLabel.textContent;
+        existingLabel.textContent = `History for - ${labelText}`;
     }
 
     _deprintify() {
-        this.$commentQuestion
-            .removeClass( 'printified' )
-            .find( 'table.temp-print' ).remove();
+        this.question.classList.remove( 'printified' );
+        this.question.querySelector( '.dn-temp-print' ).remove();
 
-        const $existingLabel = this.$commentQuestion.find( '.question-label.active' );
-        $existingLabel.text( $existingLabel.attr( 'data-original' ) );
-
+        const existingLabel = this.question.querySelector( '.question-label.active' );
+        existingLabel.textContent = existingLabel.dataset.original;
+        delete existingLabel.dataset.original;
     }
 
 }

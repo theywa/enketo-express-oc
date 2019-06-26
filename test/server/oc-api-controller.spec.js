@@ -231,11 +231,11 @@ describe( 'api', () => {
                 version,
                 endpoint: '/survey/view',
                 method: 'post',
-                goTo: '//myquestion',
+                goTo: '//myquestion#abc',
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/view\/fs\/i\/::[A-z0-9]{32}.*#\/\/myquestion$/,
+                expected: /\/view\/fs\/i\/::[A-z0-9]{32}.*#%2F%2Fmyquestion%23abc$/,
             } );
             // POST /survey/view with go_to and go_to_error_url
             testResponse( {
@@ -247,7 +247,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/view\/fs\/i\/::[A-z0-9]{32}.*(\?|&)goToErrorUrl=http%3A%2F%2Fexample\.com%2Fminiform#\/\/myquestion/,
+                expected: /\/view\/fs\/i\/::[A-z0-9]{32}.*(\?|&)goToErrorUrl=http%3A%2F%2Fexample\.com%2Fminiform#%2F%2Fmyquestion/,
             } );
             // POST /survey/view without go_to and with (ignored) go_to_error_url
             testResponse( {
@@ -552,7 +552,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /.+&goToErrorUrl=http%3A%2F%2Fexample\.com%2Ferror#\/\/hell$/
+                    expected: /.+&goToErrorUrl=http%3A%2F%2Fexample\.com%2Ferror#%2F%2Fhell$/
                 },
                 // invalid parameters
                 {

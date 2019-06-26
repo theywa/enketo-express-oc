@@ -24,21 +24,23 @@ requiredModule.update = function( updated ) {
     // to determine when to show the asterisk.
     $nodes = $nodes.add( this.form.getRelatedNodes( 'name', '[data-required]', updated ) ).add( this.form.getRelatedNodes( 'data-name', '[data-required]', updated ) );
 
-    const repeatClonesPresent = this.form.repeatsPresent && this.form.view.$.find( '.or-repeat.clone' ).length > 0;
+    const repeatClonesPresent = this.form.repeatsPresent && !!this.form.view.html.querySelector( '.or-repeat.clone' );
 
     $nodes.each( function() {
         const $input = $( this );
-        let value = that.form.input.getVal( $input ); // String or Array!
+        const control = this;
+        let value = that.form.input.getVal( control ); // String or Array!
+
         if ( typeof value === 'string' ) {
             value = value.trim();
         }
         let hide = !!value.length;
 
         if ( !hide ) {
-            const requiredExpr = that.form.input.getRequired( $input );
-            const path = that.form.input.getName( $input );
+            const requiredExpr = that.form.input.getRequired( control );
+            const path = that.form.input.getName( control );
             // Minimize index determination because it is expensive.
-            const index = repeatClonesPresent ? that.form.input.getIndex( $input ) : 0;
+            const index = repeatClonesPresent ? that.form.input.getIndex( control ) : 0;
             // The path is stripped of the last nodeName to record the context.
             // This might be dangerous, but until we find a bug, it improves performance a lot in those forms where one group contains
             // many sibling questions that each have the same required expression.
