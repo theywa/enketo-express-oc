@@ -116,7 +116,7 @@ settings.reasonForChange = /\/rfc\//.test( window.location.pathname );
 settings.strictViolationSelector = '.oc-strict-constraint.invalid-constraint, .oc-strict-required.invalid-required, .oc-strict-relevant.invalid-relevant';
 
 settings.strictViolationBlocksNavigation = settings.type !== 'view' && !( /\/fs\/dn\//.test( window.location.pathname ) );
-settings.openSingleDnThreadAutomatically = !/\/fs\/dn\//.test( window.location.pathname );
+settings.openSingleDnThreadAutomaticallyUponLoadAndGoToDn = !/\/fs\/dn\//.test( window.location.pathname ) && !settings.reasonForChange;
 
 // For Participate only
 if ( /\/participant\//.test( window.location.pathname ) ) {

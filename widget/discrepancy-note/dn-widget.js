@@ -159,6 +159,13 @@ class Comment extends Widget {
                     if ( link ) {
                         link.click();
                     }
+                    // For certain views, don't open the only thread automatically upon load
+                    // if no thread is specified.
+                } else if ( !settings.openSingleDnThreadAutomaticallyUponLoadAndGoToDn ) {
+                    const link = this.nav.querySelector( 'a#dn-history' );
+                    if ( link ) {
+                        link.click();
+                    }
                 }
             } else {
                 this.question.dispatchEvent( events.GoToHidden() );
@@ -427,7 +434,7 @@ class Comment extends Widget {
                 return status === 'updated' || status === 'new';
             } );
 
-        if ( settings.openSingleDnThreadAutomatically && openThreadFirsts.length === 1 ) {
+        if ( openThreadFirsts.length === 1 ) {
             const threadId = openThreadFirsts[ 0 ].thread_id || 'NULL';
             this.nav.querySelector( `a[data-thread="${threadId}"]` ).click();
         } else {
