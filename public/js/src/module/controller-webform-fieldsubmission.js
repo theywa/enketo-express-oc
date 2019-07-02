@@ -28,9 +28,9 @@ const formOptions = {
 };
 
 
-function init( selector, data, loadWarnings ) {
+function init( selector, data, loadWarnings = [] ) {
     let advice;
-    let loadErrors = [].concat( loadWarnings );
+    let loadErrors = [];
 
     formSelector = selector;
     formprogress = document.querySelector( '.form-progress' );
@@ -95,7 +95,7 @@ function init( selector, data, loadWarnings ) {
                 // the gotohidden event will be fired twice. We can safely remove the eventlistener after the first
                 // event is caught (for all cases).
                 form.view.html.removeEventListener( events.GoToHidden().type, handleGoToHidden );
-                loadErrors.push( err );
+                loadWarnings.push( err );
             };
 
 
@@ -147,7 +147,7 @@ function init( selector, data, loadWarnings ) {
                         }
                     } ) ] : [ replErr + t( 'alert.goto.msg1' ) ];
                 }
-                loadErrors = loadErrors.concat( goToErrors );
+                loadWarnings = loadWarnings.concat( goToErrors );
             }
 
             if ( form.encryptionKey ) {
@@ -159,7 +159,12 @@ function init( selector, data, loadWarnings ) {
             if ( loadErrors.length > 0 ) {
                 document.querySelectorAll( '.form-footer__content__main-controls button' )
                     .forEach( button => button.remove() );
-                throw loadErrors;
+            }
+
+            const loadIssues = loadWarnings.concat( loadErrors );
+
+            if ( loadIssues.length ) {
+                throw loadIssues;
             }
 
             clearedForSubmissions = true;
