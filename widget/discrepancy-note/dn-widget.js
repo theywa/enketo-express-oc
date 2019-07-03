@@ -135,13 +135,29 @@ class Comment extends Widget {
     }
 
     _setCloseHandler() {
+        let errorEl = null;
         this.linkedQuestion.addEventListener( events.AddQuery().type, event => {
             const q = event.target;
             const currentStatus = this._getCurrentStatus( this.notes );
-            const errorType = q.classList.contains( 'invalid-constraint' ) ? 'constraint' : ( q.classList.contains( 'invalid-required' ) ? 'required' : ( q.classList.contains( 'invalid-relevant' ) ? 'relevant' : null ) );
-            if ( errorType && currentStatus !== 'updated' && currentStatus !== 'new' ) {
+            const irrelevantGroupAncestor = q.closest( '.invalid-relevant' );
+
+            if ( irrelevantGroupAncestor ) {
+                const value = this.options.helpers.getModelValue( $( this.linkedQuestion.querySelector( 'input, select, textarea' ) ) );
+                if ( value && currentStatus !== 'updated' && currentStatus !== 'new' ) {
+                    // This query may not always select the correct error message if the group contains multiple irrelevant error messages
+                    errorEl = irrelevantGroupAncestor ? irrelevantGroupAncestor.querySelector( '.or-relevant-msg.active' ) : null;
+                }
+            } else {
+                const errorType = q.classList.contains( 'invalid-constraint' ) ? 'constraint' : ( q.classList.contains( 'invalid-required' ) ? 'required' : ( q.classList.contains( 'invalid-relevant' ) ? 'relevant' : null ) );
+                if ( errorType && currentStatus !== 'updated' && currentStatus !== 'new' ) {
+                    // Always a new thread
+                    errorEl = q.querySelector( `.or-${errorType}-msg.active` );
+                }
+            }
+
+            const errorMsg = errorEl ? errorEl.textContent : null;
+            if ( errorMsg ) {
                 // Always a new thread
-                const errorMsg = q.querySelector( `.or-${errorType}-msg.active` ).textContent;
                 this._addQuery( t( 'widget.dn.autoconstraint', {
                     errorMsg
                 } ), 'new', '', false, SYSTEM_USER );

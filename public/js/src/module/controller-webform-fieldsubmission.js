@@ -559,7 +559,13 @@ function _complete( bypassConfirmation = false, bypassChecks = false ) {
  * @param {*} $questions 
  */
 function _autoAddQueries( questions ) {
-    questions.forEach( q => q.dispatchEvent( events.AddQuery() ) );
+    questions.forEach( q => {
+        if ( q.matches( '.question' ) ) {
+            q.dispatchEvent( events.AddQuery() );
+        } else if ( q.matches( '.or-group.invalid-relevant, .or-group-data.invalid-relevant' ) ) {
+            q.querySelectorAll( '.question:not(.or-appearance-dn)' ).forEach( el => el.dispatchEvent( events.AddQuery() ) );
+        }
+    } );
 }
 
 function _autoAddReasonQueries( $rfcInputs ) {
