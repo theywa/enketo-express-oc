@@ -210,7 +210,7 @@ function _headlessValidateAndAutoQuery( valid ) {
 
     if ( !valid ) {
         if ( markedAsComplete ) {
-            invalid = form.view.html.querySelectorAll( '.invalid-relevant, .invalid-constraint, .invalid-required' );
+            invalid = form.view.html.querySelectorAll( '.quesetion.invalid-relevant, .invalid-constraint, .invalid-required' );
         } else {
             invalid = form.view.html.querySelectorAll( '.invalid-relevant, .invalid-constraint' );
         }
@@ -269,7 +269,7 @@ function _closeRegular( offerAutoqueries = true ) {
             const authLink = `<a href="/login" target="_blank">${t( 'here' )}</a>`;
 
             if ( offerAutoqueries ) {
-                const violated = [ ...form.view.html.querySelectorAll( '.invalid-constraint' ) ]
+                const violated = [ ...form.view.html.querySelectorAll( '.invalid-constraint, .invalid-relevant' ) ]
                     .filter( question => !question.querySelector( '.btn-comment.new, .btn-comment.updated' ) );
 
                 // First check if any constraints have been violated and prompt option to generate automatic queries
@@ -413,13 +413,8 @@ function _closeCompletedRecord( offerAutoqueries = true ) {
 
     return form.validate()
         .then( valid => {
-            const relevantViolations = [ ...form.view.html.querySelectorAll( '.invalid-relevant' ) ]
-                .filter( question => !question.querySelector( '.btn-comment.new, .btn-comment.updated' ) );
-            if ( !valid && relevantViolations.length > 0 ) {
-                gui.alert( t( 'fieldsubmission.alert.relevantvalidationerror.msg' ) );
-                return false;
-            } else if ( !valid && offerAutoqueries ) {
-                const violations = [ ...form.view.html.querySelectorAll( '.invalid-constraint, .invalid-required' ) ]
+            if ( !valid && offerAutoqueries ) {
+                const violations = [ ...form.view.html.querySelectorAll( '.invalid-constraint, .invalid-required, .invalid-relevant' ) ]
                     .filter( question => !question.querySelector( '.btn-comment.new, .btn-comment.updated' ) );
 
                 // Note that unlike _close this also looks at .invalid-required.
