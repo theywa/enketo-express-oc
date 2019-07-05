@@ -371,7 +371,7 @@ class Comment extends Widget {
                                         <a href="#"  data-type="comment" data-thread="${item.thread_id || 'NULL'}">
                                             <span class="or-comment-widget__nav__item__start">
                                                 <span class="or-comment-widget__nav__item__start__icon icon ${this._getQueryThreadStatus(this.notes, item.thread_id)}"> </span>
-                                                <span class="or-comment-widget__nav__item__start__id">${item.visible_thread_id || ''}</span>
+                                                <span class="or-comment-widget__nav__item__start__id">${item.visible_thread_id ? '#'+item.visible_thread_id : ''}</span>
                                             </span>
                                             <span class="or-comment-widget__nav__item__text ${item.comment.length < 66 ? 'short' : ''}"><span>${item.comment}</span></span>
                                         </a>
@@ -981,7 +981,8 @@ class Comment extends Widget {
         const time = ( options.timestamp === 'datetime' ) ? rdDatetime : ( elapsedTime ? elapsedTime : rdDatetime.split( ' ' )[ 0 ] );
         const fullName = this._parseFullName( item.user ) || t( 'widget.dn.me' );
         const initials = this._parseInitials( item.user ) || t( 'widget.dn.me' );
-        const assignee = !item.assigned_to ? ( this.threadNameMap[ item.thread_id ] || '' ) : t( 'widget.dn.assignedto', { id: ( this.threadNameMap[ item.thread_id ] || '' ), assignee: item.assigned_to } ).trim();
+        const visibleThreadId = this.threadNameMap[ item.thread_id ] ? `#${this.threadNameMap[ item.thread_id ]}` : '';
+        const assignee = !item.assigned_to ? visibleThreadId : t( 'widget.dn.assignedto', { id: visibleThreadId, assignee: item.assigned_to } ).trim();
         const status = item.status ? t( 'widget.dn.status', { status: item.status } ) : '';
 
         return `
