@@ -9,6 +9,7 @@
             "addannotationbutton": "Add Annotation",
             "addnewtext": "New",
             "emptyhistorytext": "No History",
+            "printhistoryheading": "History for - __labelText__ (__questionName__)",
             "me": "Me",
             "status": "Status: __status__",
             "reopen": "Reopen",

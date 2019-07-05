@@ -1114,12 +1114,23 @@ class Comment extends Widget {
         }
 
         this.question.classList.add( 'printified' );
-        $( this.question ).append( `<div class="dn-temp-print">${this.notes.queries.concat( this.notes.logs ).sort( this._datetimeDesc.bind( this ) ).map( item => that._getHistoryRow( item, { timestamp: 'datetime', username: 'full' } ) ).join( '' )}</div>` );
+        $( this.question ).append(
+            `<div class="dn-temp-print">
+                ${this.notes.queries
+                    .concat( this.notes.logs )
+                    .sort( this._datetimeDesc
+                    .bind( this ) )
+                    .map( item => that._getHistoryRow( item, { timestamp: 'datetime', username: 'full' } ) )
+                    .join( '' ) || t('widget.dn.emptyhistorytext')}        
+            </div>` );
 
         const existingLabel = this.question.querySelector( '.question-label.active' );
+        const control = this.linkedQuestion.querySelector( 'input, select, textarea' );
+        const name = control ? control.dataset.name || control.name : null;
+        const questionName = name ? name.substring( name.lastIndexOf( '/' ) + 1 ) : '?';
 
         existingLabel.dataset.original = existingLabel.textContent;
-        existingLabel.textContent = `History for - ${labelText}`;
+        existingLabel.textContent = t( 'widget.dn.printhistoryheading', { labelText, questionName } );
     }
 
     _deprintify() {
