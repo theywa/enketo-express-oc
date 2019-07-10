@@ -304,7 +304,7 @@ function _setDefaultsQueryParam( req, res, next ) {
 
     if ( map ) {
         for ( const prop in map ) {
-            if ( map.hasOwnProperty( prop ) ) {
+            if ( Object.prototype.hasOwnProperty.call( map, prop ) ) {
                 const paramKey = `d[${decodeURIComponent( prop )}]`;
                 queryParam += `${encodeURIComponent( paramKey )}=${encodeURIComponent( decodeURIComponent( map[ prop ] ) )}&`;
             }
@@ -407,92 +407,82 @@ function _generateWebformUrls( id, req ) {
     const type = `${req.webformType || 'single'}${req.webformSubType ? '-'+req.webformSubType : ''}`;
 
     switch ( type ) {
-        case 'preview':
-            {
-                const queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam, req.goToErrorUrl, req.jini ] );
-                url = `${BASEURL}preview/${IFRAMEPATH}${idOnline}${queryString}${hash}`;
-                break;
-            }
-        case 'preview-participant':
-            {
-                const queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam, req.goToErrorUrl ] );
-                url = `${BASEURL}preview/participant/${IFRAMEPATH}${idFsParticipant}${queryString}${hash}`;
-                break;
-            }
-        case 'edit':
-            {
-                const editId = dnClosePart ? idFsC : idOnline;
-                const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.goToErrorUrl, req.jini ] );
-                url = `${BASEURL}edit/${FSPATH}${dnClosePart}${IFRAMEPATH}${editId}${queryString}${hash}`;
-                break;
-            }
-        case 'edit-rfc':
-            {
-                const rfcId = dnClosePart ? idEditRfcC : idEditRfc;
-                const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.goToErrorUrl, req.jini ] );
-                url = `${BASEURL}edit/${FSPATH}rfc/${dnClosePart}${IFRAMEPATH}${rfcId}${queryString}${hash}`;
-                break;
-            }
+        case 'preview': {
+            const queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam, req.goToErrorUrl, req.jini ] );
+            url = `${BASEURL}preview/${IFRAMEPATH}${idOnline}${queryString}${hash}`;
+            break;
+        }
+        case 'preview-participant': {
+            const queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam, req.goToErrorUrl ] );
+            url = `${BASEURL}preview/participant/${IFRAMEPATH}${idFsParticipant}${queryString}${hash}`;
+            break;
+        }
+        case 'edit': {
+            const editId = dnClosePart ? idFsC : idOnline;
+            const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.goToErrorUrl, req.jini ] );
+            url = `${BASEURL}edit/${FSPATH}${dnClosePart}${IFRAMEPATH}${editId}${queryString}${hash}`;
+            break;
+        }
+        case 'edit-rfc': {
+            const rfcId = dnClosePart ? idEditRfcC : idEditRfc;
+            const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.goToErrorUrl, req.jini ] );
+            url = `${BASEURL}edit/${FSPATH}rfc/${dnClosePart}${IFRAMEPATH}${rfcId}${queryString}${hash}`;
+            break;
+        }
         case 'headless':
-            //case 'headless-rfc':
-            {
-                //const rfcPath = req.webformType === 'headless-rfc' ? 'rfc/' : '';
-                const editId = /*req.webformType === 'headless-rfc' ? idPartEditRfc : */ idPartEditHeadless;
-                const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.completeButtonParam ] );
-                url = `${BASEURL}edit/${FSPATH}headless/${editId}${queryString}`;
-                break;
-            }
-        case 'single':
-            {
-                const id = dnClosePart ? idFsC : idOnline;
-                const queryString = _generateQueryString( [ req.ecid, req.pid, req.defaultsQueryParam, req.returnQueryParam, req.parentWindowOriginParam, req.jini ] );
-                url = `${BASEURL}single/${FSPATH}${dnClosePart}${IFRAMEPATH}${id}${queryString}`;
-                break;
-            }
-        case 'single-participant':
-            {
-                const queryString = _generateQueryString( [ req.ecid, req.pid, req.defaultsQueryParam, req.returnQueryParam, req.parentWindowOriginParam, req.jini ] );
-                url = `${BASEURL}single/${FSPATH}participant/${IFRAMEPATH}${idFsParticipant}${queryString}`;
-                break;
-            }
-        case 'edit-participant':
-            {
-                const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.defaultsQueryParam, req.returnQueryParam, req.parentWindowOriginParam ] );
-                url = `${BASEURL}edit/${FSPATH}participant/${IFRAMEPATH}${idFsParticipant}${queryString}${hash}`;
-                break;
-            }
+        //case 'headless-rfc':
+        {
+            //const rfcPath = req.webformType === 'headless-rfc' ? 'rfc/' : '';
+            const editId = /*req.webformType === 'headless-rfc' ? idPartEditRfc : */ idPartEditHeadless;
+            const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.completeButtonParam ] );
+            url = `${BASEURL}edit/${FSPATH}headless/${editId}${queryString}`;
+            break;
+        }
+        case 'single': {
+            const id = dnClosePart ? idFsC : idOnline;
+            const queryString = _generateQueryString( [ req.ecid, req.pid, req.defaultsQueryParam, req.returnQueryParam, req.parentWindowOriginParam, req.jini ] );
+            url = `${BASEURL}single/${FSPATH}${dnClosePart}${IFRAMEPATH}${id}${queryString}`;
+            break;
+        }
+        case 'single-participant': {
+            const queryString = _generateQueryString( [ req.ecid, req.pid, req.defaultsQueryParam, req.returnQueryParam, req.parentWindowOriginParam, req.jini ] );
+            url = `${BASEURL}single/${FSPATH}participant/${IFRAMEPATH}${idFsParticipant}${queryString}`;
+            break;
+        }
+        case 'edit-participant': {
+            const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.defaultsQueryParam, req.returnQueryParam, req.parentWindowOriginParam ] );
+            url = `${BASEURL}edit/${FSPATH}participant/${IFRAMEPATH}${idFsParticipant}${queryString}${hash}`;
+            break;
+        }
         case 'view':
-        case 'view-instance':
-            {
-                const queryParts = [ req.ecid, req.pid, req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning, req.goToErrorUrl ];
-                if ( req.webformType === 'view-instance' ) {
-                    queryParts.unshift( `instance_id=${req.body.instance_id}` );
-                }
-                const queryString = _generateQueryString( queryParts );
-                url = `${BASEURL}view/${FSPATH}${IFRAMEPATH}${idView}${queryString}${hash}`;
-                break;
+        case 'view-instance': {
+            const queryParts = [ req.ecid, req.pid, req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning, req.goToErrorUrl ];
+            if ( req.webformType === 'view-instance' ) {
+                queryParts.unshift( `instance_id=${req.body.instance_id}` );
             }
-        case 'note-instance':
-            {
-                const viewId = dnClosePart ? idViewDnc : idViewDn;
-                const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning, req.goToErrorUrl ] );
-                url = `${BASEURL}edit/${FSPATH}dn/${dnClosePart}${IFRAMEPATH}${viewId}${queryString}${hash}`;
-                break;
+            const queryString = _generateQueryString( queryParts );
+            url = `${BASEURL}view/${FSPATH}${IFRAMEPATH}${idView}${queryString}${hash}`;
+            break;
+        }
+        case 'note-instance': {
+            const viewId = dnClosePart ? idViewDnc : idViewDn;
+            const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.loadWarning, req.goToErrorUrl ] );
+            url = `${BASEURL}edit/${FSPATH}dn/${dnClosePart}${IFRAMEPATH}${viewId}${queryString}${hash}`;
+            break;
+        }
+        case 'pdf': {
+            // We use the view-instance view because it is:
+            // - has optional instance support
+            // - has protection against accidental fieldsubmissions (extra layer of security)
+            // - for now OC is planning to not add DN questions to the XForm if it doesn't want those printed
+            const queryParts = [ req.ecid, req.pid, 'print=true' ];
+            if ( req.body.instance_id ) {
+                queryParts.push( `instance_id=${req.body.instance_id}` );
             }
-        case 'pdf':
-            {
-                // We use the view-instance view because it is:
-                // - has optional instance support
-                // - has protection against accidental fieldsubmissions (extra layer of security)
-                // - for now OC is planning to not add DN questions to the XForm if it doesn't want those printed
-                const queryParts = [ req.ecid, req.pid, 'print=true' ];
-                if ( req.body.instance_id ) {
-                    queryParts.push( `instance_id=${req.body.instance_id}` );
-                }
-                const queryString = _generateQueryString( queryParts );
-                url = `${BASEURL}view/${FSPATH}${idView}${queryString}`;
-                break;
-            }
+            const queryString = _generateQueryString( queryParts );
+            url = `${BASEURL}view/${FSPATH}${idView}${queryString}`;
+            break;
+        }
         default:
             url = 'Could not generate a webform URL. Unknown webform type.';
             break;

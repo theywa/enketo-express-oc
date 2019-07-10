@@ -81,7 +81,7 @@ function getFileUrl( subject ) {
 }
 
 function getInstanceAttachmentUrl( subject ) {
-    if ( subject && instanceAttachments && ( instanceAttachments.hasOwnProperty( subject ) ) ) {
+    if ( subject && instanceAttachments && ( Object.prototype.hasOwnProperty.call( instanceAttachments, subject ) ) ) {
         return instanceAttachments[ subject ];
     }
     return null;
