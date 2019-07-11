@@ -74,6 +74,7 @@ router
     .get( '/edit/fs/dn/c/:mod/:encrypted_enketo_id_view_dnc', fieldSubmission )
     .get( '/edit/fs/participant/:mod/:encrypted_enketo_id_fs_participant', fieldSubmission )
     .get( '/edit/fs/headless/:encrypted_enketo_id_headless', fieldSubmission )
+    .get( '/edit/fs/rfc/headless/:encrypted_enketo_id_headless', fieldSubmission )
     .get( '/view/fs/:encrypted_enketo_id_view', fieldSubmission )
     .get( '/view/fs/:mod/:encrypted_enketo_id_view', fieldSubmission )
     .get( '/xform/:enketo_id', xform )

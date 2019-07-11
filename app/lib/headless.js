@@ -19,6 +19,7 @@ async function run( url ) {
             e.status = 400;
             throw e;
         } );
+
         page.on( 'requestfailed', e => {
             // I have not been able to actually reach this code.
             e.status = 400;
@@ -30,20 +31,22 @@ async function run( url ) {
             e.status = 400;
             throw e;
         } );
+
         //await page.evaluate( () => { throw new Error( 'js throw some error' ); } );
         const element = await page.waitForSelector( '#headless-result', { timeout } ).catch( e => {
-            // I have not been able to actually reach this code.
             e.status = /timeout/i.test( e.message ) ? 408 : 400;
             throw e;
         } );
+
         const errorEl = await element.$( '#error' );
-        // LoadErrors caught by Enketo
+        // Load or submission errors caught by Enketo
         if ( errorEl ) {
             const msg = await errorEl.getProperty( 'textContent' );
             const error = new Error( await msg.jsonValue() );
             error.status = 400;
             throw error;
         }
+
         const fsEl = await element.$( '#fieldsubmissions' );
         if ( fsEl ) {
             const fs = await fsEl.getProperty( 'textContent' );

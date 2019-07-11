@@ -193,7 +193,22 @@ Same as POST /instance/note except that this view has a **Close button** in the 
 
 Loads a record headlessly, adds autoqueries and submits. 
 
-The result object has a `"message"`, and `"fieldsubmissions"` property. The `"message"` value contains an error message if the HTTP response is not `200` or `201` (otherwise the value is "OK"). The `"fieldsubmissions"` value is the number of fieldsubmissions that were successfully submitted. For example:
+The result object has a `"message"` and if it was succesful also a `"fieldsubmissions"` property. The `"message"` value contains an error message if the HTTP response is not `200` or `201` (otherwise the value is "OK"). The `"fieldsubmissions"` value is the number of fieldsubmissions that were successfully submitted if there was no loading or submission error (otherwise this property is absent). For example:
+
+```json
+{
+    "message": "OK",
+    "fieldsubmissions": 1
+}
+```
+
+Otherwise, use like [POST /instance](http://apidocs.enketo.org/v2/#/post-instance) (without `return_url` and `go_to` parameters)
+
+### POST /instance/headless/rfc
+
+Loads a completed record headlessly, adds autoqueries and submits. 
+
+The result object has a `"message"` and if it was succesful also a `"fieldsubmissions"` property. The `"message"` value contains an error message if the HTTP response is not `200` or `201` (otherwise the value is "OK"). The `"fieldsubmissions"` value is the number of fieldsubmissions that were successfully submitted if there was no loading or submission error (otherwise this property is absent). For example:
 
 ```json
 {
@@ -206,7 +221,7 @@ Otherwise, use like [POST /instance](http://apidocs.enketo.org/v2/#/post-instanc
 
 ### DELETE /instance
 
-Removes cached instance. This method may not have a practical use as instances POSTed to enketo for editing are only cached/saved very briefly (available for a maximum of 1 minute).
+Removes cached instance. This method may not have a practical use as instances POSTed to enketo for editing are only cached/saved very briefly (see [expiry for record cache](https://github.com/enketo/enketo-express/tree/master/config#expiry-for-record-cache) ).
 
 Use exactly as [DELETE /instance](https://apidocs.enketo.org/v2#/delete-instance)
 
