@@ -26,3 +26,8 @@
 .repeat-buttons .remove {
     line-height: 20px;
 }
+
+// This extra push is to integrate with the dn-widget. Hence it's not included in Enketo Core as part of the analog scale widget
+.or-analog-scale-initialized.or-appearance-vertical:not(.disabled) .analog-scale-widget {
+    margin-top: 15px;
+}
