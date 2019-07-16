@@ -140,9 +140,9 @@ Form.prototype.specialOcLoadValidate = function( includeRequired ) {
  */
 Form.prototype.validateInput = function( control ) {
     const that = this;
-    // There is a condition where a valuechange results in both an invalid-relevant and invalid-constraint,
+    // There is a condition where a value change results in both an invalid-relevant and invalid-constraint,
     // where the invalid constraint is added *after* the invalid-relevant. I can reproduce in automated test (not manually).
-    // It is probably related due to the asynchronousity of contraint evaluation.
+    // It is probably related due to the asynchronicity of the constraint evaluation.
     // 
     // To crudely resolve this, we remove any constraint error here.
     // However we do want some of the other things that validateInput does (ie. updating the required "*" visibility), so 
@@ -151,8 +151,11 @@ Form.prototype.validateInput = function( control ) {
     // This is very unfortunate, but these are the kind of acrobatics that are necessary to "fight" the built-in behavior of Enketo's form engine.
     return originalValidateInput.call( this, control )
         .then( passed => {
-            if ( !passed && control.closest( '.question' ).classList.contains( 'invalid-relevant' ) ) {
-                that.setValid( control, 'constraint' );
+            if ( !passed ) {
+                const question = control.closest( '.question' );
+                if ( question && question.classList.contains( 'invalid-relevant' ) ) {
+                    that.setValid( control, 'constraint' );
+                }
             }
             return passed;
         } );
