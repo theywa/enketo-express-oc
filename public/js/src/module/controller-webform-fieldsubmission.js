@@ -270,7 +270,7 @@ function _closeRegular( offerAutoqueries = true ) {
 
             if ( offerAutoqueries ) {
                 const violated = [ ...form.view.html.querySelectorAll( '.invalid-constraint, .invalid-relevant' ) ]
-                    .filter( question => !question.querySelector( '.btn-comment.new, .btn-comment.updated' ) );
+                    .filter( question => !question.querySelector( '.btn-comment.new, .btn-comment.updated' ) || question.matches( '.or-group.invalid-relevant, .or-group-data.invalid-relevant' ) );
 
                 // First check if any constraints have been violated and prompt option to generate automatic queries
                 if ( violated.length ) {
@@ -415,7 +415,7 @@ function _closeCompletedRecord( offerAutoqueries = true ) {
         .then( valid => {
             if ( !valid && offerAutoqueries ) {
                 const violations = [ ...form.view.html.querySelectorAll( '.invalid-constraint, .invalid-required, .invalid-relevant' ) ]
-                    .filter( question => !question.querySelector( '.btn-comment.new, .btn-comment.updated' ) );
+                    .filter( question => !question.querySelector( '.btn-comment.new, .btn-comment.updated' ) || question.matches( '.or-group.invalid-relevant, .or-group-data.invalid-relevant' ) );
 
                 // Note that unlike _close this also looks at .invalid-required.
                 if ( violations.length ) {
