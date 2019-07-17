@@ -42,7 +42,7 @@ function _cacheInstance( survey ) {
                             reject( error );
                         } else {
                             // expire, no need to wait for result
-                            client.expire( instanceKey, 30 );
+                            client.expire( instanceKey, 60 );
                             resolve( survey );
                         }
                     } );
