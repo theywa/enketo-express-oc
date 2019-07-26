@@ -1103,7 +1103,11 @@ class Comment extends Widget {
     // used during regular data entry.
     _printify() {
         let labelText;
-        const that = this;
+
+        if ( this.linkedQuestion.closest( '.disabled' ) ) {
+            console.log( 'disabled', this.linkedQuestion );
+            return;
+        }
 
         if ( this.linkedQuestion.matches( '.or-appearance-analog-scale' ) ) {
             const $clone = $( this.linkedQuestion ).find( '.question-label.widget.active' ).clone();
@@ -1114,15 +1118,15 @@ class Comment extends Widget {
         }
 
         this.question.classList.add( 'printified' );
-        $( this.question ).append(
+        this.question.append( document.createRange().createContextualFragment(
             `<div class="dn-temp-print">
                 ${this.notes.queries
                     .concat( this.notes.logs )
                     .sort( this._datetimeDesc
                     .bind( this ) )
-                    .map( item => that._getHistoryRow( item, { timestamp: 'datetime', username: 'full' } ) )
+                    .map( item => this._getHistoryRow( item, { timestamp: 'datetime', username: 'full' } ) )
                     .join( '' ) || t('widget.dn.emptyhistorytext')}        
-            </div>` );
+            </div>` ) );
 
         const existingLabel = this.question.querySelector( '.question-label.active' );
         const control = this.linkedQuestion.querySelector( 'input, select, textarea' );
@@ -1134,12 +1138,14 @@ class Comment extends Widget {
     }
 
     _deprintify() {
-        this.question.classList.remove( 'printified' );
-        this.question.querySelector( '.dn-temp-print' ).remove();
+        if ( this.question.classList.contains( 'printified' ) ) {
+            this.question.classList.remove( 'printified' );
+            this.question.querySelector( '.dn-temp-print' ).remove();
 
-        const existingLabel = this.question.querySelector( '.question-label.active' );
-        existingLabel.textContent = existingLabel.dataset.original;
-        delete existingLabel.dataset.original;
+            const existingLabel = this.question.querySelector( '.question-label.active' );
+            existingLabel.textContent = existingLabel.dataset.original;
+            delete existingLabel.dataset.original;
+        }
     }
 
 }
