@@ -202,7 +202,7 @@ The result object has a `"message"` and if it was succesful also a `"fieldsubmis
 }
 ```
 
-Otherwise, use like [POST /instance](http://apidocs.enketo.org/v2/#/post-instance) (without `return_url` and `go_to` parameters)
+Otherwise, use like [POST /instance/edit](#post-instanceedit) (without `return_url` and `go_to` parameters)
 
 ### POST /instance/headless/rfc
 
@@ -217,7 +217,7 @@ The result object has a `"message"` and if it was succesful also a `"fieldsubmis
 }
 ```
 
-Otherwise, use like [POST /instance](http://apidocs.enketo.org/v2/#/post-instance) (without `return_url` and `go_to` parameters)
+Otherwise, use like [POST /instance/edit/rfc](#post-instanceeditrfc) (without `return_url` and `go_to` parameters)
 
 ### DELETE /instance
 

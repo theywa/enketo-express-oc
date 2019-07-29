@@ -76,7 +76,7 @@ router
     .post( '*', _setReturnQueryParam ) // is this actually used by OC?
     .post( '*', _setGoTo )
     .post( '*', _setParentWindow )
-    .post( /\/(survey|instance)\/(collect|edit|view|note)/, _setEcid ) // excl preview
+    .post( /\/(survey|instance)\/(collect|edit|view|note|headless)/, _setEcid ) // excl preview
     .post( /\/(survey|instance)\/(collect|edit|preview)(?!\/participant)/, _setJini ) // excl view, note, and participant
     .post( /\/(survey|instance)\/(collect|edit|view|note)(?!\/participant)/, _setPid ) // excl preview, and participant
     .post( /\/(view|note)/, _setLoadWarning )
@@ -432,7 +432,7 @@ function _generateWebformUrls( id, req ) {
         case 'headless':
         case 'headless-rfc': {
             const rfcPath = req.webformType === 'headless-rfc' ? 'rfc/' : '';
-            const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.completeButtonParam ] );
+            const queryString = _generateQueryString( [ req.ecid, `instance_id=${req.body.instance_id}`, req.completeButtonParam ] );
             url = `${BASEURL}edit/${FSPATH}${rfcPath}headless/${idEditHeadless}${queryString}`;
             break;
         }
