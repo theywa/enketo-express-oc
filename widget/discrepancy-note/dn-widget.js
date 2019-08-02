@@ -48,7 +48,24 @@ class Comment extends Widget {
             // Any <button> inside a <label> receives click events if the <label> is clicked!
             // See http://codepen.io/MartijnR/pen/rWJeOG?editors=1111
             const commentButton = document.createRange().createContextualFragment( '<a class="btn-icon-only btn-comment btn-dn" tabindex="-1" type="button" href="#"><i class="icon"> </i></a>' );
-            [ ...this.linkedQuestion.querySelectorAll( '.question-label' ) ].slice( -1 )[ 0 ].after( commentButton );
+            const lastLabel = [ ...this.linkedQuestion.querySelectorAll( '.question-label' ) ].slice( -1 )[ 0 ];
+            if ( !lastLabel ) {
+                /*
+                 * https://github.com/OpenClinica/enketo-express-oc/issues/238 
+                 * 
+                 * Offically there is no support for questions without a label, but unfortunately, some forms were created like this.
+                 * We just want the widget to keep working (not crash) but accept visual issues (e.g. long hints may overlap icon).
+                 */
+                const alternative = this.linkedQuestion.querySelector( '.required, .or-hint' );
+                if ( alternative ) {
+                    alternative.before( commentButton );
+                } else {
+                    // if there is a hint, this makes it nearly impossible to click the comment button, so we use this if only as last resort.
+                    this.linkedQuestion.prepend( commentButton );
+                }
+            } else {
+                lastLabel.after( commentButton );
+            }
             this.commentButton = this.linkedQuestion.querySelector( '.btn-dn' );
             this._setCommentButtonState( this._getCurrentStatus( this.notes ), this._hasAnnotation( this.notes ), this._hasMultipleOpenQueries( this.notes ) );
             this._setUserOptions( this.readOnly );
