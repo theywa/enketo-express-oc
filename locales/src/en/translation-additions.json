@@ -102,7 +102,8 @@
         "feedback": {
             "ongoing": "Saving...",
             "success": "All changes saved.",
-            "fail": "Failed to save changes."
+            "fail": "Failed to save changes.",
+            "disabled": "Failed to save changes due to form loading error."
         },
         "readonly": {
             "msg": "You're in read-only mode."

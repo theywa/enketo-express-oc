@@ -21,7 +21,6 @@ let form;
 let formSelector;
 let formprogress;
 let ignoreBeforeUnload = false;
-let clearedForSubmissions = false;
 
 const formOptions = {
     printRelevantOnly: settings.printRelevantOnly
@@ -46,15 +45,7 @@ function init( selector, data, loadWarnings = [] ) {
 
             // Additional layer of security to disable submissions in readonly views.
             // Should not be necessary to do this.
-            if ( settings.type !== 'view' ) {
-                fieldSubmissionQueue = new FieldSubmissionQueue();
-            } else {
-                console.log( 'Fieldsubmissions disabled' );
-                fieldSubmissionQueue = {
-                    submitAll() { return Promise.resolve(); },
-                    get() { return {}; }
-                };
-            }
+            fieldSubmissionQueue = new FieldSubmissionQueue();
 
             // For Participant emtpy-form view in order to show Close button on all pages
             if ( settings.strictViolationSelector && settings.type !== 'edit' ) {
@@ -159,6 +150,9 @@ function init( selector, data, loadWarnings = [] ) {
             if ( loadErrors.length > 0 ) {
                 document.querySelectorAll( '.form-footer__content__main-controls button' )
                     .forEach( button => button.remove() );
+            } else if ( settings.type !== 'view' ) {
+                // Current queue can be submitted, and so can future fieldsubmissions.
+                fieldSubmissionQueue.enable();
             }
 
             const loadIssues = loadWarnings.concat( loadErrors );
@@ -167,7 +161,6 @@ function init( selector, data, loadWarnings = [] ) {
                 throw loadIssues;
             }
 
-            clearedForSubmissions = true;
             resolve( form );
         } )
         .catch( error => {
@@ -600,9 +593,7 @@ function _setFormEventHandlers() {
 
         postHeartbeat();
         fieldSubmissionQueue.addRepeatRemoval( updated.xmlFragment, instanceId, form.deprecatedID );
-        if ( clearedForSubmissions ) {
-            fieldSubmissionQueue.submitAll();
-        }
+        fieldSubmissionQueue.submitAll();
     } );
     // Field is changed
     form.view.html.addEventListener( events.DataUpdate().type, event => {
@@ -640,9 +631,7 @@ function _setFormEventHandlers() {
         // populated at the time the instanceID dataupdate event is processed and added to the fieldSubmission queue.
         postHeartbeat();
         fieldSubmissionQueue.addFieldSubmission( updated.fullPath, updated.xmlFragment, instanceId, form.deprecatedID, file );
-        if ( clearedForSubmissions ) {
-            fieldSubmissionQueue.submitAll();
-        }
+        fieldSubmissionQueue.submitAll();
     } );
 
     // Before repeat removal from view and model

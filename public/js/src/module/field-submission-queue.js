@@ -15,7 +15,15 @@ function FieldSubmissionQueue() {
     this.submittedCounter = 0;
     this.queuedSubmitAllRequest = undefined;
     this._uploadStatus.init();
+    this._enabled = true;
 }
+
+FieldSubmissionQueue.prototype.enable = function() {
+    // Tbc if this is the best approach. The ability to add submissions to the queue is still there, 
+    // but they can no longer be submitted.
+    console.log( 'fieldsubmissions have been enabled' );
+    this._enabled = true;
+};
 
 FieldSubmissionQueue.prototype.get = function() {
     return this.submissionQueue;
@@ -80,6 +88,12 @@ FieldSubmissionQueue.prototype.addRepeatRemoval = function( xmlFragment, instanc
 
 FieldSubmissionQueue.prototype.submitAll = function() {
     const that = this;
+
+    if ( !this._enabled ) {
+        this._uploadStatus.update( 'disabled' );
+        return Promise.resolve();
+    }
+
     if ( this.ongoingSubmissions ) {
         // store the successive request in a global variable (without executing it)
         this.queuedSubmitAllRequest = this._submitAll;
@@ -218,6 +232,11 @@ FieldSubmissionQueue.prototype.complete = function( instanceId, deprecatedId ) {
     let error;
     let method = 'POST';
 
+    if ( !this._enabled ) {
+        this._uploadStatus( 'disabled' );
+        return Promise.reject( new Error( 'Attempt to complete a record for a form that was disabled due to loading error(s).' ) );
+    }
+
     if ( Object.keys( this.submissionQueue ).length === 0 && instanceId ) {
         const fd = new FormData();
         fd.append( 'instance_id', instanceId );
@@ -280,16 +299,17 @@ FieldSubmissionQueue.prototype._uploadStatus = {
         return {
             ongoing: t( 'fieldsubmission.feedback.ongoing' ),
             success: t( 'fieldsubmission.feedback.success' ),
-            fail: t( 'fieldsubmission.feedback.fail' )
+            fail: t( 'fieldsubmission.feedback.fail' ),
+            disabled: t( 'fieldsubmission.feedback.disabled' )
         } [ status ];
     },
     _updateClass( status ) {
         this._getBox().removeClass( 'ongoing success error fail' ).addClass( status ).text( this._getText( status ) );
     },
     update( status ) {
-        if ( /\/fs\/dnc?\//.test( window.location.pathname ) ) {
-            return;
-        }
+        //if ( /\/fs\/dnc?\//.test( window.location.pathname ) ) {
+        //    return;
+        //}
         this._updateClass( status );
     }
 };
