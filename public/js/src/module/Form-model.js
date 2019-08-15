@@ -6,6 +6,7 @@ import $ from 'jquery';
 
 // Add OC custom XPath functions
 import extendXPath from 'enketo-xpath-extensions-oc';
+import sniffer from './sniffer';
 extendXPath( XPathJS );
 
 Model.prototype.getUpdateEventData = function( el, type ) {
@@ -66,13 +67,22 @@ Model.prototype.getXmlFragmentStr = function( node ) {
 
 Model.prototype.isMarkedComplete = function() {
     // Monkeypatch the namespace resolver to ensure oc namespace prefix is declared
-    // It's alright since this function is only called once.
     const OPENCLINICA_NS = 'http://openclinica.org/xforms';
     if ( !this.getNamespacePrefix( OPENCLINICA_NS ) ) {
         this.namespaces[ 'oc' ] = OPENCLINICA_NS;
     }
+    const nsPrefix = this.getNamespacePrefix( OPENCLINICA_NS );
 
-    return this.evaluate( '/node()/@oc:complete = "true"', 'boolean', null, null, true );
+    if ( sniffer.browser.ie && this.data.instanceStr ) {
+        // In IE11, the merged model does not include the oc:complete attribute at all
+        // This crap should be removed once we drop IE11.
+        const record = new DOMParser().parseFromString( this.data.instanceStr, 'text/xml' );
+        const attribute = record.querySelector( '*' ).getAttribute( `${nsPrefix}:complete` );
+        return attribute && attribute === 'true';
+    } else {
+        // This is proper
+        return this.evaluate( `/node()/@${nsPrefix}:complete = "true"`, 'boolean', null, null, false );
+    }
 };
 
 export default Model;
