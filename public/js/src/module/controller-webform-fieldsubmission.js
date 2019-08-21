@@ -746,11 +746,14 @@ function _setButtonEventHandlers() {
         form.view.html.addEventListener( events.Heartbeat().type, postHeartbeat );
     }
 
-    if ( settings.type !== 'view' && !( /\/fs\/dn\//.test( window.location.pathname ) ) ) {
+    if ( settings.type !== 'view' ) {
         window.onbeforeunload = () => {
             if ( !ignoreBeforeUnload ) {
-                _autoAddQueries( form.view.html.querySelectorAll( '.invalid-constraint' ) );
-                _autoAddReasonQueries( reasons.getInvalidFields() );
+                // Do not add autoqueries for note-only views
+                if ( !( /\/fs\/dn\//.test( window.location.pathname ) ) ) {
+                    _autoAddQueries( form.view.html.querySelectorAll( '.invalid-constraint' ) );
+                    _autoAddReasonQueries( reasons.getInvalidFields() );
+                }
                 if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
                     return 'Any unsaved data will be lost';
                 }
