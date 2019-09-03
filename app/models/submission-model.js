@@ -1,3 +1,7 @@
+/**
+ * @module submission-model
+ */
+
 const config = require( './config-model' ).server;
 const client = require( 'redis' ).createClient( config.redis.main.port, config.redis.main.host, {
     auth_pass: config.redis.main.password
@@ -9,12 +13,12 @@ let logger;
 /**
  * Use a cron job and logrotate service, e.g.:
  * /usr/sbin/logrotate /home/enketo/logrotate.conf -s /home/enketo/enketo-express/logs/logrotate
- * 
+ *
  * Example analyses of log files for form with enketo ID "YYYd":
  *
- * zgrep --no-filename "      YYYd    " submissions*.* | sort > YYYd-submissions.log 
- * (you may need to enter CTRL-V to enter the literal TAB character), 
- * 
+ * zgrep --no-filename "      YYYd    " submissions*.* | sort > YYYd-submissions.log
+ * (you may need to enter CTRL-V to enter the literal TAB character),
+ *
  * or (might be slower):
  * zgrep --no-filename -P "\tYYYd\t" submissions*.* > YYYp-submissions.log
  */
@@ -51,9 +55,10 @@ if ( process.env.NODE_ENV === 'test' ) {
  *
  * Note that edited records are submitted multiple times with different instanceIDs.
  *
- * @param  {[type]}  id         [description]
- * @param  {[type]}  instanceId [description]
- * @return {Boolean}            [description]
+ * @static
+ * @param {string} id
+ * @param {string} instanceId
+ * @return {Promise<Error|boolean>}
  */
 function isNew( id, instanceId ) {
     if ( !id || !instanceId ) {
@@ -86,6 +91,12 @@ function isNew( id, instanceId ) {
         } );
 }
 
+/**
+ * @static
+ * @param {string} id
+ * @param {string} instanceId
+ * @param {string} deprecatedId
+ */
 function add( id, instanceId, deprecatedId ) {
     if ( logger ) {
         logger.info( instanceId, {
@@ -96,10 +107,19 @@ function add( id, instanceId, deprecatedId ) {
     }
 }
 
+/**
+ * @param {string} instanceId
+ * @param {Array<string>} [list] List of IDs
+ * @return {boolean} Whather instanceID already exists in the list
+ */
 function _alreadyRecorded( instanceId, list = [] ) {
     return list.indexOf( instanceId ) !== -1;
 }
 
+/**
+ * @param {string} key
+ * @return {Promise}
+ */
 function _getLatestSubmissionIds( key ) {
     return new Promise( ( resolve, reject ) => {
         client.lrange( key, 0, -1, ( error, res ) => {
@@ -112,6 +132,14 @@ function _getLatestSubmissionIds( key ) {
     } );
 }
 
+/**
+ * Formatter function for logger
+ *
+ * @param {*} options
+ * @param {*} severity
+ * @param {*} date
+ * @param {Array<object>} elems
+ */
 function _formatter( options, severity, date, elems ) {
     let instanceId = '-';
     let enketoId = '-';

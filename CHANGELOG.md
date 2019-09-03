@@ -2,11 +2,22 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased]
+[1.78.0] - 2019-08-20
 ---------------------
+##### Removed
+- ArcGIS Geo widget.
+
 ##### Added
 - Make record cache expiry time configurable.
+- Support for max-pixel attribute for image uploads.
 
+##### Changed
+- Updated Swedish, Dutch and German translations.
+- Show warning if select_multiple option contains spaces in value.
+- Guidance hints are now displayed on screen as collapsible element.
+
+##### Fixed
+- Likert widget label in Grid Theme overlaps widget in print view.
 
 [1.77.1] - 2019-07-12
 --------------------

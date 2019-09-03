@@ -1,3 +1,7 @@
+/**
+ * @module account-model
+ */
+
 const utils = require( '../lib/utils' );
 const config = require( './config-model' ).server;
 const customGetAccount = config[ 'account lib' ] ? require( config[ 'account lib' ] ).getAccount : undefined;
@@ -13,9 +17,19 @@ if ( process.env.NODE_ENV === 'test' ) {
 }
 
 /**
- * Obtain account
- * @param  {[type]} survey [description]
- * @return {[type]}        [description]
+ * @typedef AccountObj
+ * @property {string} linkedServer
+ * @property {string} [openRosaServer]
+ * @property {string} key
+ * @property {number} quota
+ */
+
+/**
+ * Obtains account.
+ *
+ * @static
+ * @param {module:survey-model~SurveyObject} survey
+ * @return {Promise<Error|AccountObj>} promise that resolves in {@link module:account-model~AccountObj|Account object}
  */
 function get( survey ) {
     let error;
@@ -272,9 +286,10 @@ function getList() {
 /** 
  * Check if account for passed survey is active, and not exceeding quota.
  * This passes back the original survey object and therefore differs from the get function!
- * 
- * @param  {[type]} survey [description]
- * @return {[type]}        [description]
+ *
+ * @static
+ * @param {module:survey-model~SurveyObject} survey
+ * @return {Promise<module:survey-model~SurveyObject>} updated SurveyObject
  */
 function check( survey ) {
     return get( survey )
@@ -285,10 +300,11 @@ function check( survey ) {
 }
 
 /**
- * Checks if the provided serverUrl is part of the allowed 'linked' OpenRosa Server
- * @param { {openRosaServer:string, key:string}} account object
- * @param { string} serverUrl
- * @return { boolean } [description]
+ * Checks if the provided serverUrl is part of the allowed 'linked' OpenRosa Server.
+ *
+ * @param {AccountObj} account
+ * @param {string} serverUrl
+ * @return {boolean} Whether server URL is allowed
  */
 function _isAllowed( account, serverUrl ) {
     return account.linkedServer === '' || new RegExp( `https?://${_stripProtocol( account.linkedServer )}` ).test( serverUrl );
@@ -296,14 +312,16 @@ function _isAllowed( account, serverUrl ) {
 
 /**
  * Strips http(s):// from the provided url
- * @return {[type]} stripped url
+ *
+ * @param {string} url
+ * @return {string|null} stripped url
  */
 function _stripProtocol( url ) {
     if ( !url ) {
         return null;
     }
 
-    // strip http(s):// 
+    // strip http(s)://
     if ( /https?:\/\//.test( url ) ) {
         url = url.substring( url.indexOf( '://' ) + 3 );
     }
@@ -312,9 +330,9 @@ function _stripProtocol( url ) {
 
 /**
  * Obtains account from either configuration (hardcoded) or via custom function
- * 
- * @param  {string} serverUrl the serverUrl to be used to look up the account
- * @return {{linkedServer: string, key: string, quota: number}} account object
+ *
+ * @param {string} serverUrl - The serverUrl to be used to look up the account.
+ * @return {AccountObj} {@link module:account-model~AccountObj|Account object}
  */
 function _getAccount( serverUrl ) {
     const hardcodedAccount = _getHardcodedAccount();
@@ -351,7 +369,8 @@ function _getAccount( serverUrl ) {
 
 /**
  * Obtains the hardcoded account from the config
- * @return {[type]} [description]
+ *
+ * @return {null|AccountObj} `null` or {@link module:account-model~AccountObj|Account object}
  */
 function _getHardcodedAccount() {
     const app = require( '../../config/express' );
@@ -371,9 +390,10 @@ function _getHardcodedAccount() {
 }
 
 /**
- * Extracts the server from a survey object or server string
- * @param  {string|{openRosaServer:string}} survey server string or survey object
- * @return {[type]}        [description]
+ * Extracts the server from a survey object or server string.
+ *
+ * @param  {string|module:survey-model~SurveyObject} survey - Server string or survey object.
+ * @return {string|null} server
  */
 function _getServer( survey ) {
     if ( !survey || ( typeof survey === 'object' && ( !survey.openRosaServer && !survey.linkedServer ) ) ) {

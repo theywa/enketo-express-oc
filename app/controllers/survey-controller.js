@@ -1,3 +1,7 @@
+/**
+ * @module survey-controller
+ */
+
 const utils = require( '../lib/utils' );
 const TError = require( '../lib/custom-error' ).TranslatedError;
 const communicator = require( '../lib/communicator' );
@@ -88,6 +92,11 @@ router
         res.send( `connected ${Math.random()}` );
     } );
 
+/**
+ * @param {module:api-controller~ExpressRequest} req
+ * @param {module:api-controller~ExpressResponse} res
+ * @param {Function} next - Express callback
+ */
 function offlineWebform( req, res, next ) {
     if ( !req.app.get( 'offline enabled' ) ) {
         const error = new Error( 'Offline functionality has not been enabled for this application.' );
@@ -99,6 +108,11 @@ function offlineWebform( req, res, next ) {
     }
 }
 
+/**
+ * @param {module:api-controller~ExpressRequest} req
+ * @param {module:api-controller~ExpressResponse} res
+ * @param {Function} next - Express callback
+ */
 function webform( req, res, next ) {
     const options = {
         manifest: req.manifest,
@@ -109,6 +123,11 @@ function webform( req, res, next ) {
     _renderWebform( req, res, next, options );
 }
 
+/**
+ * @param {module:api-controller~ExpressRequest} req
+ * @param {module:api-controller~ExpressResponse} res
+ * @param {Function} next - Express callback
+ */
 function single( req, res, next ) {
     const options = {
         type: 'single',
@@ -162,6 +181,11 @@ function fieldSubmission( req, res, next ) {
     _renderWebform( req, res, next, options );
 }
 
+/**
+ * @param {module:api-controller~ExpressRequest} req
+ * @param {module:api-controller~ExpressResponse} res
+ * @param {Function} next - Express callback
+ */
 function view( req, res, next ) {
     const options = {
         type: 'view',
@@ -172,6 +196,11 @@ function view( req, res, next ) {
     _renderWebform( req, res, next, options );
 }
 
+/**
+ * @param {module:api-controller~ExpressRequest} req
+ * @param {module:api-controller~ExpressResponse} res
+ * @param {Function} next - Express callback
+ */
 function preview( req, res, next ) {
     const options = {
         type: 'preview',
@@ -183,6 +212,11 @@ function preview( req, res, next ) {
     _renderWebform( req, res, next, options );
 }
 
+/**
+ * @param {module:api-controller~ExpressRequest} req
+ * @param {module:api-controller~ExpressResponse} res
+ * @param {Function} next - Express callback
+ */
 function edit( req, res, next ) {
     const options = {
         type: 'edit',
@@ -198,6 +232,12 @@ function edit( req, res, next ) {
     }
 }
 
+/**
+ * @param {module:api-controller~ExpressRequest} req
+ * @param {module:api-controller~ExpressResponse} res
+ * @param {Function} next - Express callback
+ * @param {object} options - Options passed to render
+ */
 function _renderWebform( req, res, next, options ) {
     const deviceId = req.signedCookies[ '__enketo_meta_deviceid' ] || `${req.hostname}:${utils.randomString( 16 )}`,
         cookieOptions = {
@@ -212,10 +252,10 @@ function _renderWebform( req, res, next, options ) {
 
 /**
  * Debugging view that shows underlying XForm
- * @param  {[type]}   req  [description]
- * @param  {[type]}   res  [description]
- * @param  {Function} next [description]
- * @return {[type]}        [description]
+ *
+ * @param {module:api-controller~ExpressRequest} req
+ * @param {module:api-controller~ExpressResponse} res
+ * @param {Function} next - Express callback
  */
 function xform( req, res, next ) {
     return surveyModel.get( req.enketoId )

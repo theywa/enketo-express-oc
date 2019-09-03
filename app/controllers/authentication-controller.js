@@ -1,3 +1,7 @@
+/**
+ * @module authentication-controller
+ */
+
 const csrfProtection = require( 'csurf' )( {
     cookie: true
 } );
@@ -15,6 +19,11 @@ router
     .get( '/logout', logout )
     .post( '/login', csrfProtection, setToken );
 
+/**
+ * @param {module:api-controller~ExpressRequest} req
+ * @param {module:api-controller~ExpressResponse} res
+ * @param {Function} next - Express callback
+ */
 function login( req, res, next ) {
     let error;
     const authSettings = req.app.get( 'linked form and data server' ).authentication;
@@ -23,8 +32,8 @@ function login( req, res, next ) {
     if ( authSettings.type.toLowerCase() !== 'basic' ) {
         if ( authSettings.url ) {
             // the url is expected to:
-            // - authenticate the user, 
-            // - set a session cookie (cross-domain if necessary) or add a token as query parameter to the return URL, 
+            // - authenticate the user,
+            // - set a session cookie (cross-domain if necessary) or add a token as query parameter to the return URL,
             // - and return the user back to Enketo
             // - enketo will then pass the cookie or token along when requesting resources, or submitting data
             // Though returnUrl was encoded with encodeURIComponent, for some reason it appears to have been automatically decoded here.
@@ -46,6 +55,10 @@ function login( req, res, next ) {
     }
 }
 
+/**
+ * @param {module:api-controller~ExpressRequest} req
+ * @param {module:api-controller~ExpressResponse} res
+ */
 function logout( req, res ) {
     res
         .clearCookie( req.app.get( 'authentication cookie name' ) )
@@ -54,6 +67,10 @@ function logout( req, res ) {
         .render( 'surveys/logout' );
 }
 
+/**
+ * @param {module:api-controller~ExpressRequest} req
+ * @param {module:api-controller~ExpressResponse} res
+ */
 function setToken( req, res ) {
     const username = req.body.username.trim();
     const maxAge = 30 * 24 * 60 * 60 * 1000;

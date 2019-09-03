@@ -1,7 +1,19 @@
+/**
+ * @module user-model
+ */
+
 const jwt = require( 'jwt-simple' );
 const url = require( 'url' );
 // var debug = require( 'debug' )( 'user-model' );
 
+/**
+ * Returns credentials from request object.
+ * Handles `'basic'` and `'token'` authentication types.
+ *
+ * @static
+ * @param {module:api-controller~ExpressRequest} req
+ * @return {object|null} Credentials
+ */
 function getCredentials( req ) {
     const auth = req.app.get( 'linked form and data server' ).authentication;
     const authType = auth.type.toLowerCase();

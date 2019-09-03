@@ -1,12 +1,19 @@
+/**
+ * @module utils
+ */
+
 const crypto = require( 'crypto' );
 const config = require( '../models/config-model' ).server;
 const validUrl = require( 'valid-url' );
 // var debug = require( 'debug' )( 'utils' );
 
-/** 
+/**
  * Returns a unique, predictable openRosaKey from a survey oject
- * @param  {[type]} survey [description]
- * @return {[type]}        [description]
+ *
+ * @static
+ * @param {module:survey-model~SurveyObject} survey
+ * @param {string} [prefix]
+ * @return {string|null} openRosaKey
  */
 function getOpenRosaKey( survey, prefix ) {
     if ( !survey || !survey.openRosaServer || !survey.openRosaId ) {
@@ -17,6 +24,14 @@ function getOpenRosaKey( survey, prefix ) {
     return `${prefix + cleanUrl( survey.openRosaServer )},${survey.openRosaId.trim()}`;
 }
 
+/**
+ * Returns a XForm manifest hash.
+ *
+ * @static
+ * @param {object} manifest
+ * @param {string} type - Webform type
+ * @return {string} Hash
+ */
 function getXformsManifestHash( manifest, type ) {
     const hash = '';
 
@@ -36,8 +51,10 @@ function getXformsManifestHash( manifest, type ) {
 /**
  * Cleans a Server URL so it becomes useful as a db key
  * It strips the protocol, removes a trailing slash, removes www, and converts to lowercase
- * @param  {string} url [description]
- * @return {string=}     [description]
+ *
+ * @static
+ * @param {string} url - Url to be cleaned up
+ * @return {string} Cleaned up url
  */
 function cleanUrl( url ) {
     url = url.trim();
@@ -55,14 +72,22 @@ function cleanUrl( url ) {
  * The name of this function is deceiving. It checks for a valid server URL and therefore doesn't approve of:
  * - fragment identifiers
  * - query strings
- * 
- * @param  {[type]}  url [description]
- * @return {Boolean}     [description]
+ *
+ * @static
+ * @param {string} url - Url to be validated
+ * @return {boolean} Whether the url is valid
  */
 function isValidUrl( url ) {
     return !!validUrl.isWebUri( url ) && !( /\?/.test( url ) ) && !( /#/.test( url ) );
 }
 
+/**
+ * Returns md5 hash of given message
+ *
+ * @static
+ * @param {string} message - Message to be hashed
+ * @return {string} Hash string
+ */
 function md5( message ) {
     const hash = crypto.createHash( 'md5' );
     hash.update( message );
@@ -70,14 +95,15 @@ function md5( message ) {
 }
 
 /**
- * This is not secure encryption as it doesn't use a random cipher. Therefore the result is 
- * always the same for each text & pw (which is desirable in this case). 
+ * This is not secure encryption as it doesn't use a random cipher. Therefore the result is
+ * always the same for each text & pw (which is desirable in this case).
  * This means the password is vulnerable to be cracked,
  * and we should use a dedicated low-importance password for this.
- * 
- * @param  {string} text The text to be encrypted
- * @param  {string} pw   The password to use for encryption
- * @return {string}      The encrypted result.
+ *
+ * @static
+ * @param {string} text - The text to be encrypted
+ * @param {string} pw - The password to use for encryption
+ * @return {string} The encrypted result
  */
 function insecureAes192Encrypt( text, pw ) {
     let encrypted;
@@ -88,6 +114,14 @@ function insecureAes192Encrypt( text, pw ) {
     return encrypted;
 }
 
+/**
+ * Decrypts encrypted text.
+ *
+ * @static
+ * @param {*} encrypted - The text to be decrypted
+ * @param {*} pw - The password to use for decryption
+ * @return {string} The decrypted result
+ */
 function insecureAes192Decrypt( encrypted, pw ) {
     let decrypted;
     const decipher = crypto.createDecipher( 'aes192', pw );
@@ -97,6 +131,14 @@ function insecureAes192Decrypt( encrypted, pw ) {
     return decrypted;
 }
 
+/**
+ * Returns random howMany-lengthed string from provided characters.
+ *
+ * @static
+ * @param {number} [howMany] - Desired length of string
+ * @param {string} [chars] - Characters to use
+ * @return {string} Random string
+ */
 function randomString( howMany = 8, chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' ) {
     const rnd = crypto.randomBytes( howMany );
 
@@ -106,6 +148,13 @@ function randomString( howMany = 8, chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHI
         .join( '' );
 }
 
+/**
+ * Returns random item from array.
+ *
+ * @static
+ * @param {Array} array - Target array
+ * @return {*|null} Random array item
+ */
 function pickRandomItemFromArray( array ) {
     if ( !Array.isArray( array ) || array.length === 0 ) {
         return null;
@@ -117,7 +166,14 @@ function pickRandomItemFromArray( array ) {
     return array[ random ];
 }
 
-// not recursive, only goes one property level deep
+/**
+ * Compares two objects by shallow properties.
+ *
+ * @static
+ * @param {object} a - First object to be compared
+ * @param {object} b - Second object to be compared
+ * @return {null|boolean} Whether objects are equal (`null` for invalid arguments)
+ */
 function areOwnPropertiesEqual( a, b ) {
     let prop;
     const results = [];
@@ -147,8 +203,9 @@ function areOwnPropertiesEqual( a, b ) {
 /**
  * Converts a url to a local (proxied) url.
  *
- * @param  {string} url The url to convert.
- * @return {string}     The converted url.
+ * @static
+ * @param {string} url - The url to convert
+ * @return {string} The converted url
  */
 function toLocalMediaUrl( url ) {
     const localUrl = `${config[ 'base path' ]}/media/get/${url.replace( /(https?):\/\//, '$1/' )}`;

@@ -115,6 +115,9 @@
             "heading": "OK",
             "msg": "The enquete is geldig!"
         },
+        "valuehasspaces": {
+            "multiple": "Een \"select multiple\" question heeft een illegale waarde &#39;__waarde&#39; die een spatie bevat."
+        },
         "xpatherror": {
             "heading": "Formula fout",
             "msg": "Er is een formule evaluatie fout opgetreden. Contacteer __emailLink__ met deze fout beschrijving:"
@@ -169,6 +172,10 @@
             "psize": "Papier Formaat",
             "reminder": "Denk er aan om dezelfde settings te gebruiken in het print menu hierna!"
         },
+        "repeatremove": {
+            "heading": "Deze group met antwoorden verwijderen?",
+            "msg": "Deze actie is onomkeerbaar. Weet je zeker dat je verder wilt gaan?"
+        },
         "save": {
             "existingerror": "Deze record naam of ID bestaat al.",
             "hint": "Deze naam dient om makkelijk het opgeslagen bestand te kunnen vinden om het later compleet te maken.",
@@ -177,10 +184,6 @@
             "posButton": "Sla Op & Sluit",
             "renamemsg": "Weet je zeker dat je __currentName__ naar __newName__ wilt veranderen?",
             "unkownerror": "Een onbekende fout trad op tijdens het opslaan."
-        },
-        "repeatremove": {
-            "heading": "Deze group met antwoorden verwijderen?",
-            "msg": "Deze actie is onomkeerbaar. Weet je zeker dat je verder wilt gaan?"
         }
     },
     "constraint": {
@@ -266,6 +269,11 @@
         "searchPlaceholder": "zoek naar plaats of adres"
     },
     "here": "hier",
+    "hint": {
+        "guidance": {
+            "details": "meer details"
+        }
+    },
     "home": {
         "msg": "__appTitle__ werkt! De Enketo enquetes zijn vanaf de __serverName__ installatie toegankelijk."
     },
@@ -300,6 +308,10 @@
         "th": "Thai",
         "vi": "Vietnamees",
         "zh": "Chinees"
+    },
+    "literacywidget": {
+        "finish": "Eind",
+        "start": "Begin"
     },
     "page": {
         "modernbrowsers": {
