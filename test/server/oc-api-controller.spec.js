@@ -625,7 +625,7 @@ describe( 'api', () => {
                     auth: true,
                     instanceId: beingEdited,
                     instance: true,
-                    status: 405
+                    status: 201 // readonly view, so not blocked
                 },
                 // test load warning in response
                 {

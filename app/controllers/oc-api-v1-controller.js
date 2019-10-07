@@ -222,7 +222,7 @@ function cacheInstance( req, res, next ) {
             // If the API call is for /instance/edit/*, make sure
             // to not allow caching if it is already cached as some lame
             // protection against multiple people edit the same record simultaneously
-            const protect = req.webformType === 'edit';
+            const protect = !req.webformType.startsWith( 'view' ) && !req.webformType.startsWith( 'pdf' );
             return instanceModel.set( survey, protect );
         } )
         .then( () => {
