@@ -1,6 +1,7 @@
 // Extend the Enketo Core Form Model, and expose it for local testing.
 
 import { FormModel as Model } from 'enketo-core';
+import { getXPath } from 'enketo-core/src/js/dom-utils';
 import XPathJS from 'enketo-xpathjs';
 import $ from 'jquery';
 
@@ -18,7 +19,7 @@ Model.prototype.getUpdateEventData = function( el, type ) {
         console.error( new Error( 'XML Node not found. Form probably contains reference to non-existing XML node.' ) );
         return {};
     }
-    fullPath = this.getXPath( el, 'instance', true );
+    fullPath = getXPath( el, 'instance', true );
     xmlFragment = this.getXmlFragmentStr( el );
     file = ( type === 'binary' ) ? el.textContent : undefined;
     return {

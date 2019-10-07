@@ -1,6 +1,7 @@
 // Modify the Enketo Core branch module.
 
 import branchModule from 'enketo-core/src/js/relevant';
+import { getXPath } from 'enketo-core/src/js/dom-utils';
 import events from 'enketo-core/src/js/event';
 
 import $ from 'jquery';
@@ -170,7 +171,7 @@ branchModule.deactivate = function( $branchNode ) {
                 return [ ...dataEl.querySelectorAll( '*' ) ]
                     .filter( el => {
                         if ( el.children.length === 0 ) {
-                            const path = this.form.model.getXPath( el, 'instance' );
+                            const path = getXPath( el, 'instance' );
                             const selector = `.calculation > [name="${path}"], .or-appearance-dn > [name="${path}"]`;
                             // If a repeat has zero instances, the search for .or-appearance-dn in form.html will result in null, which means the dn-detection would fail.
                             const searchElements = [ this.form.view.html ].concat( Object.entries( this.form.repeats.templates ).map( entries => entries[ 1 ] ) );
