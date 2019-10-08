@@ -47,7 +47,7 @@
         "debug": "4.1.x",
         "enketo-core": "5.8.0",
         "enketo-transformer": "1.34.0",
-        "enketo-xpath-extensions-oc": "github:OpenClinica/enketo-xpath-extensions-oc#76ad770",
+        "enketo-xpath-extensions-oc": "github:OpenClinica/enketo-xpath-extensions-oc#efa9830",
         "express": "4.x.x",
         "grunt": "^1.0.3",
         "grunt-env": "1.0.x",

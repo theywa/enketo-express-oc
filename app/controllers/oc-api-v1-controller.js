@@ -53,10 +53,10 @@ router
         req.webformType = 'headless';
         next();
     } )
-    //.post( '*/rfc/headless', ( req, res, next ) => {
-    //    req.webformType = 'headless-rfc';
-    //    next();
-    //} )
+    .post( '*/headless/rfc', ( req, res, next ) => {
+        req.webformType = 'headless-rfc';
+        next();
+    } )
     .post( '/instance/note*', ( req, res, next ) => {
         req.webformType = 'note-instance';
         next();
@@ -76,7 +76,7 @@ router
     .post( '*', _setReturnQueryParam ) // is this actually used by OC?
     .post( '*', _setGoTo )
     .post( '*', _setParentWindow )
-    .post( /\/(survey|instance)\/(collect|edit|view|note)/, _setEcid ) // excl preview
+    .post( /\/(survey|instance)\/(collect|edit|view|note|headless)/, _setEcid ) // excl preview
     .post( /\/(survey|instance)\/(collect|edit|preview)(?!\/participant)/, _setJini ) // excl view, note, and participant
     .post( /\/(survey|instance)\/(collect|edit|view|note)(?!\/participant)/, _setPid ) // excl preview, and participant
     .post( /\/(view|note)/, _setLoadWarning )
@@ -98,7 +98,7 @@ router
     .post( '/instance/note/c', cacheInstance )
     .post( '/instance/edit/participant', cacheInstance )
     .post( '/instance/headless', cacheInstance )
-    //.post( '/instance/rfc/headless', cacheInstance )
+    .post( '/instance/headless/rfc', cacheInstance )
     .all( '*', ( req, res, next ) => {
         const error = new Error( 'Not allowed.' );
         error.status = 405;
@@ -229,7 +229,7 @@ function cacheInstance( req, res, next ) {
             const status = 201;
             if ( req.webformType === 'pdf' ) {
                 _renderPdf( status, enketoId, req, res );
-            } else if ( req.webformType === 'headless' /*|| req.webformType === 'headless-rfc' */ ) {
+            } else if ( req.webformType === 'headless' || req.webformType === 'headless-rfc' ) {
                 _renderHeadless( status, enketoId, req, res );
             } else {
                 _render( status, _generateWebformUrls( enketoId, req ), res );
@@ -404,7 +404,7 @@ function _generateWebformUrls( id, req ) {
     const idEditRfcC = `::${utils.insecureAes192Encrypt( id, keys.editRfcC )}`;
     const idFsC = `::${utils.insecureAes192Encrypt( id, keys.fsC )}`;
     const idFsParticipant = `::${utils.insecureAes192Encrypt( id, keys.fsParticipant )}`;
-    const idPartEditHeadless = `::${utils.insecureAes192Encrypt( id, keys.editHeadless )}`;
+    const idEditHeadless = `::${utils.insecureAes192Encrypt( id, keys.editHeadless )}`;
 
     let url;
 
@@ -434,12 +434,10 @@ function _generateWebformUrls( id, req ) {
             break;
         }
         case 'headless':
-        //case 'headless-rfc':
-        {
-            //const rfcPath = req.webformType === 'headless-rfc' ? 'rfc/' : '';
-            const editId = /*req.webformType === 'headless-rfc' ? idPartEditRfc : */ idPartEditHeadless;
-            const queryString = _generateQueryString( [ `instance_id=${req.body.instance_id}`, req.completeButtonParam ] );
-            url = `${BASEURL}edit/${FSPATH}headless/${editId}${queryString}`;
+        case 'headless-rfc': {
+            const rfcPath = req.webformType === 'headless-rfc' ? 'rfc/' : '';
+            const queryString = _generateQueryString( [ req.ecid, `instance_id=${req.body.instance_id}`, req.completeButtonParam ] );
+            url = `${BASEURL}edit/${FSPATH}${rfcPath}headless/${idEditHeadless}${queryString}`;
             break;
         }
         case 'single': {

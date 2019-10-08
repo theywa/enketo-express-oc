@@ -97,11 +97,9 @@ function init( selector, data, loadWarnings = [] ) {
 
             // Check if record is marked complete, before setting button event handlers.
             if ( data.instanceStr ) {
-                // DEBUG
-                // console.log( 'record to load:', data.instanceStr );
+                const regCloseButton = document.querySelector( 'button#close-form-regular' );
                 if ( form.model.isMarkedComplete() ) {
                     const finishButton = document.querySelector( 'button#finish-form' );
-                    const regCloseButton = document.querySelector( 'button#close-form-regular' );
                     if ( finishButton ) {
                         finishButton.remove();
                     }
@@ -110,7 +108,9 @@ function init( selector, data, loadWarnings = [] ) {
                     }
                 } else if ( settings.reasonForChange ) {
                     loadErrors.push( 'This record is not complete and cannot be used here.' );
-                    document.querySelector( 'button#close-form-regular' ).remove();
+                    if ( regCloseButton ) {
+                        regCloseButton.remove();
+                    }
                 }
                 if ( !settings.headless ) {
                     form.specialOcLoadValidate( form.model.isMarkedComplete() );
@@ -175,76 +175,47 @@ function init( selector, data, loadWarnings = [] ) {
         } )
         .then( () => {
             if ( settings.headless ) {
+                let action;
                 console.log( 'doing headless things' );
-                const $result = $( '<div id="headless-result" style="position: fixed; background: pink; top: 0; left: 50%;"/>' );
+                gui.prompt = () => Promise.resolve( true );
+                const resultFragment = document.createRange().createContextualFragment(
+                    `<div 
+                        id="headless-result" 
+                        style="position: fixed; width: 100%; background: pink; top: 0; left: 0; border: 5px solid black; padding: 10px 20px; text-align:center;"
+                        ></div>`
+                ).querySelector( '#headless-result' );
+
                 if ( loadErrors.length ) {
-                    $result.append( `<span id="error">${loadErrors[ 0 ]}</span>` );
-                    $( 'body' ).append( $result );
+                    action = Promise.reject( new Error( loadErrors[ 0 ] ) );
+                } else {
+                    if ( settings.reasonForChange ) {
+                        if ( !form.model.isMarkedComplete() ) {
+                            action = Promise.reject( new Error( 'Attempt to load RFC view for non-completed record.' ) );
+                        } else {
+                            action = _closeCompletedRecord( true );
+                        }
+                    } else {
+                        action = _closeRegular( true );
+                    }
                 }
-                return _headlessCloseComplete()
-                    .then( fieldsubmissions => {
-                        $result.append( `<span id="fieldsubmissions">${fieldsubmissions}</span>` );
-                    } )
+
+                return action
                     .catch( error => {
-                        $result.append( `<span id="error">${error.message}</span>` );
+                        resultFragment.append( document.createRange().createContextualFragment( `<div id="error">${error.message}</div>` ) );
                     } )
-                    .then( () => {
-                        $( 'body' ).append( $result );
+                    .finally( () => {
+                        const fieldsubmissions = fieldSubmissionQueue.submittedCounter;
+                        resultFragment.append( document.createRange().createContextualFragment(
+                            `<div 
+                                id="fieldsubmissions" 
+                                style="border: 5px dotted black; display: inline-block; padding: 10px 20px;"
+                            >${fieldsubmissions}</div>` ) );
+                        document.querySelector( 'body' ).append( resultFragment );
                     } );
             }
         } )
         // OC will return even if there were errors
         .then( () => form );
-}
-
-function _headlessValidateAndAutoQuery( valid ) {
-    const markedAsComplete = form.model.isMarkedComplete();
-    let invalid;
-
-    if ( !valid ) {
-        if ( markedAsComplete ) {
-            invalid = form.view.html.querySelectorAll( '.quesetion.invalid-relevant, .invalid-constraint, .invalid-required' );
-        } else {
-            invalid = form.view.html.querySelectorAll( '.invalid-relevant, .invalid-constraint' );
-        }
-        // Trigger auto-queries for relevant, constraint and required (handled in DN widget)
-        _autoAddQueries( invalid );
-        // Not efficient but robust, and not relying on validateContinuously: true, we just validate again.
-        return form.validate();
-    }
-    return valid;
-}
-
-function _headlessCloseComplete() {
-    const markedAsComplete = form.model.isMarkedComplete();
-    return form.validate()
-        // We run the autoquery-and-validate logic 3 times for those forms that have validation logic
-        // that is affected by autoqueries, ie. an autoquery for question A makes question B invalid.
-        .then( _headlessValidateAndAutoQuery )
-        .then( _headlessValidateAndAutoQuery )
-        .then( _headlessValidateAndAutoQuery )
-        .then( valid => {
-            if ( !valid && markedAsComplete ) {
-                return valid;
-            }
-            // ignore .invalid-required
-            return form.view.$.find( '.invalid-relevant, .invalid-constraint' ).length === 0;
-        } )
-        .then( valid => {
-            if ( !valid || reasons.getInvalidFields().length ) {
-                throw new Error( 'Could not create valid record using autoqueries' );
-            }
-            return fieldSubmissionQueue.submitAll();
-        } )
-        .then( () => {
-            if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
-                throw new Error( 'Failed to submit fieldsubmissions' );
-            }
-            if ( markedAsComplete ) {
-                return fieldSubmissionQueue.complete( form.instanceID, form.deprecatedID );
-            }
-        } )
-        .then( () => fieldSubmissionQueue.submittedCounter );
 }
 
 
@@ -328,6 +299,9 @@ function _closeRegular( offerAutoqueries = true ) {
                                 }
                             } );
                     }
+                    if ( settings.headless ) {
+                        throw new Error( errorMsg );
+                    }
 
                 } );
         } );
@@ -396,10 +370,11 @@ function _closeCompletedRecord( offerAutoqueries = true ) {
 
     if ( !reasons.validate() ) {
         const firstInvalidInput = reasons.getFirstInvalidField();
-        gui.alert( t( 'fieldsubmission.alert.reasonforchangevalidationerror.msg' ) );
+        const msg = t( 'fieldsubmission.alert.reasonforchangevalidationerror.msg' );
+        gui.alert( msg );
         firstInvalidInput.scrollIntoView();
         firstInvalidInput.focus();
-        return Promise.resolve( false );
+        return Promise.reject( new Error( msg ) );
     } else {
         reasons.clearAll();
     }
@@ -466,6 +441,9 @@ function _closeParticipant() {
 }
 
 function _redirect( msec ) {
+    if ( settings.headless ) {
+        return true;
+    }
     ignoreBeforeUnload = true;
     setTimeout( () => {
         location.href = decodeURIComponent( settings.returnUrl || DEFAULT_THANKS_URL );
@@ -492,10 +470,15 @@ function _complete( bypassConfirmation = false, bypassChecks = false ) {
                     .querySelector( settings.strictViolationSelector );
                 if ( strictViolations ) {
                     gui.alertStrictBlock();
+                    throw new Error( t( 'fieldsubmission.alert.participanterror.msg' ) );
                 } else if ( form.view.html.querySelector( '.invalid-relevant' ) ) {
-                    gui.alert( t( 'fieldsubmission.alert.relevantvalidationerror.msg' ) );
+                    const msg = t( 'fieldsubmission.alert.relevantvalidationerror.msg' );
+                    gui.alert( msg );
+                    throw new Error( msg );
                 } else {
-                    gui.alert( t( 'fieldsubmission.alert.validationerror.msg' ) );
+                    const msg = t( 'fieldsubmission.alert.validationerror.msg' );
+                    gui.alert( msg );
+                    throw new Error( msg );
                 }
             } else {
                 let beforeMsg;
@@ -533,7 +516,7 @@ function _complete( bypassConfirmation = false, bypassChecks = false ) {
                     } )
                     .catch( result => {
                         result = result || {};
-                        console.error( 'submission failed' );
+
                         if ( result.status === 401 ) {
                             msg = t( 'alert.submissionerror.authrequiredmsg', {
                                 here: authLink
@@ -542,6 +525,8 @@ function _complete( bypassConfirmation = false, bypassChecks = false ) {
                             msg = result.message || gui.getErrorResponseMsg( result.status );
                         }
                         gui.alert( msg, t( 'alert.submissionerror.heading' ) );
+                        // meant to be used in headless mode to output in API response
+                        throw new Error( msg );
                     } );
             }
         } );
