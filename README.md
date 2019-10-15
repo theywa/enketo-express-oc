@@ -23,7 +23,7 @@ This is a fork of [enketo/enketo-express](https://github.com/enketo/enketo-expre
 
 ------
 
-OpenClinica users, in addition to the above, may want to take special note of these recommended settings:
+OpenClinica users, in addition to the configuration documentation linked above, may want to take special note of these recommended settings:
 
 0. Set a secret value for `"account manager api key"`.
 1. The `"linked form and data server"` should have a non-empty value for `"server url"` to avoid bypassing the Account Manager API. E.g. leave the default value.
@@ -45,7 +45,7 @@ _Send a message if you'd like to contribute! We use an easy web interface provid
 
 -------
 
-OpenClinica has a few [additional text strings](./locales/en/translation-additions.json) that can be translated separately.
+OpenClinica has a few [additional text strings](./locales/src/en/translation-additions.json) that can be translated separately.
 
 --------
 
