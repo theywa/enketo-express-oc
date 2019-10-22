@@ -59,26 +59,27 @@ pageModule._next = function() {
             const next = that._getNext( currentIndex );
             const newIndex = currentIndex + 1;
 
-            if ( valid ) {
-                that._flipTo( next, newIndex );
-            }
+            if ( next ) {
+                if ( valid ) {
+                    that._flipTo( next, newIndex );
+                }
 
-            // for strict-validation navigation-blocking, we ignore some errors (compared to Enketo Core module)
-            if ( !valid && settings.strictViolationSelector ) {
+                // for strict-validation navigation-blocking, we ignore some errors (compared to Enketo Core module)
+                if ( !valid && settings.strictViolationSelector ) {
 
-                const strictViolations = that.$current[ 0 ].matches( settings.strictViolationSelector ) || !!that.$current[ 0 ].querySelector( settings.strictViolationSelector );
+                    const strictViolations = that.$current[ 0 ].matches( settings.strictViolationSelector ) || !!that.$current[ 0 ].querySelector( settings.strictViolationSelector );
 
-                if ( !strictViolations || !settings.strictViolationBlocksNavigation ) {
+                    if ( !strictViolations || !settings.strictViolationBlocksNavigation ) {
 
-                    if ( next ) {
                         that._flipTo( next, newIndex );
                         //return newIndex;
-                    }
 
-                    valid = true;
-                } else {
-                    gui.alertStrictBlock();
+                        valid = true;
+                    } else {
+                        gui.alertStrictBlock();
+                    }
                 }
+
             }
             return valid;
         } );
