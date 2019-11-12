@@ -78,7 +78,7 @@ if [ -d "$ENKETO_EXPRESS_REPO_DIR/node_modules" ]; then
 fi
 #npm -g install npm@2.14.3
 npm install -g grunt-cli gulp nodemon mocha
-npm install --production
+npm install --production --unsafe-perm
 
 # build js and css
 grunt
