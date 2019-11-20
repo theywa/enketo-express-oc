@@ -1120,9 +1120,12 @@ class Comment extends Widget {
     // used during regular data entry.
     _printify() {
         let labelText;
+        const items = this.notes.queries
+            .concat( this.notes.logs )
+            .sort( this._datetimeDesc.bind( this ) );
 
-        if ( this.linkedQuestion.closest( '.disabled' ) ) {
-            console.log( 'disabled', this.linkedQuestion );
+        // Do not display DN questions that have no history.
+        if ( items.length === 0 ) {
             return;
         }
 
@@ -1137,12 +1140,9 @@ class Comment extends Widget {
         this.question.classList.add( 'printified' );
         this.question.append( document.createRange().createContextualFragment(
             `<div class="dn-temp-print">
-                ${this.notes.queries
-                    .concat( this.notes.logs )
-                    .sort( this._datetimeDesc
-                    .bind( this ) )
+                ${items
                     .map( item => this._getHistoryRow( item, { timestamp: 'datetime', username: 'full' } ) )
-                    .join( '' ) || t('widget.dn.emptyhistorytext')}        
+                    .join( '' )}        
             </div>` ) );
 
         const existingLabel = this.question.querySelector( '.question-label.active' );
