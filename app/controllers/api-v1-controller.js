@@ -7,6 +7,8 @@ var auth = require( 'basic-auth' );
 var express = require( 'express' );
 var router = express.Router();
 var quotaErrorMessage = 'Forbidden. No quota left';
+var keys = require( '../lib/router-utils' ).idEncryptionKeys;
+var utils = require( '../lib/utils' );
 //var debug = require( 'debug' )( 'api-controller-v1' );
 
 module.exports = function( app ) {
@@ -294,13 +296,14 @@ function _generateWebformUrls( id, req ) {
     var baseUrl = protocol + '://' + req.headers.host + req.app.get( 'base path' ) + '/';
     var idPartOnline = '::' + id;
     var idPartOffline = '#' + id;
+    var idPartPreview = '::' + utils.insecureAes192Encrypt( id, keys.preview );
     var offline = req.app.get( 'offline enabled' );
 
     req.webformType = req.webformType || 'default';
 
     switch ( req.webformType ) {
         case 'preview':
-            obj.preview_url = baseUrl + 'preview/' + iframePart + idPartOnline;
+            obj.preview_url = baseUrl + 'preview/' + iframePart + idPartPreview;
             break;
         case 'edit':
             queryString = _generateQueryString( [ 'instance_id=' + req.body.instance_id, req.returnQueryParam ] );
@@ -309,7 +312,7 @@ function _generateWebformUrls( id, req ) {
         case 'all':
             // non-iframe views
             obj.url = ( offline ) ? baseUrl + 'x/' + idPartOffline : baseUrl + idPartOnline;
-            obj.preview_url = baseUrl + 'preview/' + idPartOnline;
+            obj.preview_url = baseUrl + 'preview/' + idPartPreview;
             // iframe views
             obj.iframe_url = baseUrl + IFRAMEPATH + idPartOnline;
             obj.preview_iframe_url = baseUrl + 'preview/' + IFRAMEPATH + idPartOnline;
