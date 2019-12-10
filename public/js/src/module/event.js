@@ -24,4 +24,8 @@ events.AddQuery = function() {
     return new CustomEvent( 'addquery', { bubbles: true } );
 };
 
+events.FakeInputUpdate = function() {
+    return new CustomEvent( 'fakeinputupdate', { bubbles: true } );
+};
+
 export default events;

@@ -25,6 +25,7 @@ let ignoreBeforeUnload = false;
 const formOptions = {
     printRelevantOnly: settings.printRelevantOnly
 };
+const inputUpdateEventBuffer = [];
 
 
 function init( selector, data, loadWarnings = [] ) {
@@ -46,6 +47,10 @@ function init( selector, data, loadWarnings = [] ) {
             // Additional layer of security to disable submissions in readonly views.
             // Should not be necessary to do this.
             fieldSubmissionQueue = new FieldSubmissionQueue();
+
+            // Buffer inputupdate events (DURING LOAD ONLY), in order to eventually log these
+            // changes in the DN widget after it has been initalized
+            form.view.html.addEventListener( events.InputUpdate().type, _addToInputUpdateEventBuffer );
 
             // For Participant emtpy-form view in order to show Close button on all pages
             if ( settings.strictViolationSelector && settings.type !== 'edit' ) {
@@ -94,6 +99,12 @@ function init( selector, data, loadWarnings = [] ) {
             form.view.html.addEventListener( events.GoToHidden().type, handleGoToHidden );
 
             loadErrors = loadErrors.concat( form.init() );
+
+
+            // Make sure audits are logged in DN widget for calculated values during form initialization 
+            // before the DN widget was initialized.
+            form.view.html.removeEventListener( events.InputUpdate().type, _addToInputUpdateEventBuffer );
+            inputUpdateEventBuffer.forEach( el => el.dispatchEvent( events.FakeInputUpdate() ) );
 
             // Check if record is marked complete, before setting button event handlers.
             if ( data.instanceStr ) {
@@ -218,6 +229,9 @@ function init( selector, data, loadWarnings = [] ) {
         .then( () => form );
 }
 
+function _addToInputUpdateEventBuffer( event ) {
+    inputUpdateEventBuffer.push( event.target );
+}
 
 /**
  * Closes the form after checking that the queue is empty.

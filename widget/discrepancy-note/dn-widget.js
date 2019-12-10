@@ -250,52 +250,64 @@ class Comment extends Widget {
         let previousValue = this.options.helpers.getModelValue( $( this.linkedQuestion.querySelector( 'input, select, textarea' ) ) );
 
         $( this.linkedQuestion ).on( 'valuechange inputupdate', evt => {
-            let comment;
             const currentValue = that.options.helpers.getModelValue( $( evt.target ) );
 
             if ( previousValue !== currentValue ) {
-                // Note obtaining the values like this does not work for file input types, but since have a different
-                // change comment for those that doesn't mention the filename, we don't need to fix that.
-                if ( evt.target.type !== 'file' ) {
-                    comment = t( 'widget.dn.valuechange', {
-                        'new': `"${currentValue}"`,
-                        'previous': `"${previousValue}"`
-                    } );
-                } else {
-                    comment = currentValue ? t( 'widget.dn.newfile' ) : t( 'widget.dn.fileremoved' );
-                }
-
-                that._addAudit( comment, '', false );
-
-                if ( settings.reasonForChange && !that.linkedQuestionReadonly ) {
-                    reasons.addField( that.linkedQuestion )
-                        .on( 'change', evt => {
-                            // Also for empty onchange values
-                            // TODO: exclude empty values if RFC field never had a value?
-                            that._addReason( evt.target.value );
-                            reasons.setSubmitted( evt.target );
-                        } )
-                        .on( 'input', evt => {
-                            if ( evt.target.value && evt.target.value.trim() ) {
-                                reasons.setEdited( evt.target );
-                            }
-                        } );
-
-                    reasons.applyToAll();
-                }
-
+                that._createAudit( evt, currentValue, previousValue );
                 previousValue = currentValue;
+            }
+        } );
 
-                comment = t( 'widget.dn.closedmodified' );
-                that._getThreadFirsts( that.notes ).forEach( item => {
-                    const status = that._getQueryThreadStatus( that.notes, item.thread_id );
-                    if ( status === 'closed' ) {
-                        that._addQuery( comment, 'closed-modified', '', false, SYSTEM_USER, 'comment', item.thread_id || 'NULL' );
+        this.linkedQuestion.addEventListener( events.FakeInputUpdate().type, evt => {
+            // For this special event we can assume previousValue was '' because OC does not use defaults.
+            const currentValue = that.options.helpers.getModelValue( $( evt.target ) );
+            this._createAudit( evt, currentValue, '' );
+            previousValue = currentValue;
+        } );
+    }
+
+    _createAudit( evt, currentValue, previousValue ) {
+        let comment;
+        // Note obtaining the values like this does not work for file input types, but since have a different
+        // change comment for those that doesn't mention the filename, we don't need to fix that.
+        if ( evt.target.type !== 'file' ) {
+            comment = t( 'widget.dn.valuechange', {
+                'new': `"${currentValue}"`,
+                'previous': `"${previousValue}"`
+            } );
+        } else {
+            comment = currentValue ? t( 'widget.dn.newfile' ) : t( 'widget.dn.fileremoved' );
+        }
+
+        this._addAudit( comment, '', false );
+
+        if ( settings.reasonForChange && !this.linkedQuestionReadonly ) {
+            reasons.addField( this.linkedQuestion )
+                .on( 'change', evt => {
+                    // Also for empty onchange values
+                    // TODO: exclude empty values if RFC field never had a value?
+                    this._addReason( evt.target.value );
+                    reasons.setSubmitted( evt.target );
+                } )
+                .on( 'input', evt => {
+                    if ( evt.target.value && evt.target.value.trim() ) {
+                        reasons.setEdited( evt.target );
                     }
                 } );
 
+            reasons.applyToAll();
+        }
+
+        previousValue = currentValue;
+
+        comment = t( 'widget.dn.closedmodified' );
+        this._getThreadFirsts( this.notes ).forEach( item => {
+            const status = this._getQueryThreadStatus( this.notes, item.thread_id );
+            if ( status === 'closed' ) {
+                this._addQuery( comment, 'closed-modified', '', false, SYSTEM_USER, 'comment', item.thread_id || 'NULL' );
             }
         } );
+
     }
 
     _setRepeatRemovalReasonChangeHandler() {
