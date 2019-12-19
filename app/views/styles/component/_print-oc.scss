@@ -1,16 +1,33 @@
 .or-appearance-dn {
     width: 100% !important;
     flex: 100% !important;
+
     &.printified {
         display: inherit !important;
+
         input {
             display: none;
         }
+
         table.temp-print {
             order: 5;
         }
+
         &::after {
             content: none;
+        }
+    }
+}
+
+.or.print-relevant-only {
+
+    //.question.or-branch.disabled,
+    .or-branch.disabled {
+        display: inherit;
+
+        &.question:not(.or-appearance-dn):not(.printified),
+        .question:not(.or-appearance-dn):not(.printified) {
+            display: none;
         }
     }
 }
