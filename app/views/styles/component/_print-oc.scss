@@ -30,6 +30,21 @@
             display: none;
         }
     }
+
+    .or-comment-widget__content__history__row__start__username {
+        border: none;
+        height: 25px;
+        line-height: 25px;
+    }
+
+    .or-comment-widget__content__history__row__main {
+        border: none;
+        padding: 0;
+    }
+
+    .or-comment-widget__content__history__row__main:before, .or-comment-widget__content__history__row__main:after {
+        opacity: 0;
+    }
 }
 
 .btn-dn {
