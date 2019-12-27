@@ -3,10 +3,15 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]
+[1.82.0] - 2019-12-18
 ---------------------
+##### Added
+- Support for default drawings in all 3 drawing widgets.
+  
 ##### Fixed
 - Some PDF viewers do not show radiobuttons with an opacity (e.g. a disabled radio button).
 - MS Edge does not show any checkmarks in printouts of radiobuttons and checkboxes.
+- Overflowing content in text form controls is not shown on printout.
 
 [1.81.3] - 2010-11-22
 ---------------------
