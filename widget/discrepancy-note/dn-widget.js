@@ -1161,9 +1161,10 @@ class Comment extends Widget {
         const control = this.linkedQuestion.querySelector( 'input, select, textarea' );
         const name = control ? control.dataset.name || control.name : null;
         const questionName = name ? name.substring( name.lastIndexOf( '/' ) + 1 ) : '?';
+        const parser = new DOMParser;
 
         existingLabel.dataset.original = existingLabel.textContent;
-        existingLabel.textContent = t( 'widget.dn.printhistoryheading', { labelText, questionName } );
+        existingLabel.textContent = parser.parseFromString( t( 'widget.dn.printhistoryheading', { labelText, questionName } ), 'text/html' ).body.textContent;
     }
 
     _deprintify() {
