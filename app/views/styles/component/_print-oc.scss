@@ -31,20 +31,46 @@
         }
     }
 
-    .or-comment-widget__content__history__row__start__username {
-        border: none;
-        height: 25px;
-        line-height: 25px;
+    .question.or-appearance-dn.printified[role="comment"] {
+        padding-top: 5px;
+        padding-bottom: 10px;
     }
 
-    .or-comment-widget__content__history__row__main {
-        border: none;
-        padding: 0;
+}
+
+.dn-temp-print {
+    margin-top: 5px;
+    margin-bottom: 0px;
+
+    .or-comment-widget__content__history__row, .or-comment-widget__content__history__row.audit {
+        margin-bottom: 5px;
+
+        &:not(:last-child) {
+            margin-bottom: 2px;
+        }
+
+        .or-comment-widget__content__history__row__start__username {
+            border: none;
+            height: 18px;
+            line-height: 18px;
+        }
+
+        .or-comment-widget__content__history__row__main {
+            border: none;
+            padding: 0;
+        }
+
+        .or-comment-widget__content__history__row__main--audit {
+            padding-top: 0;
+            height: 35px;
+        }
+
+        .or-comment-widget__content__history__row__main:before, .or-comment-widget__content__history__row__main:after {
+            opacity: 0;
+        }
+
     }
 
-    .or-comment-widget__content__history__row__main:before, .or-comment-widget__content__history__row__main:after {
-        opacity: 0;
-    }
 }
 
 .btn-dn {
