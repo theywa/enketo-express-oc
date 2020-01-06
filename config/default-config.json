@@ -52,7 +52,7 @@
         "script url": ""
     },
     "headless": {
-        "timeout": 5000
+        "timeout": 60000
     },
     "maps": [ {
         "name": "streets",
