@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.83.1] - 2020-01-06
+----------------------
+##### Changed
+- Updated Spanish and French translations.
+
+##### Fixed
+- Annotate widget broken when uploading new image.
+
 [1.83.0] - 2020-01-03
 ---------------------
 ##### Added
