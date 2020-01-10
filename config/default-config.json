@@ -31,7 +31,7 @@
         "table", "radio", "date", "time", "datetime", "select-media", "file", "draw", "rank",
         "analog-scale", "../../../widget/discrepancy-note/dn-widget", "../../../widget/strict-class/strict-class",
         "likert", "range", "columns", "image-view", "comment", "image-map", "date-native", "date-native-ios",
-        "date-mobile", "text-max", "rating"
+        "date-mobile", "text-max", "text-print", "rating"
     ],
     "analytics": "google",
     "google": {
@@ -52,7 +52,7 @@
         "script url": ""
     },
     "headless": {
-        "timeout": 5000
+        "timeout": 60000
     },
     "maps": [ {
         "name": "streets",
