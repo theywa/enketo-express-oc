@@ -61,8 +61,15 @@
         }
 
         .or-comment-widget__content__history__row__main--audit {
-            padding-top: 0;
-            height: 35px;
+            padding: 0 20px 0 10px;
+
+            .or-comment-widget__content__history__row__main__comment {
+                
+                .or-comment-widget__content__history__row__main__comment__meta {
+                    display: none;
+                }
+
+            }
         }
 
         .or-comment-widget__content__history__row__main:before, .or-comment-widget__content__history__row__main:after {
