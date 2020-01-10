@@ -614,6 +614,13 @@ $dn-default-color: #575756;
                     &__icon {
                         height: 100%;
                         display: inline-block;
+
+                        // dn-annotation-icon hack with <img> to ensure it is always printed
+                        img {
+                            width: 15px;
+                            height: 15px;
+                            max-width: inherit;
+                        }
                     }
 
                     &__comment {

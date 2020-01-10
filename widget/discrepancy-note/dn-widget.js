@@ -7,6 +7,7 @@ import fileManager from '../../public/js/src/module/file-manager';
 let usersOptionsHtml;
 let currentUser;
 let users;
+let annotationIconDataUri;
 const SYSTEM_USER = 'root';
 import reasons from '../../public/js/src/module/reasons';
 
@@ -78,6 +79,7 @@ class Comment extends Widget {
             this._setConstraintEvaluationHandler();
             this._setRepeatRemovalReasonChangeHandler();
             this._setPrintOptimizationHandler();
+            this._setAnnotationIconDataUri();
         }
     }
 
@@ -990,12 +992,27 @@ class Comment extends Widget {
         return linkifiedComment;
     }
 
+    // The annotation icon is not part of font-awesome. In css we use background-image but this it not printed automatically in all browsers
+    // so we use an <img> to ensure the icon gets printed (in _getHistoryRow()).
+    _setAnnotationIconDataUri() {
+        if ( !annotationIconDataUri ) {
+            this.linkedQuestion.append( document.createRange().createContextualFragment( '<span class="temporary icon icon-dn-annotation"> </span>' ) );
+            const icon = this.linkedQuestion.querySelector( '.temporary.icon-dn-annotation' );
+            const cssUri = window.getComputedStyle( icon ).backgroundImage;
+            const result = /url\("([^)]+)"\)/.exec( cssUri );
+            if ( result && result[ 1 ] ) {
+                annotationIconDataUri = result[ 1 ];
+            }
+            icon.remove();
+        }
+    }
+
     _getHistoryRow( item, options = {} ) {
         const types = {
             comment: '<span class="icon fa-comment-o"> </span>',
             audit: '',
             reason: '<span class="icon icon-delta"> </span>',
-            annotation: '<span class="icon icon-dn-annotation"> </span>'
+            annotation: `<span class="icon"><img src="${annotationIconDataUri}"/></span>`
         };
         if ( typeof item.user === 'undefined' ) {
             item.user = currentUser;
