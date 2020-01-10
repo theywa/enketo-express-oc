@@ -16,4 +16,4 @@ echo ${TRAVIS_TAG} > .tag.txt
 
 # Create zip file:
 cd ${TARGET_BASE}
-zip -rq9 ${FILENAME}_${TRAVIS_TAG}_node${TRAVIS_NODE_VERSION}_${OS}.zip ../enketo-express-oc -x "*.git*" "*/public/js/build/*" "*/setup/*" "*/test/*" "*/docs/*" "*/test-coverage/*" "*/tutorials/*" "*/Vagrantfile"
+zip -rq9 ${FILENAME}_${TRAVIS_TAG}_node${TRAVIS_NODE_VERSION}_${OS}.zip ../enketo-express-oc -x "*.git*" "*/public/js/build/*" "*/setup/*" "*/test/*" "*/docs/*" "*/test-coverage/*" "*/tutorials/*" "*/Vagrantfile" "*/node_modules/.bin/*"
