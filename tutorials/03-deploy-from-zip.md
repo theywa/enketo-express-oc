@@ -4,13 +4,15 @@
 2. Install the same nodejs version as in the filename of the zipped release
 3. Install grunt-cli with `npm install -g grunt-cli`
 4. Do `npm rebuild` from the enketo-express-oc folder
-5. Configure Enketo with config.json (or environment variables)
+5. Configure Enketo with your custom config.json (or environment variables)
 6. Do `grunt` to build.
 
 
 ### Issues?
 
-If this Vagrantfile still works, it may help figure out what the issue is:
+If this Vagrantfile below still works, it may help figure out what the issue is.
+
+This assumes the Vagrantfile with the content below is placed in some folder (e.g. "test") and that the unzipped "enketo-express-oc" folder is inside that "test" folder.
 
 ```ruby
 # -*- mode: ruby -*-
@@ -33,3 +35,8 @@ Vagrant.configure("2") do |config|
   SHELL
 end
 ```
+
+1. run `vagrant up` from the folder containing the Vagrantfile
+2. do `vagrant ssh` when done
+3. do `cd /vagrant/enketo-express-oc`
+4. run `grunt`
