@@ -31,53 +31,80 @@
         }
     }
 
-    .question.or-appearance-dn.printified[role="comment"] {
-        padding-top: 5px;
-        padding-bottom: 10px;
+    .question.or-appearance-dn.printified {
+        
+        &[role="comment"] {
+            padding-top: 5px;
+            padding-bottom: 10px;
+        }
     }
 
+    &.pages.or {
+
+        [role="page"].current:not(.question) {
+
+            .or-group:not(.disabled),
+            .or-group-data:not(.disabled),
+            .or-repeat:not(.disabled) {
+                display: block;
+            }
+        }
+    }
 }
+
 
 .dn-temp-print {
     margin-top: 5px;
     margin-bottom: 0px;
 
-    .or-comment-widget__content__history__row, .or-comment-widget__content__history__row.audit {
-        margin-bottom: 5px;
+    .or-comment-widget {
+        &__content__history__row,
+        &.audit {
+            margin-bottom: 5px;
+            display: table;
+            border-collapse: separate;
+            border-spacing: 15px 0;
 
-        &:not(:last-child) {
-            margin-bottom: 2px;
-        }
+            &:not(:last-child) {
+                margin-bottom: 2px;
+            }
 
-        .or-comment-widget__content__history__row__start__username {
-            border: none;
-            height: 18px;
-            line-height: 18px;
-        }
+            &__start {
+                display: table-cell;
 
-        .or-comment-widget__content__history__row__main {
-            border: none;
-            padding: 0;
-        }
-
-        .or-comment-widget__content__history__row__main--audit {
-            padding: 0 20px 0 10px;
-
-            .or-comment-widget__content__history__row__main__comment {
-                
-                .or-comment-widget__content__history__row__main__comment__meta {
-                    display: none;
+                &__username {
+                    border: none;
+                    height: 18px;
+                    line-height: 18px;    
                 }
 
             }
-        }
 
-        .or-comment-widget__content__history__row__main:before, .or-comment-widget__content__history__row__main:after {
-            opacity: 0;
-        }
+            &__main {
+                border: none;
+                padding: 0;
+                display: table-cell;
 
+                &--audit {
+                    padding: 0 20px 0 10px;
+
+                    .or-comment-widget__content__history__row__main__comment__meta {
+                        display: none;
+                    }
+
+                }
+
+                &:before,
+                &:after {
+                    opacity: 0;
+                }
+
+                &__comment__meta {
+                    display: inline-block; // 'display: block' result in some margin on print preview
+                }
+            }
+        }
     }
-
 }
 
 .btn-dn {
