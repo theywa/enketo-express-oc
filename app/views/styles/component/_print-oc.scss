@@ -36,6 +36,7 @@
         &[role="comment"] {
             padding-top: 5px;
             padding-bottom: 10px;
+            height: 100% !important;
         }
     }
 
@@ -64,6 +65,7 @@
             display: table;
             border-collapse: separate;
             border-spacing: 15px 0;
+            page-break-inside: avoid;
 
             &:not(:last-child) {
                 margin-bottom: 2px;
@@ -75,7 +77,8 @@
                 &__username {
                     border: none;
                     height: 18px;
-                    line-height: 18px;    
+                    line-height: 18px;
+                    display: inline-block;
                 }
 
             }
