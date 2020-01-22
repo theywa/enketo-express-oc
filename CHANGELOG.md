@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[1.83.4] - 2020-01-21
+---------------------
+##### Fixed
+- Forms in pages mode sometimes do not show correct first page upon load (regression since 5.11.3).
+- Forms in pages mode with groups or repeats without field-list appearance show empty pages (regression since 5.11.3).
+
+[1.83.3] - 2020-01-20
+---------------------
+##### Fixed
+- Radiobutton questions inside repeats allow multiple selections (regression since 1.83.0).
+- Comment questions in a form in Pages mode without field-list appearances, add an empty page.
+
 [1.83.2] - 2020-01-10
 ---------------------
 ##### Changed
