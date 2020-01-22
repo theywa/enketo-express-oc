@@ -27,6 +27,8 @@ pageModule.setRepeatHandlers = function() {
         // except if the new repeat is actually the first page in the form, or contains the first page
         if ( event.detail.trigger === 'user' || this.activePages[ 0 ] === event.target || getAncestors( this.activePages[ 0 ], '.or-repeat' ).includes( event.target ) ) {
             this.flipToPageContaining( $( event.target ) );
+        } else {
+            this._toggleButtons();
         }
     } );
 
