@@ -1,4 +1,5 @@
 import pageModule from 'enketo-core/src/js/page';
+import { getAncestors } from 'enketo-core/src/js/dom-utils';
 import events from './event';
 import reasons from './reasons';
 import settings from './settings';
