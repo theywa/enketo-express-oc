@@ -23,8 +23,8 @@ pageModule.setRepeatHandlers = function() {
 
         // Don't flip if the user didn't create the repeat with the + button.
         // or if is the default first instance created during loading.
-        // except if the new repeat is actually first page in the form.
-        if ( event.detail.trigger === 'user' || this.activePages[ 0 ] === event.target ) {
+        // except if the new repeat is actually the first page in the form, or contains the first page
+        if ( event.detail.trigger === 'user' || this.activePages[ 0 ] === event.target || getAncestors( this.activePages[ 0 ], '.or-repeat' ).includes( event.target ) ) {
             this.flipToPageContaining( $( event.target ) );
         }
     } );
