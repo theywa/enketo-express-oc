@@ -514,7 +514,8 @@ function getPrintDialogComponents() {
 
 function printGrid( format ) {
     const swapped = printHelper.styleToAll();
-    return printHelper.fixGrid( format )
+    return printHelper.fixGrid( format, 800 )
+        .then( _delay )
         .then( window.print )
         .catch( console.error )
         .then( () => {
@@ -527,6 +528,12 @@ function printGrid( format ) {
                 } );
             }
         } );
+}
+
+function _delay( delay = 400 ) {
+    return new Promise( ( resolve ) => {
+        setTimeout( resolve, delay );
+    } );
 }
 
 /**
