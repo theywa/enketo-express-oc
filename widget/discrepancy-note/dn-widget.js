@@ -251,7 +251,7 @@ class Comment extends Widget {
         const that = this;
         let previousValue = this.options.helpers.getModelValue( $( this.linkedQuestion.querySelector( 'input, select, textarea' ) ) );
 
-        $( this.linkedQuestion ).on( 'valuechange inputupdate', evt => {
+        $( this.linkedQuestion ).on( `${events.XFormsValueChanged().type} inputupdate`, evt => {
             const currentValue = that.options.helpers.getModelValue( $( evt.target ) );
 
             if ( previousValue !== currentValue ) {

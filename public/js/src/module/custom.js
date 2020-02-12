@@ -1,6 +1,7 @@
 // Custom OC things used across views
 
 import $ from 'jquery';
+import events from './event'
 
 function addSignedStatus( form ) {
     let $status;
@@ -10,7 +11,7 @@ function addSignedStatus( form ) {
         $status = $( `<div class="record-signed-status">${signature.replace( /\\n/g, '<br/>' ).replace( /\n/g, '<br/>' )}</div>` );
         $( '#form-title' )
             .before( $status )
-            .closest( 'form.or' ).one( 'valuechange', '.question:not(.or-appearance-dn)', () => {
+            .closest( 'form.or' ).one( events.XFormsValueChanged(), '.question:not(.or-appearance-dn)', () => {
                 $status.remove();
             } );
     }
