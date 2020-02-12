@@ -1,7 +1,7 @@
 // Custom OC things used across views
 
 import $ from 'jquery';
-import events from './event'
+import events from './event';
 
 function addSignedStatus( form ) {
     let $status;
