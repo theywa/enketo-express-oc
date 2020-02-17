@@ -4,17 +4,23 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]
 -----------------------
+##### Changed
+- Don't load audio and video files (in labels or record) for pdf views. **Warning: requires server to sent proper Content-Type header upon HEAD request.**
+
+[1.85.0] - 2020-02-14
+-----------------------
 ##### Added
 - Support for setvalue action with xforms-value-changed event.
 - Basic support for "thousands-sep" appearance on integer and decimal fields.
 
 ##### Changed
-- "valuechange" event was changed to "xforms-value-changed" (TBC!)
+- "valuechange" event was changed to "xforms-value-changed"
+- The `odk:generated-by` attribute check on the primary instance (introduced in 1.83.0), was changed to a check for `odk:xforms-version` on the model node.
 
 ##### Fixed
 - Text-print widget causes double URL to be shown in print view for URL widget.
-- Last row of Grid Theme form may have incorrect cell heights.
-- Readonly month-year or year inputs show full underlying value instead of month-year/year.å
+- Last row of Grid Theme form may have incorrect cell heights in print view.
+- Readonly month-year or year inputs show full underlying value instead of month-year/year.
 
 [1.84.1] - 2020-01-31
 ----------------------
