@@ -515,7 +515,11 @@ function _complete( bypassConfirmation = false, bypassChecks = false ) {
                         if ( queueLength === 0 ) {
                             instanceId = form.instanceID;
                             deprecatedId = form.deprecatedID;
-                            return fieldSubmissionQueue.complete( instanceId, deprecatedId );
+                            if ( form.model.isMarkedComplete() ) {
+                                return;
+                            } else {
+                                return fieldSubmissionQueue.complete( instanceId, deprecatedId );
+                            }
                         } else {
                             throw new Error( t( 'fieldsubmission.alert.complete.msg' ) );
                         }
