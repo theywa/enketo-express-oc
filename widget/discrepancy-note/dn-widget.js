@@ -495,7 +495,13 @@ class Comment extends Widget {
             widget.style[ o[ 0 ] ] = o[ 1 ];
         } );
 
-        this.linkedQuestion.scrollIntoView( true );
+        // Scroll directly to Query modal if not enough height for user to view the Query modal
+        if ( window.innerHeight - this.linkedQuestion.offsetHeight < 50 ) {
+            this.linkedQuestion.querySelector( '.widget.or-comment-widget' ).scrollIntoView( { behavior: 'smooth', block: 'start', inline: 'nearest' } );
+        } else {
+            this.linkedQuestion.scrollIntoView( { behavior: 'smooth', block: 'start', inline: 'nearest' } );
+        }
+
 
         const closeButton = widget.querySelector( '.or-comment-widget__content__btn-close-x' );
         const overlay = widget.querySelector( '.or-comment-widget__overlay--click-preventer' );
