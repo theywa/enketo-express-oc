@@ -483,7 +483,15 @@ $dn-default-color: #575756;
                     display: inline-block;
                     margin-right: -10px;
                     margin-left: -10px;
+                    
+                    &.option-wrapper {
+
+                        .option-label {
+                            word-break: normal;
+                        }
+                    }
                 }
+
             }
         }
 
@@ -838,6 +846,24 @@ $dn-default-color: #575756;
         &__username {
             border-radius: 2px;
             width: auto;
+        }
+    }
+}
+
+// used to override the image-map widget styles
+.or-image-map-initialized {
+    .or-comment-widget {
+        &__content {
+            &__form {
+                &__user {
+                    &__dn-notify {
+                        &.option-wrapper {
+                            // showing normally on dn-widget
+                            display: block;
+                        }
+                    }
+                }
+            }
         }
     }
 }
