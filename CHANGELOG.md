@@ -2,10 +2,31 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased]
------------------------
+[1.86.2] - 2020-03-18
+----------------------
+##### Changed
+- Updated Swedish, Dutch and Spanish translations of modal dialog introduced in 1.86.1.
+
+[1.86.1] - 2020-03-12
+----------------------
+**WARNING: IT IS HIGHLY RECOMMENDED TO DEPLOY THIS VERSION BEFORE MARCH 31ST, 2020. READ MORE [HERE](https://groups.google.com/forum/#!topic/enketo-users/1AewNMkAIiU).**
+##### Changed
+- Added modal dialog for offline-capable views that will assist users with a future technology transition (to Service Workers) in version 2.0.0.
+
+[1.86.0] - 2020-03-11
+----------------------
+##### Changed
+- The checkbox for 'save as draft' in offline-capable views has been replaced with a button.
+- Updated French, Spanish, Dutch, Swedish and Arabic translations.
+
+[1.85.1] - 2020-02-28
+----------------------
 ##### Changed
 - Don't load audio and video files (in labels or record) for pdf views. **Warning: requires server to sent proper Content-Type header upon HEAD request.**
+
+##### Fixed
+- `jr:count` does not work if number is provided instead of /path/to/count.
+- Date calculations in readonly fields do not show a value if not loaded from record.
 
 [1.85.0] - 2020-02-14
 -----------------------

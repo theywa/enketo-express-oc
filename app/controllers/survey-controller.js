@@ -104,6 +104,7 @@ function offlineWebform( req, res, next ) {
         error.status = 405;
         next( error );
     } else {
+        req.offline = true;
         req.manifest = `${req.app.get( 'base path' )}/x/manifest.appcache`;
         webform( req, res, next );
     }
@@ -116,6 +117,7 @@ function offlineWebform( req, res, next ) {
  */
 function webform( req, res, next ) {
     const options = {
+        offline: req.offline,
         manifest: req.manifest,
         iframe: req.iframe,
         print: req.query.print === 'true'
