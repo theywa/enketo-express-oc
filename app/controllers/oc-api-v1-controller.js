@@ -396,15 +396,14 @@ function _generateWebformUrls( id, req ) {
     const hash = req.goTo;
     const protocol = req.headers[ 'x-forwarded-proto' ] || req.protocol;
     const BASEURL = `${protocol}://${req.headers.host}${req.app.get( 'base path' )}/`;
-    const idOnline = `::${id}`;
-    const idView = `::${utils.insecureAes192Encrypt( id, keys.view )}`;
-    const idViewDn = `::${utils.insecureAes192Encrypt( id, keys.viewDn )}`;
-    const idViewDnc = `::${utils.insecureAes192Encrypt( id, keys.viewDnc )}`;
-    const idEditRfc = `::${utils.insecureAes192Encrypt( id, keys.editRfc )}`;
-    const idEditRfcC = `::${utils.insecureAes192Encrypt( id, keys.editRfcC )}`;
-    const idFsC = `::${utils.insecureAes192Encrypt( id, keys.fsC )}`;
-    const idFsParticipant = `::${utils.insecureAes192Encrypt( id, keys.fsParticipant )}`;
-    const idEditHeadless = `::${utils.insecureAes192Encrypt( id, keys.editHeadless )}`;
+    const idView = `${utils.insecureAes192Encrypt( id, keys.view )}`;
+    const idViewDn = `${utils.insecureAes192Encrypt( id, keys.viewDn )}`;
+    const idViewDnc = `${utils.insecureAes192Encrypt( id, keys.viewDnc )}`;
+    const idEditRfc = `${utils.insecureAes192Encrypt( id, keys.editRfc )}`;
+    const idEditRfcC = `${utils.insecureAes192Encrypt( id, keys.editRfcC )}`;
+    const idFsC = `${utils.insecureAes192Encrypt( id, keys.fsC )}`;
+    const idFsParticipant = `${utils.insecureAes192Encrypt( id, keys.fsParticipant )}`;
+    const idEditHeadless = `${utils.insecureAes192Encrypt( id, keys.editHeadless )}`;
 
     let url;
 
@@ -413,7 +412,7 @@ function _generateWebformUrls( id, req ) {
     switch ( type ) {
         case 'preview': {
             const queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam, req.goToErrorUrl, req.jini ] );
-            url = `${BASEURL}preview/${IFRAMEPATH}${idOnline}${queryString}${hash}`;
+            url = `${BASEURL}preview/${IFRAMEPATH}${id}${queryString}${hash}`;
             break;
         }
         case 'preview-participant': {
@@ -422,7 +421,7 @@ function _generateWebformUrls( id, req ) {
             break;
         }
         case 'edit': {
-            const editId = dnClosePart ? idFsC : idOnline;
+            const editId = dnClosePart ? idFsC : id;
             const queryString = _generateQueryString( [ req.ecid, req.pid, `instance_id=${req.body.instance_id}`, req.parentWindowOriginParam, req.returnQueryParam, req.goToErrorUrl, req.jini ] );
             url = `${BASEURL}edit/${FSPATH}${dnClosePart}${IFRAMEPATH}${editId}${queryString}${hash}`;
             break;
@@ -441,9 +440,9 @@ function _generateWebformUrls( id, req ) {
             break;
         }
         case 'single': {
-            const id = dnClosePart ? idFsC : idOnline;
+            const idToUse = dnClosePart ? idFsC : id;
             const queryString = _generateQueryString( [ req.ecid, req.pid, req.defaultsQueryParam, req.returnQueryParam, req.parentWindowOriginParam, req.jini ] );
-            url = `${BASEURL}single/${FSPATH}${dnClosePart}${IFRAMEPATH}${id}${queryString}`;
+            url = `${BASEURL}single/${FSPATH}${dnClosePart}${IFRAMEPATH}${idToUse}${queryString}`;
             break;
         }
         case 'single-participant': {

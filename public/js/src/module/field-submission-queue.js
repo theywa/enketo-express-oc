@@ -5,8 +5,8 @@ import Promise from 'lie';
 import $ from 'jquery';
 import gui from './gui';
 import MD5 from 'crypto-js/md5';
-const FIELDSUBMISSION_URL = ( settings.enketoId ) ? `${settings.basePath}/fieldsubmission/${settings.enketoIdPrefix}${settings.enketoId}${utils.getQueryString( settings.submissionParameter )}` : null;
-const FIELDSUBMISSION_COMPLETE_URL = ( settings.enketoId ) ? `${settings.basePath}/fieldsubmission/complete/${settings.enketoIdPrefix}${settings.enketoId}${utils.getQueryString( settings.submissionParameter )}` : null;
+const FIELDSUBMISSION_URL = ( settings.enketoId ) ? `${settings.basePath}/fieldsubmission/${settings.enketoId}${utils.getQueryString( settings.submissionParameter )}` : null;
+const FIELDSUBMISSION_COMPLETE_URL = ( settings.enketoId ) ? `${settings.basePath}/fieldsubmission/complete/${settings.enketoId}${utils.getQueryString( settings.submissionParameter )}` : null;
 
 function FieldSubmissionQueue() {
     this.submissionQueue = {};

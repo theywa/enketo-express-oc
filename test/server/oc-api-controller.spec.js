@@ -173,7 +173,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/single\/fs\/i\/::[A-z0-9]{8,10}/,
+                expected: /\/single\/fs\/i\/[A-z0-9]{8,10}/,
             } );
             // GET /survey/collect
             testResponse( {
@@ -193,7 +193,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/single\/fs\/i\/::[A-z0-9]{8,10}.*(\?|&)parentWindowOrigin=http%3A%2F%2Fexample\.com/,
+                expected: /\/single\/fs\/i\/[A-z0-9]{8,10}.*(\?|&)parentWindowOrigin=http%3A%2F%2Fexample\.com/,
             } );
             // POST /survey/collect/c
             testResponse( {
@@ -203,7 +203,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/single\/fs\/c\/i\/::[A-z0-9]{32}/,
+                expected: /\/single\/fs\/c\/i\/[A-z0-9]{32}/,
             } );
             // with parent_window_origin
             testResponse( {
@@ -214,7 +214,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/single\/fs\/c\/i\/::[A-z0-9]{32}.*(\?|&)parentWindowOrigin=http%3A%2F%2Fexample\.com/,
+                expected: /\/single\/fs\/c\/i\/[A-z0-9]{32}.*(\?|&)parentWindowOrigin=http%3A%2F%2Fexample\.com/,
             } );
             // POST /survey/view
             testResponse( {
@@ -224,7 +224,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/view\/fs\/i\/::[A-z0-9]{32}/,
+                expected: /\/view\/fs\/i\/[A-z0-9]{32}/,
             } );
             // POST /survey/view with go_to
             testResponse( {
@@ -235,7 +235,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/view\/fs\/i\/::[A-z0-9]{32}.*#%2F%2Fmyquestion%23abc$/,
+                expected: /\/view\/fs\/i\/[A-z0-9]{32}.*#%2F%2Fmyquestion%23abc$/,
             } );
             // POST /survey/view with go_to and go_to_error_url
             testResponse( {
@@ -247,7 +247,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/view\/fs\/i\/::[A-z0-9]{32}.*(\?|&)goToErrorUrl=http%3A%2F%2Fexample\.com%2Fminiform#%2F%2Fmyquestion/,
+                expected: /\/view\/fs\/i\/[A-z0-9]{32}.*(\?|&)goToErrorUrl=http%3A%2F%2Fexample\.com%2Fminiform#%2F%2Fmyquestion/,
             } );
             // POST /survey/view without go_to and with (ignored) go_to_error_url
             testResponse( {
@@ -258,7 +258,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/view\/fs\/i\/::[A-z0-9]{32}/,
+                expected: /\/view\/fs\/i\/[A-z0-9]{32}/,
             } );
             // POST /survey/view with load warning
             testResponse( {
@@ -269,7 +269,7 @@ describe( 'api', () => {
                 warning: 'hey you',
                 auth: true,
                 status: 200,
-                expected: /\/view\/fs\/i\/::[A-z0-9]{32}.*(\?|&)loadWarning=hey%20you/,
+                expected: /\/view\/fs\/i\/[A-z0-9]{32}.*(\?|&)loadWarning=hey%20you/,
             } );
             // POST /survey/preview
             testResponse( {
@@ -279,7 +279,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/preview\/i\/::[A-z0-9]{8,10}/,
+                expected: /\/preview\/i\/[A-z0-9]{8,10}/,
             } );
             // POST /survey/preview
             testResponse( {
@@ -289,7 +289,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/preview\/participant\/i\/::[A-z0-9]{32}$/,
+                expected: /\/preview\/participant\/i\/[A-z0-9]{32}$/,
             } );
         } );
 
@@ -303,8 +303,8 @@ describe( 'api', () => {
                     instanceId: 'AAA',
                     instance: true,
                     status: 201,
-                    // includes proper enketoID and not e.g. ::null 
-                    expected: /::[A-z0-9]{8,10}/
+                    // includes proper enketoID and not e.g. null 
+                    expected: /[A-z0-9]{8,10}/
                 },
                 // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
                 {
@@ -314,8 +314,8 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    // includes proper enketoID and not e.g. ::null 
-                    expected: /::[A-z0-9]{8,10}/
+                    // includes proper enketoID and not e.g. null 
+                    expected: /[A-z0-9]{8,10}/
                 },
                 // already being edited
                 {
@@ -466,7 +466,7 @@ describe( 'api', () => {
                 instanceId: 'AAA',
                 instance: true,
                 status: 201,
-                expected: /\/edit\/fs\/c\/i\/::[A-z0-9]{32}.*(\?|&)instance_id=AAA/
+                expected: /\/edit\/fs\/c\/i\/[A-z0-9]{32}.*(\?|&)instance_id=AAA/
             }, {
                 // edit with RFC UI
                 method: 'post',
@@ -475,8 +475,8 @@ describe( 'api', () => {
                 instanceId: 'AAA',
                 instance: true,
                 status: 201,
-                // includes proper enketoID and not e.g. ::null 
-                expected: /\/edit\/fs\/rfc\/i\/::[A-z0-9]{32}.*(\?|&)instance_id=AAA/
+                // includes proper enketoID and not e.g. null 
+                expected: /\/edit\/fs\/rfc\/i\/[A-z0-9]{32}.*(\?|&)instance_id=AAA/
             }, {
                 // edit with RFC UI and with Close button in dn widget
                 method: 'post',
@@ -485,8 +485,8 @@ describe( 'api', () => {
                 instanceId: 'AAA',
                 instance: true,
                 status: 201,
-                // includes proper enketoID and not e.g. ::null 
-                expected: /\/edit\/fs\/rfc\/c\/i\/::[A-z0-9]{32}.*(\?|&)instance_id=AAA/
+                // includes proper enketoID and not e.g. null 
+                expected: /\/edit\/fs\/rfc\/c\/i\/[A-z0-9]{32}.*(\?|&)instance_id=AAA/
             } ].map( obj => {
                 obj.version = version;
                 return obj;
@@ -500,8 +500,8 @@ describe( 'api', () => {
                     instanceId: 'AAA',
                     instance: true,
                     status: 201,
-                    // includes proper enketoID and not e.g. ::null 
-                    expected: /\/edit\/fs\/dn(\/c)?\/i\/::[A-z0-9]{32}.*(\?|&)instance_id=AAA/
+                    // includes proper enketoID and not e.g. null 
+                    expected: /\/edit\/fs\/dn(\/c)?\/i\/[A-z0-9]{32}.*(\?|&)instance_id=AAA/
                 },
                 // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
                 {
@@ -511,8 +511,8 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    // includes proper enketoID and not e.g. ::null 
-                    expected: /\/edit\/fs\/dn(\/c)?\/i\/::[A-z0-9]{32}.*(\?|&)instance_id/
+                    // includes proper enketoID and not e.g. null 
+                    expected: /\/edit\/fs\/dn(\/c)?\/i\/[A-z0-9]{32}.*(\?|&)instance_id/
                 },
                 // already being edited
                 {
@@ -605,8 +605,8 @@ describe( 'api', () => {
                     instanceId: 'AAA',
                     instance: true,
                     status: 201,
-                    // includes proper enketoID and not e.g. ::null 
-                    expected: /\/view\/fs\/i\/::[A-z0-9]{32}.*(\?|&)instance_id=AAA/
+                    // includes proper enketoID and not e.g. null 
+                    expected: /\/view\/fs\/i\/[A-z0-9]{32}.*(\?|&)instance_id=AAA/
                 },
                 // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
                 {
@@ -616,8 +616,8 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    // includes proper enketoID and not e.g. ::null 
-                    expected: /\/view\/fs\/i\/::[A-z0-9]{32}.*(\?|&)instance_id/
+                    // includes proper enketoID and not e.g. null 
+                    expected: /\/view\/fs\/i\/[A-z0-9]{32}.*(\?|&)instance_id/
                 },
                 // already being edited
                 {
@@ -831,7 +831,7 @@ describe( 'api', () => {
                 pid: 'a',
                 ecid: 'b',
                 status: 200,
-                expected: /::[A-z0-9]+$/
+                expected: /[A-z0-9]+$/
             } );
 
             // jini
