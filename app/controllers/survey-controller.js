@@ -44,13 +44,13 @@ router
         req.participant = true;
         next();
     } )
-    .get( '/x/', offlineWebform )
-    .get( '/_/', offlineWebform )
     .get( '*/headless*', _setHeadless )
     .get( '/preview*', _setJini )
     .get( /\/(single|edit)\/fs(\/rfc)?(\/c)?\/i/, _setJini )
     .get( /\/(edit|single)\/fs\/(?!(participant|rfc|dn|view))/, _setCompleteButton )
     .get( '*', _setCloseButtonClass )
+    .get( `${config[ 'offline path' ]}/:enketo_id`, offlineWebform )
+    .get( `${config[ 'offline path' ]}/`, redirect )
     .get( '/:enketo_id', webform )
     .get( '/:mod/:enketo_id', webform )
     .get( '/single/fs/:mod/:enketo_id', fieldSubmission )
@@ -88,6 +88,7 @@ router
     .get( '/xform/:encrypted_enketo_id_view_dnc', xform )
     .get( '/xform/:encrypted_enketo_id_fs_c', xform )
     .get( '/xform/:encrypted_enketo_id_fs_participant', xform )
+    .get( /.*\/::[A-z0-9]{4,8}/, redirect )
     .get( '/connection', ( req, res ) => {
         res.status = 200;
         res.send( `connected ${Math.random()}` );
@@ -104,8 +105,7 @@ function offlineWebform( req, res, next ) {
         error.status = 405;
         next( error );
     } else {
-        req.offline = true;
-        req.manifest = `${req.app.get( 'base path' )}/x/manifest.appcache`;
+        req.offlinePath = config[ 'offline path' ];
         webform( req, res, next );
     }
 }
@@ -117,8 +117,7 @@ function offlineWebform( req, res, next ) {
  */
 function webform( req, res, next ) {
     const options = {
-        offline: req.offline,
-        manifest: req.manifest,
+        offlinePath: req.offlinePath,
         iframe: req.iframe,
         print: req.query.print === 'true'
     };
@@ -213,6 +212,18 @@ function preview( req, res, next ) {
     };
 
     _renderWebform( req, res, next, options );
+}
+
+/**
+ * This serves a page that redirects old pre-2.0.0 urls into new urls.
+ * The reason this on the client-side is to cache the redirect itself which is important
+ * in case people have bookmarked an offline-capable old-style url and go into the field without Internet.
+ * @param {module:api-controller~ExpressRequest} req
+ * @param {module:api-controller~ExpressResponse} res
+ * @param {Function} next - Express callback
+ */
+function redirect( req, res, next ) {
+    res.render( 'surveys/webform-redirect' );
 }
 
 /**

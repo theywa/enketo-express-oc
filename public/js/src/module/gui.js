@@ -619,6 +619,7 @@ function alertCacheUnsupported() {
 updateStatus = {
     offlineCapable( offlineCapable ) {
         if ( offlineCapable ) {
+
             $( '.offline-enabled__icon.not-enabled' ).removeClass( 'not-enabled' );
         } else {
             $( '.offline-enabled__icon' ).addClass( 'not-enabled' );

@@ -28,4 +28,12 @@ events.FakeInputUpdate = function() {
     return new CustomEvent( 'fakeinputupdate', { bubbles: true } );
 };
 
+events.OfflineLaunchCapable = function( detail ) {
+    return new CustomEvent( 'offlinelaunchcapable', { detail, bubbles: true } );
+};
+
+events.ApplicationUpdated = function() {
+    return new CustomEvent( 'applicationupdated', { bubbles: true } );
+};
+
 export default events;

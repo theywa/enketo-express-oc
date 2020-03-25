@@ -1,5 +1,15 @@
 module.exports = grunt => {
-    const JS_INCLUDE = [ '**/*.js', '!**/node_modules/**', '!test/**/*.spec.js', '!public/js/build/*', '!test/client/config/karma.conf.js', '!docs/**', '!test-coverage/**' ];
+    const JS_INCLUDE = [
+        '**/*.js',
+        '!**/offline-app-worker-partial.js',
+        '!**/node_modules/**',
+        '!test/**/*.spec.js',
+        '!public/js/build/*',
+        '!test/client/config/karma.conf.js',
+        '!docs/**',
+        '!test-coverage/**',
+        '!**/redirect-IE.js'
+    ];
     const path = require( 'path' );
     const nodeSass = require( 'node-sass' );
     const bundles = require( './buildFiles' ).bundles;
@@ -81,19 +91,6 @@ module.exports = grunt => {
             buildReadmeBadge: {
                 command: 'node ./tools/update-readme-with-shield-badge.js'
             },
-            translation: {
-                command: [
-                    'cd locales',
-                    'npx gulp',
-                    'cd ..'
-                ].join( ' && ' )
-            },
-            ie11polyfill: {
-                command: [
-                    'mkdir -p public/js/build && curl "https://polyfill.io/v3/polyfill.min.js?ua=ie%2F11.0.0&features=es2015%2Ces2016%2Ces2017%2Ces2018%2Cdefault-3.6%2Cfetch%2CNodeList.prototype.forEach" -o "public/js/build/ie11-polyfill.min.js"',
-                    'cp -f node_modules/enketo-core/src/js/obscure-ie11-polyfills.js public/js/build/obscure-ie11-polyfills.js'
-                ].join( '&&' )
-            },
             'clean-css': {
                 command: 'rm -f public/css/*'
             },
@@ -103,19 +100,13 @@ module.exports = grunt => {
             'clean-js': {
                 command: 'rm -f public/js/build/* && rm -f public/js/*.js && rm -f public/temp-client-config.json'
             },
+            translation: {
+                command: 'echo "No automatic translation key generation at the moment."'
+                // Does not work correctly yet for TError() calls and probably not for pug files either.
+                // npx i18next -c ./i18next-parser.config.js
+            },
             rollup: {
                 command: 'npx rollup --config'
-            },
-            babel: {
-                command: bundles
-                    .map( bundle => `npx babel ${bundle} --out-file ${bundle.replace('-bundle.', '-ie11-temp-bundle.')}` )
-                    .join( '&&' )
-            },
-            browserify: {
-                command: bundles
-                    .map( bundle => `npx browserify node_modules/enketo-core/src/js/workarounds-ie11.js ${bundle.replace('-bundle.', '-ie11-temp-bundle.')} -o ${bundle.replace('-bundle.', '-ie11-bundle.')}` )
-                    .concat( [ 'rm -f public/js/build/*ie11-temp-bundle.js' ] )
-                    .join( '&&' )
             }
         },
         jsbeautifier: {
@@ -183,7 +174,6 @@ module.exports = grunt => {
             },
             all: {
                 files: bundles
-                    .concat( bundles.map( bundle => bundle.replace( '-bundle.', '-ie11-bundle.' ) ) )
                     .map( bundle => [ bundle.replace( '.js', '.min.js' ), [ bundle ] ] )
                     .reduce( ( o, [ key, value ] ) => {
                         o[ key ] = value;
@@ -302,12 +292,9 @@ module.exports = grunt => {
     grunt.registerTask( 'locales', [ 'shell:clean-locales', 'i18next' ] );
     grunt.registerTask( 'js', [ 'shell:clean-js', 'client-config-file:create', 'widgets', 'shell:rollup' ] );
     grunt.registerTask( 'js-dev', [ 'js' ] );
-    grunt.registerTask( 'js-ie11', [ 'js', 'shell:ie11polyfill', 'shell:babel', 'shell:browserify' ] );
-    grunt.registerTask( 'build-ie11', [ 'js-ie11', 'terser' ] );
     grunt.registerTask( 'css', [ 'shell:clean-css', 'system-sass-variables:create', 'sass' ] );
     grunt.registerTask( 'test', [ 'env:test', 'transforms', 'js', 'css', 'nyc:cover', 'karma:headless', 'shell:buildReadmeBadge', 'jsbeautifier:test', 'eslint' ] );
     grunt.registerTask( 'test-browser', [ 'env:test', 'css', 'client-config-file:create', 'karma:browsers' ] );
     grunt.registerTask( 'develop', [ 'env:develop', 'i18next', 'js-dev', 'css', 'concurrent:develop' ] );
-    grunt.registerTask( 'develop-ie11', [ 'env:develop', 'i18next', 'js-ie11', 'css', 'concurrent:develop' ] );
     grunt.registerTask( 'test-and-build', [ 'env:test', 'mochaTest:all', 'karma:headless', 'env:production', 'default' ] );
 };

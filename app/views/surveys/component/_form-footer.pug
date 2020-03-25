@@ -13,7 +13,7 @@ section.form-footer
               i.icon.icon-check= ' '
               | #{t('formfooter.complete.btn')}
         else
-          if draftEnabled && offline
+          if draftEnabled && offlinePath
             button#save-draft.btn.btn-default
               i.icon.icon-info-circle.save-draft-info= ' '
               i.icon.icon-pencil= ' '

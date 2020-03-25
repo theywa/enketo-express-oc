@@ -1,7 +1,7 @@
 @import "system_variables";
 
 $base-path: "" !default;
-$fa-font-path: $base-path+"/fonts";
+$fa-font-path: "../fonts";
 
 $dn-nav-min-width: 220px !default;
 $dn-nav-max-width: 220px !default;
