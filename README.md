@@ -35,6 +35,12 @@ OpenClinica users, in addition to the configuration documentation linked above, 
 7. Set `"default theme": "oc"`
 8. Set `"text field character limit": 3999`
 
+
+OpenClinica users, to build special Internet Explorer 11 javascript bundles, do after the regular build (ie. `npm install`):
+
+0. `grunt build-ie11`
+
+
 --------
 
 ### Translation
