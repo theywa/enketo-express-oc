@@ -27,7 +27,9 @@ section.form-footer
 
         include _logout
         include _enketo-power
-        a.previous-page.disabled(href="#")= t('form.pages.back')
+        a.btn.btn-default.previous-page.disabled(href="#")
+          i.icon.icon-arrow-left
+          span= t('form.pages.back')
 
       .form-footer__content__jump-nav
         if !participant
