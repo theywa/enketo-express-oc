@@ -4,7 +4,6 @@ import { t } from '../../public/js/src/module/translator';
 import settings from '../../public/js/src/module/settings';
 import events from '../../public/js/src/module/event';
 import fileManager from '../../public/js/src/module/file-manager';
-let usersOptionsHtml;
 let currentUser;
 let users;
 let annotationIconDataUri;
@@ -69,6 +68,7 @@ class Comment extends Widget {
             }
             this.commentButton = this.linkedQuestion.querySelector( '.btn-dn' );
             this._setCommentButtonState( this._getCurrentStatus( this.notes ), this._hasAnnotation( this.notes ), this._hasMultipleOpenQueries( this.notes ) );
+            this._setUsers();
             this._setUserOptions( this.readOnly );
             this._setCommentButtonHandler();
             this._setValidationHandler();
@@ -531,36 +531,37 @@ class Comment extends Widget {
     }
 
     /**
-     * Sets users, currentUser, and usersOptionsHtml global variables (once for all dn widgets);
-     * 
-     * @param {boolean=} readOnly 
+     * Sets users and currentUser global variables (once for all dn widgets);
      */
-    _setUserOptions( readOnly ) {
-        if ( !usersOptionsHtml ) {
-            const disabled = readOnly ? 'disabled' : '';
-            const defaultAssignee = this.defaultAssignee;
+    _setUsers() {
+        if ( !users ) {
             try {
                 const userNodes = this.options.helpers.evaluate( 'instance("_users")/root/item', 'nodes', null, null, true );
-
                 // doing this in 2 steps as it is likely useful later on to store the users array separately.
                 users = userNodes.map( item => ( {
                     firstName: item.querySelector( 'first_name' ).textContent,
                     lastName: item.querySelector( 'last_name' ).textContent,
                     userName: item.querySelector( 'user_name' ).textContent
                 } ) );
-                usersOptionsHtml = `<option value="" ${disabled}></option>${users.map( user => {
-                    const readableName = `${user.firstName} ${user.lastName} (${user.userName})`;
-                    const selected = user.userName === defaultAssignee ? ' selected ' : '';
-                    return `<option value="${user.userName}"${selected}${disabled}>${readableName}</option>`;
-                } )}`;
-
                 const currentUsernameNode = this.options.helpers.evaluate( 'instance("_users")/root/item[@current]/user_name', 'node', null, null, true );
                 currentUser = currentUsernameNode ? currentUsernameNode.textContent : null;
             } catch ( e ) {
-                //users = [];
                 console.error( e );
             }
         }
+    }
+
+    /**
+     * @param {boolean=} readOnly 
+     */
+    _setUserOptions( readOnly ) {
+        const disabled = readOnly ? 'disabled' : '';
+        const defaultAssignee = this.defaultAssignee;
+        this.usersOptionsHtml = `<option value="" ${disabled}></option>${users.map( user => {
+            const readableName = `${user.firstName} ${user.lastName} (${user.userName})`;
+            const selected = user.userName === defaultAssignee ? ' selected ' : '';
+            return `<option value="${user.userName}"${selected}${disabled}>${readableName}</option>`;
+        } )}`;
     }
 
     _getCurrentErrorMsg() {
@@ -879,7 +880,7 @@ class Comment extends Widget {
             `<div class="or-comment-widget__content__form__user">
                 <label class="or-comment-widget__content__form__user__dn-assignee">
                     <span>${assignText}</span>
-                    <select name="dn-assignee" class="ignore" >${usersOptionsHtml}</select>
+                    <select name="dn-assignee" class="ignore" >${this.usersOptionsHtml}</select>
                 </label>
                 <div class="or-comment-widget__content__form__user__dn-notify option-wrapper">
                     <label>
