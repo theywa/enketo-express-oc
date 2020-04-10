@@ -328,6 +328,12 @@ $secondary-color: #eeeeee;
 
                 .next-page {
                     order: 3;
+                    // reverse icon and text
+                    display: flex;
+
+                    .icon {
+                        order: 2;
+                    }
 
                     &.disabled {
                         display: block;

@@ -52,15 +52,6 @@
                 display: none;
             }
 
-            .next-page {
-                // reverse icon and text
-                display: flex;
-
-                .icon {
-                    order: 2;
-                }
-            }
-
             .previous-page {
                 // This button is absolutely positioned to avoid
                 // it pushing up other form footer content when it becomes
