@@ -142,7 +142,9 @@ function _addBranding( survey ) {
         brandImg.src = '';
         brandImg.setAttribute( attribute, survey.branding.source );
     }
-    brandImg.classList.remove( 'hide' );
+    if ( brandImg ) {
+        brandImg.classList.remove( 'hide' );
+    }
 
     return survey;
 }
