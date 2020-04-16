@@ -4,8 +4,24 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]
 ---------------------
+##### Changed
+- Updated Georgian translation.
+
+[2.2.0] - 2020-04-15
+---------------------
+##### Added
+- Sync form and UI language upon load and when switching language within a session. See [load scenarios and resolution](https://docs.google.com/spreadsheets/d/1CigMLAQewcXi-OJJHi_JQQ-fJXOam99livM0oYrtbkk/edit?pli=1#gid=0)
+- Translation into Georgian.
+- Configuration item "id length" to make the Enketo ID length configurable between 4 and 64 characters.
+
 ##### Fixed
-- Previews using a `form` queryparameter show a submit button instead of a validate button.
+- Previews using a `form` query parameter show a submit button instead of a validate button.
+- Docker builds fail due to an outdated Node.js base image.
+- The dotted lines on Grid theme printouts are not positioned at the bottom of cells.
+- A text question on Grid theme printouts that has only text questions on the same row (or nothing else), has too little space to write on.
+- Date/datetime/time questions take up too much vertical space on Grid theme printouts.
+- Empty readonly text fields take up unnecessary space in the print view.
+- Irrelevant questions in Grid theme are not getting the correct width in the print view.
 
 [2.1.1] - 2020-04-02
 ---------------------
