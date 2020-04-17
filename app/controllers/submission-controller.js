@@ -43,7 +43,6 @@ router
     .get( '/max-size/:encrypted_enketo_id_rfc_c', maxSize )
     .get( '/max-size/:encrypted_enketo_id_headless', maxSize )
     .get( '/max-size/:encrypted_enketo_id_participant', maxSize )
-    .get( '/:enketo_id', getInstance )
     .get( '/:encrypted_enketo_id_fs_c', getInstance )
     .get( '/:encrypted_enketo_id_view', getInstance )
     .get( '/:encrypted_enketo_id_view_dn', getInstance )
@@ -52,8 +51,9 @@ router
     .get( '/:encrypted_enketo_id_rfc_c', getInstance )
     .get( '/:encrypted_enketo_id_headless', getInstance )
     .get( '/:encrypted_enketo_id_participant', getInstance )
-    .post( '/:enketo_id', submit )
+    .get( '/:enketo_id', getInstance )
     .post( '/:encrypted_enketo_id_single', submit )
+    .post( '/:enketo_id', submit )
     .all( '/*', ( req, res, next ) => {
         const error = new Error( 'Not allowed' );
         error.status = 405;

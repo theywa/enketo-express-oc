@@ -38,7 +38,6 @@ router
         res.set( 'Content-Type', 'application/json' );
         next();
     } )
-    .post( '/xform/:enketo_id', getSurveyParts )
     .post( '/xform/:encrypted_enketo_id_single', getSurveyParts )
     .post( '/xform/:encrypted_enketo_id_view', getSurveyParts )
     .post( '/xform/:encrypted_enketo_id_view_dn', getSurveyParts )
@@ -48,6 +47,7 @@ router
     .post( '/xform/:encrypted_enketo_id_rfc_c', getSurveyParts )
     .post( '/xform/:encrypted_enketo_id_fs_participant', getSurveyParts )
     .post( '/xform/:encrypted_enketo_id_headless', getSurveyParts )
+    .post( '/xform/:enketo_id', getSurveyParts )
     .post( '/xform', getSurveyParts )
     .post( '/xform/hash/:enketo_id', getSurveyHash );
 
