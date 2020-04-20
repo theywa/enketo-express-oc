@@ -17,10 +17,10 @@ describe( 'OC Account manager API', () => {
     const validAccountManagerApiKey = config[ 'account manager api key' ];
     const invalidAccountManagerApiKey = 'bad';
     const validAuth = {
-        'Authorization': `Basic ${new Buffer( `${validAccountManagerApiKey}:` ).toString( 'base64' )}`
+        'Authorization': `Basic ${Buffer.from( `${validAccountManagerApiKey}:` ).toString( 'base64' )}`
     };
     const invalidAuth = {
-        'Authorization': `Basic ${new Buffer( `${invalidAccountManagerApiKey}:` ).toString( 'base64' )}`
+        'Authorization': `Basic ${Buffer.from( `${invalidAccountManagerApiKey}:` ).toString( 'base64' )}`
     };
     const validServer1 = 'https://octestserver1.com';
     const validServer2 = 'https://octestserver2.com';
