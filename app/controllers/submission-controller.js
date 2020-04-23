@@ -34,7 +34,6 @@ router
         res.set( 'Content-Type', 'application/json' );
         next();
     } )
-    .get( '/max-size/:enketo_id?', maxSize )
     .get( '/max-size/:encrypted_enketo_id_single', maxSize )
     .get( '/max-size/:encrypted_enketo_id_fs_c', maxSize )
     .get( '/max-size/:encrypted_enketo_id_view_dn', maxSize )
@@ -44,6 +43,7 @@ router
     .get( '/max-size/:encrypted_enketo_id_headless', maxSize )
     .get( '/max-size/:encrypted_enketo_id_participant', maxSize )
     .get( '/:encrypted_enketo_id_fs_c', getInstance )
+    .get( '/max-size/:enketo_id?', maxSize )
     .get( '/:encrypted_enketo_id_view', getInstance )
     .get( '/:encrypted_enketo_id_view_dn', getInstance )
     .get( '/:encrypted_enketo_id_view_dnc', getInstance )

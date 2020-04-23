@@ -51,6 +51,10 @@ router
     .get( '*', _setCloseButtonClass )
     .get( `${config[ 'offline path' ]}/:enketo_id`, offlineWebform )
     .get( `${config[ 'offline path' ]}/`, redirect )
+    .get( '/connection', ( req, res ) => {
+        res.status = 200;
+        res.send( `connected ${Math.random()}` );
+    } )
     .get( '/preview/:enketo_id', preview )
     .get( '/preview/:mod/:enketo_id', preview )
     .get( '/preview', preview )
@@ -88,11 +92,7 @@ router
     .get( '/xform/:encrypted_enketo_id_view_dnc', xform )
     .get( '/xform/:encrypted_enketo_id_fs_c', xform )
     .get( '/xform/:encrypted_enketo_id_fs_participant', xform )
-    .get( /.*\/::[A-z0-9]{4,8}/, redirect )
-    .get( '/connection', ( req, res ) => {
-        res.status = 200;
-        res.send( `connected ${Math.random()}` );
-    } );
+    .get( /.*\/::[A-z0-9]{4,8}/, redirect );
 
 /**
  * @param {module:api-controller~ExpressRequest} req
