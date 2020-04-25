@@ -13,6 +13,7 @@ import vex from 'vex-js';
 import $ from 'jquery';
 import './plugin';
 import vexEnketoDialog from 'vex-dialog-enketo';
+import events from './event'
 
 let pages;
 let homeScreenGuidance;
@@ -481,8 +482,9 @@ function printOcForm() {
     const gridInputs = inputDn + components.gridInputs + components.gridWarning;
     const regularInputs = inputDn;
 
-    const $dn = $( '.or-appearance-dn' );
-    let printified;
+    const dns = document.querySelectorAll( '.or-appearance-dn' );
+    const textPrints = document.querySelectorAll( '.question:not(.or-appearance-autocomplete):not(.or-appearance-url) > input[type=text]:not(.ignore):not([data-for]), .question:not(.or-appearance-autocomplete):not(.or-appearance-url) > textarea:not(.ignore):not([data-for])' );
+    let historyAdded;
 
     return new Promise( function( resolve ) {
             if ( formTheme === 'grid' || ( !formTheme && printHelper.isGrid() ) ) {
@@ -492,8 +494,14 @@ function printOcForm() {
                             return;
                         }
                         if ( format.queries === 'yes' ) {
-                            printified = $dn.trigger( 'printify.enketo' );
+                            historyAdded = true;
+                            dns.forEach( ( dn ) => {
+                                dn.dispatchEvent( events.Printify() );
+                            } );
                         }
+                        textPrints.forEach( ( textPrint ) => {
+                            textPrint.dispatchEvent( events.Printify() );
+                        } );
                         return printGrid( format )
                             .then( resolve );
                     } );
@@ -504,20 +512,31 @@ function printOcForm() {
                             return;
                         }
                         if ( format.queries === 'yes' ) {
-                            printified = $dn.trigger( 'printify.enketo' );
+                            historyAdded = true;
+                            dns.forEach( ( dn ) => {
+                                dn.dispatchEvent( events.Printify() );
+                            } );
                         }
+                        textPrints.forEach( ( textPrint ) => {
+                            textPrint.dispatchEvent( events.Printify() );
+                        } );
                         setTimeout( window.print, 100 );
                         resolve();
                     } );
             }
         } )
         .then( function() {
-            if ( !printified ) {
+            textPrints.forEach( ( textPrint ) => {
+                textPrint.dispatchEvent( events.DePrintify() );
+            } );
+            if ( !historyAdded ) {
                 return;
             }
             return new Promise( function( resolve ) {
                 setTimeout( function() {
-                    $dn.trigger( 'deprintify.enketo' );
+                    dns.forEach( ( dn ) => {
+                        dn.dispatchEvent( events.DePrintify() );
+                    } );
                     resolve();
                 }, 1000 );
             } );
@@ -569,7 +588,10 @@ function _delay( delay = 400 ) {
  */
 function applyPrintStyle() {
 
-    $( '.or-appearance-dn' ).trigger( 'printify.enketo' );
+    const dns = document.querySelectorAll( '.or-appearance-dn' );
+    dns.forEach( ( dn ) => {
+        dn.dispatchEvent( events.Printify() );
+    } );
 
     imagesLoaded()
         .then( () => {

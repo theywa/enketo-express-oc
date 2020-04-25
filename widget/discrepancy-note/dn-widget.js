@@ -148,9 +148,8 @@ class Comment extends Widget {
     }
 
     _setPrintOptimizationHandler() {
-        $( this.question )
-            .on( 'printify.enketo', this._printify.bind( this ) )
-            .on( 'deprintify.enketo', this._deprintify.bind( this ) );
+        this.question.addEventListener( events.Printify().type, this._printify.bind( this ) );
+        this.question.addEventListener( events.DePrintify().type, this._deprintify.bind( this ) );
     }
 
     _setCloseHandler() {
