@@ -12,6 +12,7 @@ import vex from 'vex-js';
 import $ from 'jquery';
 import './plugin';
 import vexEnketoDialog from 'vex-dialog-enketo';
+import events from './event'
 
 let pages;
 let homeScreenGuidance;
@@ -475,6 +476,7 @@ function printOcForm() {
     const regularInputs = inputDn;
 
     const $dn = $( '.or-appearance-dn' );
+    const textPrints = document.querySelectorAll( '.question:not(.or-appearance-autocomplete):not(.or-appearance-url) > input[type=text]:not(.ignore):not([data-for]), .question:not(.or-appearance-autocomplete):not(.or-appearance-url) > textarea:not(.ignore):not([data-for])' );
     let printified;
 
     return new Promise( function( resolve ) {
@@ -486,6 +488,9 @@ function printOcForm() {
                         }
                         if ( format.queries === 'yes' ) {
                             printified = $dn.trigger( 'printify.enketo' );
+                            textPrints.forEach( ( textPrint ) => {
+                                textPrint.dispatchEvent( events.PrintifyText() );
+                            } );
                         }
                         return printGrid( format )
                             .then( resolve );
@@ -498,6 +503,9 @@ function printOcForm() {
                         }
                         if ( format.queries === 'yes' ) {
                             printified = $dn.trigger( 'printify.enketo' );
+                            textPrints.forEach( ( textPrint ) => {
+                                textPrint.dispatchEvent( events.PrintifyText() );
+                            } );
                         }
                         setTimeout( window.print, 100 );
                         resolve();
@@ -511,6 +519,9 @@ function printOcForm() {
             return new Promise( function( resolve ) {
                 setTimeout( function() {
                     $dn.trigger( 'deprintify.enketo' );
+                    textPrints.forEach( ( textPrint ) => {
+                        textPrint.dispatchEvent( events.DePrintifyText() );
+                    } );
                     resolve();
                 }, 1000 );
             } );
