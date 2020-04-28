@@ -68,16 +68,16 @@ function init( selector, data, loadWarnings = [] ) {
             // set form eventhandlers before initializing form
             _setFormEventHandlers();
 
-            const handleGoToHidden = e => {
+            const handleGoToIrrelevant = e => {
                 let err;
                 // In OC hidden go_to fields should show loadError 
                 // regular questions:
                 if ( !e.target.classList.contains( 'or-appearance-dn' ) ) {
-                    err = t( 'alert.goto.hidden' );
+                    err = t( 'alert.goto.irrelevant' );
                 }
                 // Discrepancy notes
                 else {
-                    err = `${t( 'alert.goto.hidden' )} `;
+                    err = `${t( 'alert.goto.irrelevant' )} `;
                     const goToErrorLink = settings.goToErrorUrl ? `<a href="${settings.goToErrorUrl}">${settings.goToErrorUrl}</a>` : '';
                     if ( settings.interface === 'queries' ) {
                         err += goToErrorLink ? t( 'alert.goto.msg2', {
@@ -90,15 +90,22 @@ function init( selector, data, loadWarnings = [] ) {
                     }
                 }
                 // For goto targets that are discrepancy notes and are relevant but their linked question is not,
-                // the gotohidden event will be fired twice. We can safely remove the eventlistener after the first
+                // the goto-irrelevant event will be fired twice. We can safely remove the eventlistener after the first
                 // event is caught (for all cases).
-                form.view.html.removeEventListener( events.GoToHidden().type, handleGoToHidden );
+                form.view.html.removeEventListener( events.GoToIrrelevant().type, handleGoToIrrelevant );
                 loadWarnings.push( err );
             };
 
+            const handleGoToInvisible = () => {
+                form.view.html.removeEventListener( events.GoToInvisible().type, handleGoToInvisible );
+                if ( settings.interface === 'sdv' ) {
+                    loadWarnings.push( `${t( 'alert.goto.invisible' )} ` );
+                }
+            };
 
-            // listen for "gotohidden" event and add error
-            form.view.html.addEventListener( events.GoToHidden().type, handleGoToHidden );
+            // listen for "goto-irrelevant" event and add error
+            form.view.html.addEventListener( events.GoToIrrelevant().type, handleGoToIrrelevant );
+            form.view.html.addEventListener( events.GoToInvisible().type, handleGoToInvisible );
 
             loadErrors = loadErrors.concat( form.init() );
 
@@ -505,7 +512,7 @@ function _complete( bypassConfirmation = false, bypassChecks = false ) {
                 let deprecatedId;
                 let msg = '';
 
-                form.view.$.trigger( 'beforesave' );
+                form.view.html.dispatchEvent( events.BeforeSave() );
 
                 beforeMsg = t( 'alert.submission.redirectmsg' );
                 authLink = `<a href="/login" target="_blank">${t( 'here' )}</a>`;

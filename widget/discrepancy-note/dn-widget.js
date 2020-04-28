@@ -203,7 +203,7 @@ class Comment extends Widget {
                     }
                 }
             } else {
-                this.question.dispatchEvent( events.GoToHidden() );
+                this.question.dispatchEvent( events.GoToIrrelevant() );
             }
         } );
     }

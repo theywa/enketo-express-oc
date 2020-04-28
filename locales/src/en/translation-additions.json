@@ -135,7 +135,8 @@
     },
     "alert": {
         "goto": {
-            "hidden": "The item you are trying to access is currently hidden.",
+            "irrelevant": "The item you are trying to access is currently hidden.",
+            "invisible": "The item you are trying to access is not visible on the form.",
             "notfound": "The item you are trying to access has been removed from this form.",
             "msg1": "Please use the View Query Only icon instead of the View Query Within Record icon to see it.",
             "msg2": "Please visit __miniform__ to see it.",
