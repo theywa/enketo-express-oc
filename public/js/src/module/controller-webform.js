@@ -242,7 +242,7 @@ function _submitRecord() {
     let msg = '';
     const include = { irrelevant: false };
 
-    form.view.$.trigger( 'beforesave' );
+    form.view.html.dispatchEvent( events.BeforeSave() );
 
     beforeMsg = ( redirect ) ? t( 'alert.submission.redirectmsg' ) : '';
     authLink = `<a href="${settings.loginUrl}" target="_blank">${t( 'here' )}</a>`;
@@ -370,8 +370,8 @@ function _confirmRecordName( recordName, errorMsg ) {
 function _saveRecord( draft = true, recordName, confirmed, errorMsg ) {
     const include = { irrelevant: draft };
 
-    // triggering "beforesave" event to update possible "timeEnd" meta data in form
-    form.view.$.trigger( 'beforesave' );
+    // triggering "before-save" event to update possible "timeEnd" meta data in form
+    form.view.html.dispatchEvent( events.BeforeSave() );
 
     // check recordName
     if ( !recordName ) {
@@ -429,13 +429,13 @@ function _saveRecord( draft = true, recordName, confirmed, errorMsg ) {
             _resetForm( true );
 
             if ( draft ) {
-                gui.feedback( t( 'alert.recordsavesuccess.draftmsg' ), 3 );
+                gui.alert( t( 'alert.recordsavesuccess.draftmsg' ), t( 'alert.savedraftinfo.heading' ), 'info', 10 );
             } else {
-                gui.feedback( t( 'alert.recordsavesuccess.finalmsg' ), 3 );
+                gui.alert( `${t('record-list.msg2')}`, t( 'alert.recordsavesuccess.finalmsg' ), 'info', 10 );
                 // The timeout simply avoids showing two messages at the same time:
                 // 1. "added to queue"
                 // 2. "successfully submitted"
-                setTimeout( records.uploadQueue, 5 * 1000 );
+                setTimeout( records.uploadQueue, 10 * 1000 );
             }
         } )
         .catch( error => {

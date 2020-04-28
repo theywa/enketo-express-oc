@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+---------------------
+##### Added
+- Support for multiple setvalue/xforms-value-changed actions under the same form control.
+
+##### Changed
+- More prominent and differently-worded message when saving final or draft record in offline-capable views.
+- Updated Hindi translation.
+
+##### Fixed
+- Border shown when printing a Grid Theme form.
+
 [2.2.1] - 2020-04-23
 ---------------------
 ##### Changed
