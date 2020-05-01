@@ -15,7 +15,6 @@ import $ from 'jquery';
 import encryptor from './encryptor';
 
 let form;
-let formSelector;
 let formData;
 let formprogress;
 const formOptions = {
@@ -23,11 +22,10 @@ const formOptions = {
     printRelevantOnly: settings.printRelevantOnly
 };
 
-function init( selector, data ) {
+function init( formEl, data ) {
     let advice;
     let loadErrors = [];
 
-    formSelector = selector;
     formData = data;
 
     return _initializeRecords()
@@ -46,7 +44,7 @@ function init( selector, data ) {
                 formOptions.language = getCurrentUiLanguage();
             }
 
-            form = new Form( formSelector, data, formOptions );
+            form = new Form( formEl, data, formOptions );
             loadErrors = form.init();
 
             if ( !settings.headless && data.instanceStr ) {
@@ -147,8 +145,7 @@ function _resetForm( confirmed ) {
                 }
             } );
     } else {
-        form.resetView();
-        const formEl = document.querySelector( 'form.or' );
+        const formEl = form.resetView();
         form = new Form( formEl, {
             modelStr: formData.modelStr,
             external: formData.external
@@ -197,8 +194,8 @@ function _loadRecord( instanceId, confirmed ) {
                     return gui.alert( t( 'alert.recordnotfound.msg' ) );
                 }
 
-                form.resetView();
-                form = new Form( formSelector, {
+                const formEl = form.resetView();
+                form = new Form( formEl, {
                     modelStr: formData.modelStr,
                     instanceStr: record.xml,
                     external: formData.external,
@@ -429,7 +426,7 @@ function _saveRecord( draft = true, recordName, confirmed, errorMsg ) {
             _resetForm( true );
 
             if ( draft ) {
-                gui.alert( t( 'alert.recordsavesuccess.draftmsg' ), t( 'alert.savedraftinfo.heading' ), 'info', 10 );
+                gui.alert( t( 'alert.recordsavesuccess.draftmsg' ), t( 'alert.savedraftinfo.heading' ), 'info', 5 );
             } else {
                 gui.alert( `${t('record-list.msg2')}`, t( 'alert.recordsavesuccess.finalmsg' ), 'info', 10 );
                 // The timeout simply avoids showing two messages at the same time:
