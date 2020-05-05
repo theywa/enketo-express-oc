@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[2.3.1] - 2020-05-05
+---------------------
+##### Fixed
+- If an auto-saved record is recovered, a deprecatedID is generated even though the record has never been submitted.
+- Textarea not resizing correctly when printing in pages mode.
+
 [2.3.0] - 2020-05-01
 ---------------------
 ##### Added
