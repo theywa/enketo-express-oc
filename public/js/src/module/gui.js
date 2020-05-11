@@ -13,7 +13,6 @@ import vex from 'vex-js';
 import $ from 'jquery';
 import './plugin';
 import vexEnketoDialog from 'vex-dialog-enketo';
-import events from './event'
 
 let pages;
 let homeScreenGuidance;
