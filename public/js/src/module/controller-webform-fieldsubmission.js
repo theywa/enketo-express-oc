@@ -7,7 +7,8 @@
 import gui from './gui';
 
 import settings from './settings';
-import Form from './Form'; // modified for OC
+import { Form } from './Form'; // modified for OC
+import FormModel from './Form-model'; // modified for OC
 import fileManager from './file-manager';
 import events from './event';
 import { t } from './translator';
@@ -18,7 +19,6 @@ import rc from './controller-webform';
 import reasons from './reasons';
 const DEFAULT_THANKS_URL = '/thanks';
 let form;
-let formSelector;
 let formprogress;
 let ignoreBeforeUnload = false;
 
@@ -28,11 +28,10 @@ const formOptions = {
 const inputUpdateEventBuffer = [];
 
 
-function init( selector, data, loadWarnings = [] ) {
+function init( formEl, data, loadWarnings = [] ) {
     let advice;
     let loadErrors = [];
 
-    formSelector = selector;
     formprogress = document.querySelector( '.form-progress' );
 
     return new Promise( resolve => {
@@ -42,11 +41,21 @@ function init( selector, data, loadWarnings = [] ) {
                 fileManager.setInstanceAttachments( data.instanceAttachments );
             }
 
-            form = new Form( formSelector, data, formOptions );
+            // Create separate model just to identify static default values.
+            // We do this before the inputupdate listener to avoid triggering a fieldsubmission for instanceID 
+            // in duplicate/triplicate.
+            const m = new FormModel( { modelStr: data.modelStr } );
+            m.init();
+            const staticDefaultNodes = [ ...m.node( null, null, { noEmpty: true } ).getElements() ]
+                .filter( node => node !== m.getMetaNode( 'instanceID' ).getElement() );
+
+            form = new Form( formEl, data, formOptions );
 
             // Additional layer of security to disable submissions in readonly views.
             // Should not be necessary to do this.
             fieldSubmissionQueue = new FieldSubmissionQueue();
+
+
 
             // Buffer inputupdate events (DURING LOAD ONLY), in order to eventually log these
             // changes in the DN widget after it has been initalized
@@ -108,6 +117,12 @@ function init( selector, data, loadWarnings = [] ) {
             form.view.html.addEventListener( events.GoToInvisible().type, handleGoToInvisible );
 
             loadErrors = loadErrors.concat( form.init() );
+
+            // Create fieldsubmissions for static default values
+            staticDefaultNodes.forEach( node => {
+                const props = m.getUpdateEventData( node );
+                fieldSubmissionQueue.addFieldSubmission( props.fullPath, props.xmlFragment, form.instanceID );
+            } );
 
             // Make sure audits are logged in DN widget for calculated values during form initialization 
             // before the DN widget was initialized.

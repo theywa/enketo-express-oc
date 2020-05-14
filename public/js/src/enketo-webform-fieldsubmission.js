@@ -5,12 +5,13 @@ import controller from './module/controller-webform-fieldsubmission';
 import settings from './module/settings';
 import connection from './module/connection';
 import { init as initTranslator, t, localize } from './module/translator';
+import utils from './module/utils';
 import calculationModule from 'enketo-core/src/js/calculate';
 import preloadModule from 'enketo-core/src/js/preload';
-
-const $loader = $( '.main-loader' );
-const $formheader = $( '.main > .paper > .form-header' );
 import oc from './module/custom';
+
+const loader = document.querySelector( '.main-loader' );
+const formheader = document.querySelector( '.main > .paper > .form-header' );
 const $footer = $( '.form-footer' );
 const survey = {
     enketoId: settings.enketoId,
@@ -19,6 +20,7 @@ const survey = {
     xformUrl: settings.xformUrl,
     instanceId: settings.instanceId
 };
+const range = document.createRange();
 const loadWarnings = [];
 
 initTranslator( survey )
@@ -68,7 +70,7 @@ function _updateMaxSizeSetting( maxSize ) {
 }
 
 function _showErrorOrAuthenticate( error ) {
-    $loader.addClass( 'fail' );
+    loader.classList.add( 'fail' );
     if ( error.status === 401 ) {
         window.location.href = `/login?return_url=${encodeURIComponent( window.location.href )}`;
     } else {
@@ -124,26 +126,41 @@ function _readonlify( formParts, notesEnabled ) {
 }
 
 function _init( formParts ) {
-    $formheader.after( formParts.form );
-    $( document ).ready( () => {
-        localize( document.querySelector( 'form.or' ) );
-        controller.init( 'form.or', {
-            modelStr: formParts.model,
-            instanceStr: formParts.instance,
-            external: formParts.externalData,
-            instanceAttachments: formParts.instanceAttachments
-        }, loadWarnings ).then( form => {
-            // Note: be careful, "form" param returned by controller.init is undefined if there were loadErrors (in fs view).
-            const $title = $( '#form-title' );
-            const title = ( settings.pid ) ? `${settings.pid}: ${$title.text()}` : $title.text();
-            $title.text( title );
-            $( 'head>title' ).text( title );
-            if ( formParts.instance ) {
-                oc.addSignedStatus( form );
-            }
-            if ( settings.print ) {
-                gui.applyPrintStyle();
-            }
-        } );
+    let error;
+
+    return new Promise( ( resolve, reject ) => {
+        if ( formParts && formParts.form && formParts.model ) {
+            const formFragment = range.createContextualFragment( formParts.form );
+            formheader.after( formFragment );
+            const formEl = document.querySelector( 'form.or' );
+
+            controller.init( formEl, {
+                modelStr: formParts.model,
+                instanceStr: formParts.instance,
+                external: formParts.externalData,
+                instanceAttachments: formParts.instanceAttachments
+            }, loadWarnings ).then( form => {
+                //formParts.languages = form.languages; // be careful form is undefined if there were load errors
+                formParts.htmlView = formEl;
+                const title = utils.getTitleFromFormStr( formParts.form );
+                document.querySelector( 'head>title' ).textContent = settings.pid ? `${settings.pid}: ${title}` : title;
+                if ( formParts.instance ) {
+                    oc.addSignedStatus( form );
+                }
+                if ( settings.print ) {
+                    gui.applyPrintStyle();
+                }
+                localize( formEl );
+                resolve( formParts );
+            } );
+        } else if ( formParts ) {
+            error = new Error( 'Form not complete.' );
+            error.status = 400;
+            reject( error );
+        } else {
+            error = new Error( 'Form not found' );
+            error.status = 404;
+            reject( error );
+        }
     } );
 }

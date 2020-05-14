@@ -1,6 +1,5 @@
 // Extend the Enketo Core Form class, and expose it for local testing.
-import { Form } from 'enketo-core';
-import FormModel from './Form-model';
+import { Form, FormModel } from 'enketo-core';
 import $ from 'jquery';
 import gui from './gui';
 import settings from './settings';
@@ -10,7 +9,6 @@ import './relevant';
 import './required';
 import './page';
 import './repeat';
-
 
 /**
  * This function doesn't actually evaluate constraints. It triggers
@@ -275,4 +273,4 @@ Form.prototype.isValid = function( node ) {
     return this.view.html.querySelector( '.invalid-required, .invalid-constraint, .invalid-relevant' ) === null;
 };
 
-export default Form;
+export { Form };
