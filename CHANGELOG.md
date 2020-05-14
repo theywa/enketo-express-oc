@@ -4,8 +4,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]
 ---------------------
+##### Added
+- Turkish translation (45% only).
+
+##### Changed
+- Updated Hindi, Dutch, and Spanish
+
+##### Fixed
+- If requested language is not available as UI language, is available as form language but is not the default form language, the form shows default form language.
+
+[2.3.2] - 2020-05-12
+---------------------
 ##### Fixed
 - Overflowing text not shown in printout (regression in 2.3.1).
+- Protection against multiple submissions for a protected single-submission form is broken (regression in 2.2.0).
 
 [2.3.1] - 2020-05-05
 ---------------------
@@ -37,7 +49,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ##### Fixed
 - Some URLs with encrypted Enketo IDs stopped functioning (regression in 2.2.0).
 - Max-size call fails with /single/once webform URLs (single-submission webforms with protection against multiple submissions).
-- Protection against multiple submissions for a protected single-submission form is broken (regression in 2.2.0).
+- ~~Protection against multiple submissions for a protected single-submission form is broken (regression in 2.2.0).~~ (not fixed)
 - Final records in offline-capable webform views are not attempted to be submitted.
 
 [2.2.0] - 2020-04-15
