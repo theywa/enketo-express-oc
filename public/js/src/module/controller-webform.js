@@ -103,6 +103,7 @@ function _initializeRecords() {
     if ( !settings.offline ) {
         return Promise.resolve();
     }
+
     return records.init();
 }
 
@@ -111,10 +112,12 @@ function _checkAutoSavedRecord() {
     if ( !settings.offline ) {
         return Promise.resolve();
     }
+
     return records.getAutoSavedRecord()
         .then( record => {
             if ( record ) {
                 rec = record;
+
                 return gui.confirm( {
                     heading: t( 'confirm.autosaveload.heading' ),
                     msg: t( 'confirm.autosaveload.msg' ),
@@ -138,7 +141,8 @@ function _checkAutoSavedRecord() {
 
 /**
  * Controller function to reset to a blank form. Checks whether all changes have been saved first
- * @param  {boolean=} confirmed Whether unsaved changes can be discarded and lost forever
+ *
+ * @param  {boolean=} confirmed - Whether unsaved changes can be discarded and lost forever
  */
 function _resetForm( confirmed ) {
     let message;
@@ -172,8 +176,8 @@ function _resetForm( confirmed ) {
 /**
  * Loads a record from storage
  *
- * @param  {string} instanceId [description]
- * @param  {=boolean?} confirmed  [description]
+ * @param  {string} instanceId - [description]
+ * @param  {=boolean?} confirmed -  [description]
  */
 function _loadRecord( instanceId, confirmed ) {
     let texts;
@@ -256,24 +260,24 @@ function _submitRecord() {
 
 
     return new Promise( resolve => {
-            const record = {
-                'xml': form.getDataStr( include ),
-                'files': fileManager.getCurrentFiles(),
-                'instanceId': form.instanceID,
-                'deprecatedId': form.deprecatedID
-            };
+        const record = {
+            'xml': form.getDataStr( include ),
+            'files': fileManager.getCurrentFiles(),
+            'instanceId': form.instanceID,
+            'deprecatedId': form.deprecatedID
+        };
 
-            if ( form.encryptionKey ) {
-                const formProps = {
-                    encryptionKey: form.encryptionKey,
-                    id: form.view.html.id, // TODO: after enketo-core support, use form.id
-                    version: form.version,
-                };
-                resolve( encryptor.encryptRecord( formProps, record ) );
-            } else {
-                resolve( record );
-            }
-        } )
+        if ( form.encryptionKey ) {
+            const formProps = {
+                encryptionKey: form.encryptionKey,
+                id: form.view.html.id, // TODO: after enketo-core support, use form.id
+                version: form.version,
+            };
+            resolve( encryptor.encryptRecord( formProps, record ) );
+        } else {
+            resolve( record );
+        }
+    } )
         .then( connection.uploadRecord )
         .then( result => {
             result = result || {};
@@ -281,9 +285,9 @@ function _submitRecord() {
 
             if ( result.failedFiles && result.failedFiles.length > 0 ) {
                 msg = `${t( 'alert.submissionerror.fnfmsg', {
-    failedFiles: result.failedFiles.join( ', ' ),
-    supportEmail: settings.supportEmail
-} )}<br/>`;
+                    failedFiles: result.failedFiles.join( ', ' ),
+                    supportEmail: settings.supportEmail
+                } )}<br/>`;
                 level = 'warning';
             }
 
@@ -391,42 +395,43 @@ function _saveRecord( draft = true, recordName, confirmed, errorMsg ) {
     }
 
     return new Promise( resolve => {
-            // build the record object
-            const record = {
-                'draft': draft,
-                'xml': form.getDataStr( include ),
-                'name': recordName,
-                'instanceId': form.instanceID,
-                'deprecateId': form.deprecatedID,
-                'enketoId': settings.enketoId,
-                'files': fileManager.getCurrentFiles()
+        // build the record object
+        const record = {
+            'draft': draft,
+            'xml': form.getDataStr( include ),
+            'name': recordName,
+            'instanceId': form.instanceID,
+            'deprecateId': form.deprecatedID,
+            'enketoId': settings.enketoId,
+            'files': fileManager.getCurrentFiles()
+        };
+
+        // encrypt the record
+        if ( form.encryptionKey && !draft ) {
+            const formProps = {
+                encryptionKey: form.encryptionKey,
+                id: form.view.html.id, // TODO: after enketo-core support, use form.id
+                version: form.version,
             };
+            resolve( encryptor.encryptRecord( formProps, record ) );
+        } else {
+            resolve( record );
+        }
+    } ).then( record => {
+        // Change file object for database, not sure why this was chosen.
+        record.files = record.files.map( file => ( typeof file === 'string' ) ? {
+            name: file
+        } : {
+            name: file.name,
+            item: file
+        } );
 
-            // encrypt the record
-            if ( form.encryptionKey && !draft ) {
-                const formProps = {
-                    encryptionKey: form.encryptionKey,
-                    id: form.view.html.id, // TODO: after enketo-core support, use form.id
-                    version: form.version,
-                };
-                resolve( encryptor.encryptRecord( formProps, record ) );
-            } else {
-                resolve( record );
-            }
-        } ).then( record => {
-            // Change file object for database, not sure why this was chosen.
-            record.files = record.files.map( file => ( typeof file === 'string' ) ? {
-                name: file
-            } : {
-                name: file.name,
-                item: file
-            } );
+        // Save the record, determine the save method
+        const saveMethod = form.recordName ? 'update' : 'set';
+        console.log( 'saving record with', saveMethod, record );
 
-            // Save the record, determine the save method
-            const saveMethod = form.recordName ? 'update' : 'set';
-            console.log( 'saving record with', saveMethod, record );
-            return records[ saveMethod ]( record );
-        } )
+        return records[ saveMethod ]( record );
+    } )
         .then( () => {
 
             records.removeAutoSavedRecord();
@@ -435,7 +440,7 @@ function _saveRecord( draft = true, recordName, confirmed, errorMsg ) {
             if ( draft ) {
                 gui.alert( t( 'alert.recordsavesuccess.draftmsg' ), t( 'alert.savedraftinfo.heading' ), 'info', 5 );
             } else {
-                gui.alert( `${t('record-list.msg2')}`, t( 'alert.recordsavesuccess.finalmsg' ), 'info', 10 );
+                gui.alert( `${t( 'record-list.msg2' )}`, t( 'alert.recordsavesuccess.finalmsg' ), 'info', 10 );
                 // The timeout simply avoids showing two messages at the same time:
                 // 1. "added to queue"
                 // 2. "successfully submitted"
@@ -508,6 +513,7 @@ function _setEventHandlers() {
                     $button.btnBusyState( false );
                 } );
         }, 100 );
+
         return false;
     } );
 
@@ -563,6 +569,7 @@ function _setEventHandlers() {
                     } );
             }, 100 );
         }
+
         return false;
     } );
 
@@ -573,6 +580,7 @@ function _setEventHandlers() {
         setTimeout( () => {
             location.href = decodeURIComponent( settings.returnUrl || settings.defaultReturnUrl );
         }, 300 );
+
         return false;
     } );
 
@@ -666,6 +674,7 @@ function setLogoutLinkVisibility() {
 
 /** 
  * Determines whether the page is loaded inside an iframe
+ *
  * @return {boolean} [description]
  */
 function inIframe() {
@@ -678,6 +687,7 @@ function inIframe() {
 
 /**
  * Attempts to send a message to the parent window, useful if the webform is loaded inside an iframe.
+ *
  * @param  {{type: string}} event
  */
 function postEventAsMessageToParentWindow( event ) {

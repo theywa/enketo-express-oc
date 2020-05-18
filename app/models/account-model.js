@@ -38,10 +38,12 @@ function get( survey ) {
     if ( !server ) {
         error = new Error( 'Bad Request. Server URL missing.' );
         error.status = 400;
+
         return Promise.reject( error );
     } else if ( !utils.isValidUrl( server ) ) {
         error = new Error( 'Bad Request. Server URL is not a valid URL.' );
         error.status = 400;
+
         return Promise.reject( error );
     } else if ( /https?:\/\/testserver.com\/bob/.test( server ) ) {
         return Promise.resolve( {
@@ -52,18 +54,22 @@ function get( survey ) {
     } else if ( /https?:\/\/testserver.com\/noquota/.test( server ) ) {
         error = new Error( 'Forbidden. No quota left.' );
         error.status = 403;
+
         return Promise.reject( error );
     } else if ( /https?:\/\/testserver.com\/noapi/.test( server ) ) {
         error = new Error( 'Forbidden. No API access granted.' );
         error.status = 405;
+
         return Promise.reject( error );
     } else if ( /https?:\/\/testserver.com\/noquotanoapi/.test( server ) ) {
         error = new Error( 'Forbidden. No API access granted.' );
         error.status = 405;
+
         return Promise.reject( error );
     } else if ( /https?:\/\/testserver.com\/notpaid/.test( server ) ) {
         error = new Error( 'Forbidden. The account is not active.' );
         error.status = 403;
+
         return Promise.reject( error );
     }
 
@@ -283,7 +289,7 @@ function getList() {
     } );
 }
 
-/** 
+/**
  * Check if account for passed survey is active, and not exceeding quota.
  * This passes back the original survey object and therefore differs from the get function!
  *
@@ -295,6 +301,7 @@ function check( survey ) {
     return get( survey )
         .then( account => {
             survey.account = account;
+
             return survey;
         } );
 }
@@ -325,6 +332,7 @@ function _stripProtocol( url ) {
     if ( /https?:\/\//.test( url ) ) {
         url = url.substring( url.indexOf( '://' ) + 3 );
     }
+
     return url;
 }
 
