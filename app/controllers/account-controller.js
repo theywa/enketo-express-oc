@@ -48,9 +48,9 @@ function authCheck( req, res, next ) {
 
 function getExistingAccount( req, res, next ) {
     return account.get( {
-            linkedServer: req.query.server_url,
-            key: req.query.api_key
-        } )
+        linkedServer: req.query.server_url,
+        key: req.query.api_key
+    } )
         .then( account => {
             _render( 200, account, res );
         } )
@@ -59,9 +59,9 @@ function getExistingAccount( req, res, next ) {
 
 function getNewOrExistingAccount( req, res, next ) {
     return account.set( {
-            linkedServer: req.body.server_url || req.query.server_url,
-            key: req.body.api_key || req.query.api_key
-        } )
+        linkedServer: req.body.server_url || req.query.server_url,
+        key: req.body.api_key || req.query.api_key
+    } )
         .then( account => {
             _render( account.status || 201, account, res );
         } )
@@ -70,9 +70,9 @@ function getNewOrExistingAccount( req, res, next ) {
 
 function updateExistingAccount( req, res, next ) {
     return account.update( {
-            linkedServer: req.body.server_url || req.query.server_url,
-            key: req.body.api_key || req.query.api_key
-        } )
+        linkedServer: req.body.server_url || req.query.server_url,
+        key: req.body.api_key || req.query.api_key
+    } )
         .then( account => {
             _render( account.status || 201, account, res );
         } )
@@ -81,11 +81,11 @@ function updateExistingAccount( req, res, next ) {
 
 function removeAccount( req, res, next ) {
     return account.remove( {
-            linkedServer: req.body.server_url || req.query.server_url,
-            key: req.body.api_key || req.query.api_key
-        } ).then( () => {
-            _render( 204, null, res );
-        } )
+        linkedServer: req.body.server_url || req.query.server_url,
+        key: req.body.api_key || req.query.api_key
+    } ).then( () => {
+        _render( 204, null, res );
+    } )
         .catch( next );
 }
 

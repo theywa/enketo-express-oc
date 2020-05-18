@@ -1,3 +1,5 @@
+/* global process */
+
 /**
  * @module account-model
  */
@@ -78,7 +80,8 @@ function get( survey ) {
 
 /**
  * Create an account
- * @param  {{linkedServer: string, key: string}} account [description]
+ *
+ * @param  {{linkedServer: string, key: string}} account - [description]
  * @return {[type]}        [description]
  */
 function set( account ) {
@@ -149,7 +152,8 @@ function set( account ) {
 
 /**
  * Update an account
- * @param  {{linkedServer: string, key: string}} account [description]
+ *
+ * @param  {{linkedServer: string, key: string}} account - [description]
  * @return {[type]}        [description]
  */
 function update( account ) {
@@ -206,7 +210,8 @@ function update( account ) {
 
 /**
  * Remove an account
- * @param  {{linkedServer: string, key: string}} account [description]
+ *
+ * @param  {{linkedServer: string, key: string}} account - [description]
  * @return {[type]}        [description]
  */
 function remove( account ) {
@@ -252,6 +257,7 @@ function remove( account ) {
 
 /**
  * Obtains a list of acccounts
+ *
  * @return {[type]} [description]
  */
 function getList() {
@@ -410,6 +416,7 @@ function _getServer( survey ) {
     if ( typeof survey === 'string' ) {
         return survey;
     }
+
     return survey.linkedServer || survey.openRosaServer;
 }
 

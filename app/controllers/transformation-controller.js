@@ -122,6 +122,7 @@ function _getFormDirectly( survey ) {
 
 function _addSettings( survey ) {
     survey.includeRelevantMsg = true;
+
     return survey;
 }
 

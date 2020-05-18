@@ -91,6 +91,7 @@ FieldSubmissionQueue.prototype.submitAll = function() {
 
     if ( !this._enabled ) {
         this._uploadStatus.update( 'disabled' );
+
         return Promise.resolve();
     }
 
@@ -115,8 +116,10 @@ FieldSubmissionQueue.prototype.submitAll = function() {
                      * be larger than 2.
                      */
                     that.queuedSubmitAllRequest = undefined;
+
                     return request;
                 }
+
                 return result;
             } );
     } else {
@@ -158,22 +161,24 @@ FieldSubmissionQueue.prototype._submitAll = function() {
 
         // submit sequentially
         return _queue.reduce( ( prevPromise, fieldSubmission ) => prevPromise.then( () => {
-                keyParts = fieldSubmission.key.split( '_' );
-                method = keyParts[ 0 ];
-                url = FIELDSUBMISSION_URL;
-                return that._submitOne( url, fieldSubmission.fd, method )
-                    .catch( error => {
-                        console.debug( 'failed to submit ', fieldSubmission.key, 'adding it back to the queue, error:', error );
-                        // add back to the fieldSubmission queue if the field value wasn't overwritten in the mean time
-                        if ( typeof that.submissionQueue[ fieldSubmission.key ] === 'undefined' ) {
-                            that.submissionQueue[ fieldSubmission.key ] = fieldSubmission.fd;
-                        }
-                        if ( error.status === 401 ) {
-                            authRequired = true;
-                        }
-                        return error;
-                    } );
-            } ), Promise.resolve() )
+            keyParts = fieldSubmission.key.split( '_' );
+            method = keyParts[ 0 ];
+            url = FIELDSUBMISSION_URL;
+
+            return that._submitOne( url, fieldSubmission.fd, method )
+                .catch( error => {
+                    console.debug( 'failed to submit ', fieldSubmission.key, 'adding it back to the queue, error:', error );
+                    // add back to the fieldSubmission queue if the field value wasn't overwritten in the mean time
+                    if ( typeof that.submissionQueue[ fieldSubmission.key ] === 'undefined' ) {
+                        that.submissionQueue[ fieldSubmission.key ] = fieldSubmission.fd;
+                    }
+                    if ( error.status === 401 ) {
+                        authRequired = true;
+                    }
+
+                    return error;
+                } );
+        } ), Promise.resolve() )
             .then( () => {
                 console.log( 'All done with queue submission. Current remaining queue is', that.submissionQueue );
                 if ( authRequired ) {
@@ -187,9 +192,11 @@ FieldSubmissionQueue.prototype._submitAll = function() {
                 that._resetSubmissionInterval();
                 status = Object.keys( that.submissionQueue ).length > 0 ? 'fail' : 'success';
                 that._uploadStatus.update( status );
+
                 return true;
             } );
     }
+
     return Promise.resolve();
 };
 
@@ -199,16 +206,16 @@ FieldSubmissionQueue.prototype._submitOne = function( url, fd, method ) {
 
     return new Promise( ( resolve, reject ) => {
         $.ajax( url, {
-                type: method,
-                data: fd,
-                cache: false,
-                contentType: false,
-                processData: false,
-                headers: {
-                    'X-OpenClinica-Version': '1.0'
-                },
-                timeout: 3 * 60 * 1000
-            } )
+            type: method,
+            data: fd,
+            cache: false,
+            contentType: false,
+            processData: false,
+            headers: {
+                'X-OpenClinica-Version': '1.0'
+            },
+            timeout: 3 * 60 * 1000
+        } )
             .done( ( data, textStatus, jqXHR ) => {
                 if ( jqXHR.status === 201 || jqXHR.status === 202 ) {
                     that.submittedCounter = jqXHR.status === 201 ? that.submittedCounter + 1 : that.submittedCounter;
@@ -234,6 +241,7 @@ FieldSubmissionQueue.prototype.complete = function( instanceId, deprecatedId ) {
 
     if ( !this._enabled ) {
         this._uploadStatus( 'disabled' );
+
         return Promise.reject( new Error( 'Attempt to complete a record for a form that was disabled due to loading error(s).' ) );
     }
 
@@ -251,6 +259,7 @@ FieldSubmissionQueue.prototype.complete = function( instanceId, deprecatedId ) {
     } else {
         error = new Error( 'Attempt to make a "complete" request when queue is not empty or instanceId is missing', this.submissionQueue, instanceId );
         console.error( error );
+
         return Promise.reject( error );
     }
 };
@@ -275,15 +284,17 @@ FieldSubmissionQueue.prototype._duplicateCheck = function( path, fragment ) {
     const hash = MD5( fragment ).toString();
     if ( this.lastAdded[ path ] !== hash ) {
         this.lastAdded[ path ] = hash;
+
         return false;
     }
+
     return true;
 };
 
 /**
  * Shows upload progress
  *
- * @type {Object}
+ * @type {object}
  */
 FieldSubmissionQueue.prototype._uploadStatus = {
     init() {

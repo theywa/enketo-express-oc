@@ -32,6 +32,7 @@ initTranslator( survey )
                     .then( response => {
                         formParts.instance = response.instance;
                         formParts.instanceAttachments = response.instanceAttachments;
+
                         // TODO: this will fail massively if instanceID is not populated (will use POST instead of PUT). Maybe do a check?
                         return formParts;
                     } );
@@ -39,6 +40,7 @@ initTranslator( survey )
                 throw new Error( 'This URL is invalid' );
             }
         }
+
         return formParts;
     } )
     .then( formParts => {
@@ -54,6 +56,7 @@ initTranslator( survey )
         } else if ( settings.type === 'view' ) {
             return _readonlify( formParts, false );
         }
+
         return formParts;
     } )
     .then( _init )
@@ -81,8 +84,9 @@ function _showErrorOrAuthenticate( error ) {
 /**
  * Converts questions to readonly
  * Disables calculations, deprecatedID mechanism and preload items.
- * 
- * @param  {[type]} formParts [description]
+ *
+ * @param {[type]} formParts - [description]
+ * @param notesEnabled
  * @return {[type]}           [description]
  */
 function _readonlify( formParts, notesEnabled ) {

@@ -65,13 +65,14 @@ function submit( req, res, next ) {
     _request( 'field', req, res, next );
 }
 
-/** 
+/**
  * Simply pipes well-formed request to the OpenRosa server and
  * copies the response received.
  *
- * @param  {[type]}   req  [description]
- * @param  {[type]}   res  [description]
- * @param  {Function} next [description]
+ * @param type
+ * @param {[type]} req -  [description]
+ * @param {[type]} res -  [description]
+ * @param {Function} next - [description]
  * @return {[type]}        [description]
  */
 function _request( type, req, res, next ) {
@@ -87,6 +88,7 @@ function _request( type, req, res, next ) {
         .then( survey => {
             submissionUrl = _getSubmissionUrl( survey.openRosaServer, type ) + query;
             credentials = userModel.getCredentials( req );
+
             return communicator.getAuthHeader( submissionUrl, credentials );
         } )
         .then( authHeader => {
@@ -115,6 +117,7 @@ function _request( type, req, res, next ) {
 
 function _getSubmissionUrl( server, type ) {
     const lastPathPart = ( type === 'field' || !type ) ? '' : `/${type}`;
+
     return ( server.lastIndexOf( '/' ) === server.length - 1 ) ? `${server}fieldsubmission${lastPathPart}` : `${server}/fieldsubmission${lastPathPart}`;
 }
 

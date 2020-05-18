@@ -104,6 +104,7 @@ function getInstanceAttachmentUrl( subject ) {
     if ( subject && instanceAttachments && ( Object.prototype.hasOwnProperty.call( instanceAttachments, subject ) ) ) {
         return instanceAttachments[ subject ];
     }
+
     return null;
 }
 

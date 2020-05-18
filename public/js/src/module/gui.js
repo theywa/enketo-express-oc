@@ -221,8 +221,8 @@ function feedback( message, duration ) {
  *
  * @param {string} message
  * @param {string=} heading
- * @param {string=} level css class or normal (no styling) ('alert', 'info', 'warning', 'error', 'success', 'oc-strict-error')
- * @param {number=} duration duration in secondsafter which dialog should self-destruct
+ * @param {string=} level - css class or normal (no styling) ('alert', 'info', 'warning', 'error', 'success', 'oc-strict-error')
+ * @param {number=} duration - duration in secondsafter which dialog should self-destruct
  */
 function alert( message, heading, level, duration ) {
     level = level || 'error';
@@ -491,44 +491,45 @@ function printOcForm() {
     let historyAdded;
 
     return new Promise( function( resolve ) {
-            if ( formTheme === 'grid' || ( !formTheme && printHelper.isGrid() ) ) {
-                return prompt( texts, options, gridInputs )
-                    .then( function( format ) {
-                        if ( !format ) {
-                            return;
-                        }
-                        if ( format.queries === 'yes' ) {
-                            historyAdded = true;
-                            dns.forEach( ( dn ) => {
-                                dn.dispatchEvent( events.Printify() );
-                            } );
-                        }
-                        textPrints.forEach( ( textPrint ) => {
-                            textPrint.dispatchEvent( events.Printify() );
+        if ( formTheme === 'grid' || ( !formTheme && printHelper.isGrid() ) ) {
+            return prompt( texts, options, gridInputs )
+                .then( function( format ) {
+                    if ( !format ) {
+                        return;
+                    }
+                    if ( format.queries === 'yes' ) {
+                        historyAdded = true;
+                        dns.forEach( ( dn ) => {
+                            dn.dispatchEvent( events.Printify() );
                         } );
-                        return printGrid( format )
-                            .then( resolve );
+                    }
+                    textPrints.forEach( ( textPrint ) => {
+                        textPrint.dispatchEvent( events.Printify() );
                     } );
-            } else {
-                return prompt( texts, options, regularInputs )
-                    .then( function( format ) {
-                        if ( !format ) {
-                            return;
-                        }
-                        if ( format.queries === 'yes' ) {
-                            historyAdded = true;
-                            dns.forEach( ( dn ) => {
-                                dn.dispatchEvent( events.Printify() );
-                            } );
-                        }
-                        textPrints.forEach( ( textPrint ) => {
-                            textPrint.dispatchEvent( events.Printify() );
+
+                    return printGrid( format )
+                        .then( resolve );
+                } );
+        } else {
+            return prompt( texts, options, regularInputs )
+                .then( function( format ) {
+                    if ( !format ) {
+                        return;
+                    }
+                    if ( format.queries === 'yes' ) {
+                        historyAdded = true;
+                        dns.forEach( ( dn ) => {
+                            dn.dispatchEvent( events.Printify() );
                         } );
-                        setTimeout( window.print, 100 );
-                        resolve();
+                    }
+                    textPrints.forEach( ( textPrint ) => {
+                        textPrint.dispatchEvent( events.Printify() );
                     } );
-            }
-        } )
+                    setTimeout( window.print, 100 );
+                    resolve();
+                } );
+        }
+    } )
         .then( function() {
             textPrints.forEach( ( textPrint ) => {
                 textPrint.dispatchEvent( events.DePrintify() );
@@ -536,6 +537,7 @@ function printOcForm() {
             if ( !historyAdded ) {
                 return;
             }
+
             return new Promise( function( resolve ) {
                 setTimeout( function() {
                     dns.forEach( ( dn ) => {

@@ -116,12 +116,12 @@ module.exports = grunt => {
             },
             babel: {
                 command: bundles
-                    .map( bundle => `npx babel ${bundle} --out-file ${bundle.replace('-bundle.', '-ie11-temp-bundle.')}` )
+                    .map( bundle => `npx babel ${bundle} --out-file ${bundle.replace( '-bundle.', '-ie11-temp-bundle.' )}` )
                     .join( '&&' )
             },
             browserify: {
                 command: bundles
-                    .map( bundle => `npx browserify node_modules/enketo-core/src/js/workarounds-ie11.js ${bundle.replace('-bundle.', '-ie11-temp-bundle.')} -o ${bundle.replace('-bundle.', '-ie11-bundle.')}` )
+                    .map( bundle => `npx browserify node_modules/enketo-core/src/js/workarounds-ie11.js ${bundle.replace( '-bundle.', '-ie11-temp-bundle.' )} -o ${bundle.replace( '-bundle.', '-ie11-bundle.' )}` )
                     .concat( [ 'rm -f public/js/build/*ie11-temp-bundle.js' ] )
                     .join( '&&' )
             }
@@ -249,22 +249,23 @@ module.exports = grunt => {
         const transformer = require( 'enketo-transformer' );
 
         xformsPaths.reduce( function( prevPromise, filePath ) {
-                return prevPromise.then( function() {
-                    const xformStr = grunt.file.read( filePath );
-                    grunt.log.writeln( `Transforming ${filePath}...` );
-                    return transformer.transform( {
-                            xform: xformStr,
-                            includeRelevantMsg: true
-                        } )
-                        .then( function( result ) {
-                            forms[ filePath.substring( filePath.lastIndexOf( '/' ) + 1 ) ] = {
-                                html_form: result.form,
-                                xml_model: result.model
-                            };
-                        } );
-                } );
+            return prevPromise.then( function() {
+                const xformStr = grunt.file.read( filePath );
+                grunt.log.writeln( `Transforming ${filePath}...` );
 
-            }, Promise.resolve() )
+                return transformer.transform( {
+                    xform: xformStr,
+                    includeRelevantMsg: true
+                } )
+                    .then( function( result ) {
+                        forms[ filePath.substring( filePath.lastIndexOf( '/' ) + 1 ) ] = {
+                            html_form: result.form,
+                            xml_model: result.model
+                        };
+                    } );
+            } );
+
+        }, Promise.resolve() )
             .then( function() {
                 grunt.file.write( formsJsonPath, jsonStringify( forms ) );
                 done();

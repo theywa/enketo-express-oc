@@ -15,20 +15,20 @@ import './repeat';
  * an event on nodes that have constraint dependency on the changed node(s).
  * This event is used in the discrepancy notes widget.
  * 
- * @param  {[type]} updated [description]
+ * @param  {[type]} updated - [description]
  */
 const constraintUpdate = function( updated ) {
     updated = updated || {};
     // If the update object is a repeat node (cloned=true), do nothing
     if ( !updated.cloned ) {
         this.getRelatedNodes( 'data-constraint', '', updated )
-            // The filter below is commented out, because at the moment this.getRelatedNodes already takes
-            // care of this (in enketo-core). However, it is not unrealistic to expect that in the future we will 
-            // not be able to rely on that as it may be considered a performance hack too far. In that case, uncomment below.
-            // 
-            // Filter out the nodes that are inside a repeat instance other than
-            // the repeat instance that contains the node that triggered the dataupdate
-            // https://github.com/kobotoolbox/enketo-express/issues/741
+        // The filter below is commented out, because at the moment this.getRelatedNodes already takes
+        // care of this (in enketo-core). However, it is not unrealistic to expect that in the future we will 
+        // not be able to rely on that as it may be considered a performance hack too far. In that case, uncomment below.
+        // 
+        // Filter out the nodes that are inside a repeat instance other than
+        // the repeat instance that contains the node that triggered the dataupdate
+        // https://github.com/kobotoolbox/enketo-express/issues/741
             /*.filter( function() {
                 var $input;
                 var $repeat;
@@ -52,7 +52,7 @@ const constraintUpdate = function( updated ) {
  * OC does not empty irrelevant nodes. Instead non-empty irrelevant nodes get an error until the user clears the value.
  * This function takes care of re-evaluating the branch when the value is cleared.
  *
- * @param  {[type]} updated [description]
+ * @param  {[type]} updated - [description]
  * @return {[type]}         [description]
  */
 const relevantErrorUpdate = function( updated ) {
@@ -99,6 +99,7 @@ Form.prototype.init = function() {
 
 
     initialized = true;
+
     return loadErrors;
 };
 
@@ -132,12 +133,14 @@ Form.prototype.specialOcLoadValidate = function( includeRequired ) {
 
 /**
  * Skip constraint (and required) validation if question is currently marked with "invalid-relevant" error.
- * 
- * @param  {[type]} $input [description]
+ *
+ * @param {[type]} $input - [description]
+ * @param control
  * @return {[type]}        [description]
  */
 Form.prototype.validateInput = function( control ) {
     const that = this;
+
     // There is a condition where a value change results in both an invalid-relevant and invalid-constraint,
     // where the invalid constraint is added *after* the invalid-relevant. I can reproduce in automated test (not manually).
     // It is probably related due to the asynchronicity of the constraint evaluation.
@@ -155,6 +158,7 @@ Form.prototype.validateInput = function( control ) {
                     that.setValid( control, 'constraint' );
                 }
             }
+
             return passed;
         } );
 };
@@ -268,8 +272,10 @@ Form.prototype.isValid = function( node ) {
     if ( node ) {
         const questionOrGroup = node.closest( '.question, .calculation, .or-group, .or-group-data' );
         const cls = questionOrGroup.classList;
+
         return !cls.contains( 'invalid-required' ) && !cls.contains( 'invalid-constraint' && !cls.contains( 'invalid-relevant' ) );
     }
+
     return this.view.html.querySelector( '.invalid-required, .invalid-constraint, .invalid-relevant' ) === null;
 };
 

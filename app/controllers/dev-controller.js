@@ -6,7 +6,7 @@ module.exports = app => {
 };
 
 router
-    .get( '/', ( req, res, next ) => {
+    .get( '/', ( req, res ) => {
         res
             .render( 'surveys/dev', { src: req.query.iframe } );
     } );

@@ -106,7 +106,7 @@ router
         next( error );
     } );
 
-function getVersion( req, res, next ) {
+function getVersion( req, res ) {
     const version = req.app.get( 'version' );
     _render( 200, { version }, res );
 }
@@ -158,6 +158,7 @@ function getNewOrExistingSurvey( req, res, next ) {
                 return _render( 403, quotaErrorMessage, res );
             }
             status = ( id ) ? 200 : 201;
+
             // even if id was found still call .set() method to update any properties
             return surveyModel.set( survey )
                 .then( id => {
@@ -215,6 +216,7 @@ function cacheInstance( req, res, next ) {
             if ( !id ) {
                 return surveyModel.set( survey );
             }
+
             // Do not update properties if ID was found to avoid overwriting theme.
             return id;
         } )
@@ -224,6 +226,7 @@ function cacheInstance( req, res, next ) {
             // to not allow caching if it is already cached as some lame
             // protection against multiple people edit the same record simultaneously
             const protect = !req.webformType.startsWith( 'view' ) && !req.webformType.startsWith( 'pdf' );
+
             return instanceModel.set( survey, protect );
         } )
         .then( () => {
@@ -337,7 +340,7 @@ function _setInterfaceQueryParam( req, res, next ) {
 
 function _setGoTo( req, res, next ) {
     const goTo = req.body.go_to;
-    req.goTo = goTo ? `#${encodeURIComponent(goTo)}` : '';
+    req.goTo = goTo ? `#${encodeURIComponent( goTo )}` : '';
     const goToErrorUrl = req.body.go_to_error_url;
     req.goToErrorUrl = goTo && goToErrorUrl ? `goToErrorUrl=${encodeURIComponent( goToErrorUrl )}` : '';
     next();
@@ -526,6 +529,7 @@ function _render( status, body, res ) {
 
 function _renderPdf( status, id, req, res ) {
     const url = _generateWebformUrls( id, req ).url;
+
     return pdf.get( url, req.page )
         .then( function( pdfBuffer ) {
             const filename = `${req.body.form_id || req.query.form_id}${req.body.instance_id ? '-'+req.body.instance_id : ''}.pdf`;
@@ -543,6 +547,7 @@ function _renderPdf( status, id, req, res ) {
 
 function _renderHeadless( status, id, req, res ) {
     const url = _generateWebformUrls( id, req ).url;
+
     return headless.run( url )
         .then( function( fieldsubmissions ) {
             const message = 'OK';

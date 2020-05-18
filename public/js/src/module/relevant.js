@@ -7,8 +7,11 @@ import events from 'enketo-core/src/js/event';
 import $ from 'jquery';
 
 /**
- * Overwrite core functionality by **always** adding 
+ * Overwrite core functionality by **always** adding
  * .or-group.invalid-relevant and .or-group-data.invalid-relevant.
+ *
+ * @param updated
+ * @param forceClearIrrelevant
  */
 branchModule.update = function( updated, forceClearIrrelevant ) {
     let $nodes;
@@ -38,10 +41,14 @@ branchModule.originalEnable = branchModule.enable;
  * Overwrite core functionality.
  * The reason for this customization is to remove any shown irrelevant errors on the group (and perhaps question as well?)
  * once it becomes relevant again.
+ *
+ * @param $branchNode
+ * @param path
  */
 branchModule.enable = function( $branchNode, path ) {
     const change = this.originalEnable( $branchNode, path );
     $branchNode.removeClass( 'invalid-relevant' );
+
     return change;
 };
 
@@ -66,11 +73,15 @@ branchModule.disable = function( $branchNode, path, forceClearIrrelevant ) {
 
         this.deactivate( $branchNode );
     }
+
     return change;
 };
 
 /**
  * Overwrite clear function
+ *
+ * @param $branchNode
+ * @param path
  */
 branchModule.clear = function( $branchNode, path ) {
     // Only user can clear values from user-input fields in OC.
@@ -176,8 +187,10 @@ branchModule.deactivate = function( $branchNode ) {
                             // If a repeat has zero instances, the search for .or-appearance-dn in form.html will result in null, which means the dn-detection would fail.
                             const searchElements = [ this.form.view.html ].concat( Object.entries( this.form.repeats.templates ).map( entries => entries[ 1 ] ) );
                             const ignore = searchElements.some( e => !!e.querySelector( selector ) );
+
                             return !ignore;
                         }
+
                         return false;
                     } )
                     .map( el => el.textContent ? el.textContent.trim() : '' )

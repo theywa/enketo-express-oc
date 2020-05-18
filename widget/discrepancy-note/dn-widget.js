@@ -85,6 +85,8 @@ class Comment extends Widget {
 
     /**
      * This function should only be called by init (upon load).
+     *
+     * @param notes
      * @return {string} [description]
      */
     _getDefaultAssignee( notes ) {
@@ -95,6 +97,7 @@ class Comment extends Widget {
                 return false;
             }
             defaultAssignee = item.user || '';
+
             return true;
         } );
 
@@ -389,40 +392,40 @@ class Comment extends Widget {
                 <div class="or-comment-widget__nav">
                     <div class="border">
                         <h3 class="or-comment-widget__nav__main">
-                            <a id="dn-history" href="#" data-thread="*">${t('widget.dn.allhistory')}</a>
+                            <a id="dn-history" href="#" data-thread="*">${t( 'widget.dn.allhistory' )}</a>
                         </h3>
-                        <h3 class="or-comment-widget__nav__main"><span class="or-comment-widget__nav__main__title">${t('widget.dn.queries')}</span>
-                            <button class="btn btn-primary small" data-type="comment"><span class="icon icon-plus"> </span> ${t('widget.dn.addnewtext')}</button>
+                        <h3 class="or-comment-widget__nav__main"><span class="or-comment-widget__nav__main__title">${t( 'widget.dn.queries' )}</span>
+                            <button class="btn btn-primary small" data-type="comment"><span class="icon icon-plus"> </span> ${t( 'widget.dn.addnewtext' )}</button>
                         </h3>
                         <ul>
-                            ${ this._getThreadFirsts(this.notes, 'comment')
-                                .map( item => 
-                                    `<li class="or-comment-widget__nav__item">
+                            ${ this._getThreadFirsts( this.notes, 'comment' )
+        .map( item => 
+            `<li class="or-comment-widget__nav__item">
                                         <a href="#"  data-type="comment" data-thread="${item.thread_id || 'NULL'}">
                                             <span class="or-comment-widget__nav__item__start">
-                                                <span class="or-comment-widget__nav__item__start__icon icon ${this._getQueryThreadStatus(this.notes, item.thread_id)}"> </span>
+                                                <span class="or-comment-widget__nav__item__start__icon icon ${this._getQueryThreadStatus( this.notes, item.thread_id )}"> </span>
                                                 <span class="or-comment-widget__nav__item__start__id">${item.visible_thread_id ? '#'+item.visible_thread_id : ''}</span>
                                             </span>
                                             <span class="or-comment-widget__nav__item__text ${item.comment.length < 66 ? 'short' : ''}"><span>${item.comment}</span></span>
                                         </a>
-                                    </li>`)
-                                .join('')}
+                                    </li>` )
+        .join( '' )}
                         </ul>
-                        <h3 class="or-comment-widget__nav__main"><span class="or-comment-widget__nav__main__title">${t('widget.dn.annotations')}</span>
-                            <button class="btn btn-primary small" data-type="annotation"><span class="icon icon-plus"> </span> ${t('widget.dn.addnewtext')}</button>
+                        <h3 class="or-comment-widget__nav__main"><span class="or-comment-widget__nav__main__title">${t( 'widget.dn.annotations' )}</span>
+                            <button class="btn btn-primary small" data-type="annotation"><span class="icon icon-plus"> </span> ${t( 'widget.dn.addnewtext' )}</button>
                         </h3>
                         <ul>
-                            ${ this._getThreadFirsts(this.notes, 'annotation')
-                                .map( item => 
-                                    `<li  class="or-comment-widget__nav__item">
+                            ${ this._getThreadFirsts( this.notes, 'annotation' )
+        .map( item => 
+            `<li  class="or-comment-widget__nav__item">
                                         <a href="#"  data-type="annotation" data-thread="${item.thread_id || 'NULL'}">
                                             <span class="or-comment-widget__nav__item__start">
                                                 <span class="or-comment-widget__nav__item__start__icon icon icon-dn-annotation"> </span>
                                             </span>
                                             <span class="or-comment-widget__nav__item__text ${item.comment.length < 66 ? 'short' : ''}"><span>${item.comment}</span></span>
                                         </a>
-                                    </li>`)
-                                .join('')}
+                                    </li>` )
+        .join( '' )}
                         </ul>
                     </div>
                 </div>
@@ -433,7 +436,7 @@ class Comment extends Widget {
                         <div class="or-comment-widget__content__history__content"></div> 
                             <span class="or-comment-widget__content__history__value-change-filler"></span>              
                             <input id="dn-show-value-changes" class="or-comment-widget__content__history__value-change-toggle ignore" type="checkbox" name="show-value-changes" checked />
-                            <label for="dn-show-value-changes" class="option-label">${t('widget.dn.showvaluechanges')}</span>
+                            <label for="dn-show-value-changes" class="option-label">${t( 'widget.dn.showvaluechanges' )}</span>
                         </div> 
                     </div>
                 </div>
@@ -477,6 +480,7 @@ class Comment extends Widget {
         const openThreadFirsts = this._getThreadFirsts( this.notes )
             .filter( item => {
                 const status = this._getQueryThreadStatus( this.notes, item.thread_id );
+
                 return status === 'updated' || status === 'new';
             } );
 
@@ -559,6 +563,7 @@ class Comment extends Widget {
         this.usersOptionsHtml = `<option value="" ${disabled}></option>${users.map( user => {
             const readableName = `${user.firstName} ${user.lastName} (${user.userName})`;
             const selected = user.userName === defaultAssignee ? ' selected ' : '';
+
             return `<option value="${user.userName}"${selected}${disabled}>${readableName}</option>`;
         } )}`;
     }
@@ -566,9 +571,11 @@ class Comment extends Widget {
     _getCurrentErrorMsg() {
         if ( this.linkedQuestion.classList.contains( 'invalid-required' ) ) {
             const el = this.linkedQuestion.querySelector( '.or-required-msg.active' );
+
             return el ? el.textContent : '';
         } else if ( this.linkedQuestion.classList.contains( 'invalid-constraint' ) ) {
             const el = this.linkedQuestion.querySelector( '.or-constraint-msg.active' );
+
             return el ? el.textContent : '';
         } else {
             return '';
@@ -588,6 +595,7 @@ class Comment extends Widget {
                 if ( typeof model.logs === 'undefined' ) {
                     model.logs = [];
                 }
+
                 return model;
             } else {
                 return {
@@ -610,6 +618,7 @@ class Comment extends Widget {
         if ( aDate.toString() === 'Invalid Date' || aDate < bDate ) {
             return 1;
         }
+
         return 0;
     }
 
@@ -617,8 +626,10 @@ class Comment extends Widget {
         const dt = new Date( this._getIsoDatetimeStr( datetimeStr ) );
         if ( typeof datetimeStr !== 'string' || dt.toString() === 'Invalid Date' ) {
             console.error( `Could not convert datetime string "${datetimeStr}" to a Date object.` );
+
             return 'error';
         }
+
         return this._parseElapsedTimeUpTo7Days( new Date() - dt );
     }
 
@@ -626,10 +637,12 @@ class Comment extends Widget {
         const dt = new Date( this._getIsoDatetimeStr( datetimeStr ) );
         if ( typeof datetimeStr !== 'string' || dt.toString() === 'Invalid Date' ) {
             console.error( `Could not convert datetime string "${datetimeStr}" to a Date object.` );
+
             return 'error';
         }
+
         // 13-Jun-2018 13:58 UTC-04:00
-        return `${pad2( dt.getDate() )}-${dt.toLocaleDateString( 'en', { month: 'short' } )}-${dt.getFullYear()} ${pad2( dt.getHours() )}:${pad2( dt.getMinutes() )}:${pad2(dt.getSeconds())} UTC${dt.getTimezoneOffsetAsTime()}`;
+        return `${pad2( dt.getDate() )}-${dt.toLocaleDateString( 'en', { month: 'short' } )}-${dt.getFullYear()} ${pad2( dt.getHours() )}:${pad2( dt.getMinutes() )}:${pad2( dt.getSeconds() )} UTC${dt.getTimezoneOffsetAsTime()}`;
         // Date.getTimezoneOffsetAsTime is an extension in enketo-xpathjs
     }
 
@@ -641,6 +654,7 @@ class Comment extends Widget {
 
         if ( isNaN( elapsedMilliseconds ) || elapsedMilliseconds < -120000 ) {
             console.error( `Could not parse elapsed time for elapsed milliseconds: "${elapsedMilliseconds}"` );
+
             return 'error';
         }
 
@@ -667,6 +681,7 @@ class Comment extends Widget {
         if ( days <= 7 ) {
             return t( 'widget.dn.day', { count: Math.round( days ) } );
         }
+
         return null;
     }
 
@@ -754,8 +769,10 @@ class Comment extends Widget {
         [ 'new', 'updated', 'closed', 'closed-modified' ].some( st => {
             if ( this._existsThreadWithStatus( notes, threads, st ) ) {
                 status = st;
+
                 return true;
             }
+
             return false;
         } );
 
@@ -776,10 +793,13 @@ class Comment extends Widget {
             .some( item => {
                 if ( item.status ) {
                     status = item.status;
+
                     return true;
                 }
+
                 return false;
             } );
+
         return status;
     }
 
@@ -801,8 +821,10 @@ class Comment extends Widget {
         let parts;
         if ( typeof dateTimeStr === 'string' ) {
             parts = dateTimeStr.split( ' ' );
+
             return `${parts[ 0 ]}T${parts[ 1 ]}${parts[ 2 ]}`;
         }
+
         return dateTimeStr;
     }
 
@@ -812,6 +834,7 @@ class Comment extends Widget {
                 if ( item.thread_id && item.visible_thread_id ) {
                     map[ item.thread_id ] = item.visible_thread_id;
                 }
+
                 return map;
             }, {} );
     }
@@ -842,7 +865,7 @@ class Comment extends Widget {
             const closeQueryButtonHtml = settings.dnCloseButton !== true ? '' : `<button name="closed" class="btn btn-default or-comment-widget__content__form__btn-submit" type="button">${t( 'widget.dn.closequerytext' )}</button>`;
             const updateQueryButtonHtml =
                 `<button name="updated" class="btn btn-primary or-comment-widget__content__form__btn-submit" type="button">
-                    ${reopen ? t('widget.dn.reopen') : t( 'widget.comment.update' )}
+                    ${reopen ? t( 'widget.dn.reopen' ) : t( 'widget.comment.update' )}
                 </button>`;
 
             if ( status === 'new' || status === 'updated' || status === 'closed-modified' ) {
@@ -940,7 +963,7 @@ class Comment extends Widget {
         const htmlStr = `<div class="or-comment-widget__content__history__content">${notesToDisplay
             .sort( this._datetimeDesc.bind( this ) )
             .map( item => this._getHistoryRow( item ) )
-            .join( '' ) || t('widget.dn.emptyhistorytext')}</div>`;
+            .join( '' ) || t( 'widget.dn.emptyhistorytext' )}</div>`;
 
         this.history.append( range.createContextualFragment( htmlStr ) );
 
@@ -1049,7 +1072,7 @@ class Comment extends Widget {
                     <span class="or-comment-widget__content__history__row__main__comment">
                         <span class="or-comment-widget__content__history__row__main__comment__text">${msg}</span>
                         <span class="or-comment-widget__content__history__row__main__comment__meta">
-                            ${assignee ? assignee[0].toUpperCase() + assignee.substring(1) : ''} ${status}
+                            ${assignee ? assignee[0].toUpperCase() + assignee.substring( 1 ) : ''} ${status}
                         </span>
                     </span>
                 </div>
@@ -1066,7 +1089,8 @@ class Comment extends Widget {
 
         users.some( u => {
             if ( u.userName === user ) {
-                initials = `${u.firstName.substring(0,1).toUpperCase()}${u.lastName.substring(0,1).toUpperCase()}`;
+                initials = `${u.firstName.substring( 0,1 ).toUpperCase()}${u.lastName.substring( 0,1 ).toUpperCase()}`;
+
                 return true;
             }
         } );
@@ -1084,6 +1108,7 @@ class Comment extends Widget {
         users.some( u => {
             if ( u.userName === user ) {
                 fullName = `${u.firstName} ${u.lastName}`;
+
                 return true;
             }
         } );
@@ -1094,6 +1119,7 @@ class Comment extends Widget {
 
     /**
      * Returns notes of a particular thread, optionally with logs
+     *
      * @param {object} notes
      * @param {string} type 
      * @param {string} threadId 
@@ -1104,12 +1130,15 @@ class Comment extends Widget {
         // if threadId is '*' or undefined, include everything
         // if threadId is '', include only those items with that particular empty string value (should be nothing)
         filtered = filtered.filter( item => threadId === '*' || ( threadId === 'NULL' && !item.thread_id ) || ( item.thread_id === threadId ) );
+
         return includeLogs ? filtered.concat( notes.logs ) : filtered;
     }
 
     /**
      * Returns an array of thread objects
-     * @param {string} type 
+     *
+     * @param notes
+     * @param {string} type
      */
     _getThreadFirsts( notes, type = 'comment' ) {
         let threads = [];
@@ -1124,6 +1153,7 @@ class Comment extends Widget {
                     return false;
                 }
                 threads.push( item.thread_id );
+
                 return true;
             } );
     }
@@ -1134,11 +1164,13 @@ class Comment extends Widget {
 
     /**
      * Checks if there are more than 1 open queries.
+     *
      * @param {*} notes 
      * @return {boolean}
      */
     _hasMultipleOpenQueries( notes ) {
         let first = null;
+
         return this._getThreadFirsts( notes, 'comment' )
             .some( comment => {
                 const status = this._getQueryThreadStatus( notes, comment.thread_id );
@@ -1148,6 +1180,7 @@ class Comment extends Widget {
                     }
                     first = true;
                 }
+
                 return false;
             } );
     }
@@ -1177,8 +1210,8 @@ class Comment extends Widget {
         this.question.append( document.createRange().createContextualFragment(
             `<div class="dn-temp-print">
                 ${items
-                    .map( item => this._getHistoryRow( item, { timestamp: 'datetime', username: 'full' } ) )
-                    .join( '' )}        
+        .map( item => this._getHistoryRow( item, { timestamp: 'datetime', username: 'full' } ) )
+        .join( '' )}        
             </div>` ) );
 
         const existingLabel = this.question.querySelector( '.question-label.active' );

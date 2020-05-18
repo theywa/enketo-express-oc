@@ -7,7 +7,7 @@ import $ from 'jquery';
 /**
  * Updates required "*" visibility
  *
- * @param  {{nodes:Array<string>=, repeatPath: string=, repeatIndex: number=}=} updated The object containing info on updated data nodes
+ * @param  {{nodes:Array<string>=, repeatPath: string=, repeatIndex: number=}=} updated - The object containing info on updated data nodes
  */
 
 requiredModule.update = function( updated ) {

@@ -35,171 +35,171 @@ function init( formEl, data, loadWarnings = [] ) {
     formprogress = document.querySelector( '.form-progress' );
 
     return new Promise( resolve => {
-            const goToErrorLink = settings.goToErrorUrl ? `<a href="${settings.goToErrorUrl}">${settings.goToErrorUrl}</a>` : '';
+        const goToErrorLink = settings.goToErrorUrl ? `<a href="${settings.goToErrorUrl}">${settings.goToErrorUrl}</a>` : '';
 
-            if ( data.instanceAttachments ) {
-                fileManager.setInstanceAttachments( data.instanceAttachments );
+        if ( data.instanceAttachments ) {
+            fileManager.setInstanceAttachments( data.instanceAttachments );
+        }
+
+        // Create separate model just to identify static default values.
+        // We do this before the inputupdate listener to avoid triggering a fieldsubmission for instanceID 
+        // in duplicate/triplicate.
+        const m = new FormModel( { modelStr: data.modelStr } );
+        m.init();
+        const staticDefaultNodes = [ ...m.node( null, null, { noEmpty: true } ).getElements() ]
+            .filter( node => node !== m.getMetaNode( 'instanceID' ).getElement() );
+
+        form = new Form( formEl, data, formOptions );
+
+        // Additional layer of security to disable submissions in readonly views.
+        // Should not be necessary to do this.
+        fieldSubmissionQueue = new FieldSubmissionQueue();
+
+
+
+        // Buffer inputupdate events (DURING LOAD ONLY), in order to eventually log these
+        // changes in the DN widget after it has been initalized
+        form.view.html.addEventListener( events.InputUpdate().type, _addToInputUpdateEventBuffer );
+
+        // For Participant emtpy-form view in order to show Close button on all pages
+        if ( settings.strictViolationSelector && settings.type !== 'edit' ) {
+            form.view.html.classList.add( 'empty-untouched' );
+        }
+        // For all Participant views, use a hacky solution to change the default relevant message
+        if ( settings.strictViolationSelector ) {
+            const list = form.view.html.querySelectorAll( '[data-i18n="constraint.relevant"]' );
+            for ( let i = 0; i < list.length; i++ ) {
+                const relevantErrorMsg = t( 'constraint.relevant' );
+                list[ i ].textContent = relevantErrorMsg;
             }
+        }
 
-            // Create separate model just to identify static default values.
-            // We do this before the inputupdate listener to avoid triggering a fieldsubmission for instanceID 
-            // in duplicate/triplicate.
-            const m = new FormModel( { modelStr: data.modelStr } );
-            m.init();
-            const staticDefaultNodes = [ ...m.node( null, null, { noEmpty: true } ).getElements() ]
-                .filter( node => node !== m.getMetaNode( 'instanceID' ).getElement() );
+        // set form eventhandlers before initializing form
+        _setFormEventHandlers();
 
-            form = new Form( formEl, data, formOptions );
-
-            // Additional layer of security to disable submissions in readonly views.
-            // Should not be necessary to do this.
-            fieldSubmissionQueue = new FieldSubmissionQueue();
-
-
-
-            // Buffer inputupdate events (DURING LOAD ONLY), in order to eventually log these
-            // changes in the DN widget after it has been initalized
-            form.view.html.addEventListener( events.InputUpdate().type, _addToInputUpdateEventBuffer );
-
-            // For Participant emtpy-form view in order to show Close button on all pages
-            if ( settings.strictViolationSelector && settings.type !== 'edit' ) {
-                form.view.html.classList.add( 'empty-untouched' );
+        const handleGoToIrrelevant = e => {
+            let err;
+            // In OC hidden go_to fields should show loadError 
+            // regular questions:
+            if ( !e.target.classList.contains( 'or-appearance-dn' ) ) {
+                err = t( 'alert.goto.irrelevant' );
             }
-            // For all Participant views, use a hacky solution to change the default relevant message
-            if ( settings.strictViolationSelector ) {
-                const list = form.view.html.querySelectorAll( '[data-i18n="constraint.relevant"]' );
-                for ( let i = 0; i < list.length; i++ ) {
-                    const relevantErrorMsg = t( 'constraint.relevant' );
-                    list[ i ].textContent = relevantErrorMsg;
+            // Discrepancy notes
+            else {
+                err = `${t( 'alert.goto.irrelevant' )} `;
+                const goToErrorLink = settings.goToErrorUrl ? `<a href="${settings.goToErrorUrl}">${settings.goToErrorUrl}</a>` : '';
+                if ( settings.interface === 'queries' ) {
+                    err += goToErrorLink ? t( 'alert.goto.msg2', {
+                        miniform: goToErrorLink,
+                        // switch off escaping
+                        interpolation: {
+                            escapeValue: false
+                        }
+                    } ) : t( 'alert.goto.msg1' );
                 }
             }
+            // For goto targets that are discrepancy notes and are relevant but their linked question is not,
+            // the goto-irrelevant event will be fired twice. We can safely remove the eventlistener after the first
+            // event is caught (for all cases).
+            form.view.html.removeEventListener( events.GoToIrrelevant().type, handleGoToIrrelevant );
+            loadWarnings.push( err );
+        };
 
-            // set form eventhandlers before initializing form
-            _setFormEventHandlers();
+        const handleGoToInvisible = () => {
+            form.view.html.removeEventListener( events.GoToInvisible().type, handleGoToInvisible );
+            if ( settings.interface === 'sdv' ) {
+                loadWarnings.push( `${t( 'alert.goto.invisible' )} ` );
+            }
+        };
 
-            const handleGoToIrrelevant = e => {
-                let err;
-                // In OC hidden go_to fields should show loadError 
-                // regular questions:
-                if ( !e.target.classList.contains( 'or-appearance-dn' ) ) {
-                    err = t( 'alert.goto.irrelevant' );
+        // listen for "goto-irrelevant" event and add error
+        form.view.html.addEventListener( events.GoToIrrelevant().type, handleGoToIrrelevant );
+        form.view.html.addEventListener( events.GoToInvisible().type, handleGoToInvisible );
+
+        loadErrors = loadErrors.concat( form.init() );
+
+        // Create fieldsubmissions for static default values
+        staticDefaultNodes.forEach( node => {
+            const props = m.getUpdateEventData( node );
+            fieldSubmissionQueue.addFieldSubmission( props.fullPath, props.xmlFragment, form.instanceID );
+        } );
+
+        // Make sure audits are logged in DN widget for calculated values during form initialization 
+        // before the DN widget was initialized.
+        form.view.html.removeEventListener( events.InputUpdate().type, _addToInputUpdateEventBuffer );
+        inputUpdateEventBuffer.forEach( el => el.dispatchEvent( events.FakeInputUpdate() ) );
+
+        // Check if record is marked complete, before setting button event handlers.
+        if ( data.instanceStr ) {
+            const regCloseButton = document.querySelector( 'button#close-form-regular' );
+            if ( form.model.isMarkedComplete() ) {
+                const finishButton = document.querySelector( 'button#finish-form' );
+                if ( finishButton ) {
+                    finishButton.remove();
                 }
-                // Discrepancy notes
-                else {
-                    err = `${t( 'alert.goto.irrelevant' )} `;
-                    const goToErrorLink = settings.goToErrorUrl ? `<a href="${settings.goToErrorUrl}">${settings.goToErrorUrl}</a>` : '';
-                    if ( settings.interface === 'queries' ) {
-                        err += goToErrorLink ? t( 'alert.goto.msg2', {
-                            miniform: goToErrorLink,
-                            // switch off escaping
-                            interpolation: {
-                                escapeValue: false
-                            }
-                        } ) : t( 'alert.goto.msg1' );
-                    }
+                if ( regCloseButton ) {
+                    regCloseButton.id = 'close-form-complete';
                 }
-                // For goto targets that are discrepancy notes and are relevant but their linked question is not,
-                // the goto-irrelevant event will be fired twice. We can safely remove the eventlistener after the first
-                // event is caught (for all cases).
-                form.view.html.removeEventListener( events.GoToIrrelevant().type, handleGoToIrrelevant );
-                loadWarnings.push( err );
-            };
-
-            const handleGoToInvisible = () => {
-                form.view.html.removeEventListener( events.GoToInvisible().type, handleGoToInvisible );
-                if ( settings.interface === 'sdv' ) {
-                    loadWarnings.push( `${t( 'alert.goto.invisible' )} ` );
-                }
-            };
-
-            // listen for "goto-irrelevant" event and add error
-            form.view.html.addEventListener( events.GoToIrrelevant().type, handleGoToIrrelevant );
-            form.view.html.addEventListener( events.GoToInvisible().type, handleGoToInvisible );
-
-            loadErrors = loadErrors.concat( form.init() );
-
-            // Create fieldsubmissions for static default values
-            staticDefaultNodes.forEach( node => {
-                const props = m.getUpdateEventData( node );
-                fieldSubmissionQueue.addFieldSubmission( props.fullPath, props.xmlFragment, form.instanceID );
-            } );
-
-            // Make sure audits are logged in DN widget for calculated values during form initialization 
-            // before the DN widget was initialized.
-            form.view.html.removeEventListener( events.InputUpdate().type, _addToInputUpdateEventBuffer );
-            inputUpdateEventBuffer.forEach( el => el.dispatchEvent( events.FakeInputUpdate() ) );
-
-            // Check if record is marked complete, before setting button event handlers.
-            if ( data.instanceStr ) {
-                const regCloseButton = document.querySelector( 'button#close-form-regular' );
-                if ( form.model.isMarkedComplete() ) {
-                    const finishButton = document.querySelector( 'button#finish-form' );
-                    if ( finishButton ) {
-                        finishButton.remove();
-                    }
-                    if ( regCloseButton ) {
-                        regCloseButton.id = 'close-form-complete';
-                    }
-                } else if ( settings.reasonForChange ) {
-                    loadErrors.push( 'This record is not complete and cannot be used here.' );
-                    if ( regCloseButton ) {
-                        regCloseButton.remove();
-                    }
-                }
-                if ( !settings.headless ) {
-                    form.specialOcLoadValidate( form.model.isMarkedComplete() );
+            } else if ( settings.reasonForChange ) {
+                loadErrors.push( 'This record is not complete and cannot be used here.' );
+                if ( regCloseButton ) {
+                    regCloseButton.remove();
                 }
             }
+            if ( !settings.headless ) {
+                form.specialOcLoadValidate( form.model.isMarkedComplete() );
+            }
+        }
 
-            _setButtonEventHandlers();
+        _setButtonEventHandlers();
 
-            // Remove loader. This will make the form visible.
-            // In order to aggregate regular loadErrors and GoTo loaderrors,
-            // this is placed in between form.init() and form.goTo().
-            $( '.main-loader' ).remove();
-            if ( settings.goTo && location.hash ) {
-                // form.goTo returns an array of 1 error if it has error. We're using our special
-                // knowledge of Enketo Core to replace this error
-                let goToErrors = form.goTo( decodeURIComponent( location.hash.substring( 1 ) ).split( '#' )[ 0 ] );
-                const replacementError = `${t( 'alert.goto.notfound' )} `;
-                if ( goToErrors.length ) {
-                    if ( settings.interface === 'queries' ) {
-                        goToErrors = goToErrorLink ? [ replacementError + t( 'alert.goto.msg2', {
-                            miniform: goToErrorLink,
-                            // switch off escaping
-                            interpolation: {
-                                escapeValue: false
-                            }
-                        } ) ] : [ replacementError + t( 'alert.goto.msg1' ) ];
-                    } else {
-                        goToErrors = [ replacementError ];
-                    }
+        // Remove loader. This will make the form visible.
+        // In order to aggregate regular loadErrors and GoTo loaderrors,
+        // this is placed in between form.init() and form.goTo().
+        $( '.main-loader' ).remove();
+        if ( settings.goTo && location.hash ) {
+            // form.goTo returns an array of 1 error if it has error. We're using our special
+            // knowledge of Enketo Core to replace this error
+            let goToErrors = form.goTo( decodeURIComponent( location.hash.substring( 1 ) ).split( '#' )[ 0 ] );
+            const replacementError = `${t( 'alert.goto.notfound' )} `;
+            if ( goToErrors.length ) {
+                if ( settings.interface === 'queries' ) {
+                    goToErrors = goToErrorLink ? [ replacementError + t( 'alert.goto.msg2', {
+                        miniform: goToErrorLink,
+                        // switch off escaping
+                        interpolation: {
+                            escapeValue: false
+                        }
+                    } ) ] : [ replacementError + t( 'alert.goto.msg1' ) ];
+                } else {
+                    goToErrors = [ replacementError ];
                 }
-                loadWarnings = loadWarnings.concat( goToErrors );
             }
+            loadWarnings = loadWarnings.concat( goToErrors );
+        }
 
-            if ( form.encryptionKey ) {
-                loadErrors.unshift( `<strong>${t( 'error.encryptionnotsupported' )}</strong>` );
-            }
+        if ( form.encryptionKey ) {
+            loadErrors.unshift( `<strong>${t( 'error.encryptionnotsupported' )}</strong>` );
+        }
 
-            rc.setLogoutLinkVisibility();
+        rc.setLogoutLinkVisibility();
 
-            if ( loadErrors.length > 0 ) {
-                document.querySelectorAll( '.form-footer__content__main-controls button' )
-                    .forEach( button => button.remove() );
-            } else if ( settings.type !== 'view' ) {
-                // Current queue can be submitted, and so can future fieldsubmissions.
-                fieldSubmissionQueue.enable();
-            }
+        if ( loadErrors.length > 0 ) {
+            document.querySelectorAll( '.form-footer__content__main-controls button' )
+                .forEach( button => button.remove() );
+        } else if ( settings.type !== 'view' ) {
+            // Current queue can be submitted, and so can future fieldsubmissions.
+            fieldSubmissionQueue.enable();
+        }
 
-            const loadIssues = loadWarnings.concat( loadErrors );
+        const loadIssues = loadWarnings.concat( loadErrors );
 
-            if ( loadIssues.length ) {
-                throw loadIssues;
-            }
+        if ( loadIssues.length ) {
+            throw loadIssues;
+        }
 
-            resolve( form );
-        } )
+        resolve( form );
+    } )
         .catch( error => {
             if ( Array.isArray( error ) ) {
                 loadErrors = error;
@@ -261,7 +261,8 @@ function _addToInputUpdateEventBuffer( event ) {
 
 /**
  * Closes the form after checking that the queue is empty.
- * 
+ *
+ * @param offerAutoqueries
  * @return {Promise} [description]
  */
 function _closeRegular( offerAutoqueries = true ) {
@@ -279,18 +280,19 @@ function _closeRegular( offerAutoqueries = true ) {
                 // First check if any constraints have been violated and prompt option to generate automatic queries
                 if ( violated.length ) {
                     return gui.confirm( {
-                            heading: t( 'alert.default.heading' ),
-                            errorMsg: t( 'fieldsubmission.confirm.autoquery.msg1' ),
-                            msg: t( 'fieldsubmission.confirm.autoquery.msg2' )
-                        }, {
-                            posButton: t( 'fieldsubmission.confirm.autoquery.automatic' ),
-                            negButton: t( 'fieldsubmission.confirm.autoquery.manual' ),
-                        } )
+                        heading: t( 'alert.default.heading' ),
+                        errorMsg: t( 'fieldsubmission.confirm.autoquery.msg1' ),
+                        msg: t( 'fieldsubmission.confirm.autoquery.msg2' )
+                    }, {
+                        posButton: t( 'fieldsubmission.confirm.autoquery.automatic' ),
+                        negButton: t( 'fieldsubmission.confirm.autoquery.manual' ),
+                    } )
                         .then( confirmed => {
                             if ( !confirmed ) {
                                 return false;
                             }
                             _autoAddQueries( violated );
+
                             return _closeRegular( false );
                         } );
                 }
@@ -325,13 +327,13 @@ function _closeRegular( offerAutoqueries = true ) {
                     } else {
                         errorMsg = error.message || gui.getErrorResponseMsg( error.status );
                         gui.confirm( {
-                                heading: t( 'alert.default.heading' ),
-                                errorMsg,
-                                msg: t( 'fieldsubmission.confirm.leaveanyway.msg' )
-                            }, {
-                                posButton: t( 'confirm.default.negButton' ),
-                                negButton: t( 'fieldsubmission.confirm.leaveanyway.button' )
-                            } )
+                            heading: t( 'alert.default.heading' ),
+                            errorMsg,
+                            msg: t( 'fieldsubmission.confirm.leaveanyway.msg' )
+                        }, {
+                            posButton: t( 'confirm.default.negButton' ),
+                            negButton: t( 'fieldsubmission.confirm.leaveanyway.button' )
+                        } )
                             .then( confirmed => {
                                 if ( !confirmed ) {
                                     document.dispatchEvent( events.Close() );
@@ -386,13 +388,13 @@ function _closeSimple() {
                     } else {
                         errorMsg = error.message || gui.getErrorResponseMsg( error.status );
                         gui.confirm( {
-                                heading: t( 'alert.default.heading' ),
-                                errorMsg,
-                                msg: t( 'fieldsubmission.confirm.leaveanyway.msg' )
-                            }, {
-                                posButton: t( 'confirm.default.negButton' ),
-                                negButton: t( 'fieldsubmission.confirm.leaveanyway.button' )
-                            } )
+                            heading: t( 'alert.default.heading' ),
+                            errorMsg,
+                            msg: t( 'fieldsubmission.confirm.leaveanyway.msg' )
+                        }, {
+                            posButton: t( 'confirm.default.negButton' ),
+                            negButton: t( 'fieldsubmission.confirm.leaveanyway.button' )
+                        } )
                             .then( confirmed => {
                                 if ( !confirmed ) {
                                     document.dispatchEvent( events.Close() );
@@ -414,6 +416,7 @@ function _closeCompletedRecord( offerAutoqueries = true ) {
         gui.alert( msg );
         firstInvalidInput.scrollIntoView();
         firstInvalidInput.focus();
+
         return Promise.reject( new Error( msg ) );
     } else {
         reasons.clearAll();
@@ -428,18 +431,19 @@ function _closeCompletedRecord( offerAutoqueries = true ) {
                 // Note that unlike _close this also looks at .invalid-required.
                 if ( violations.length ) {
                     return gui.confirm( {
-                            heading: t( 'alert.default.heading' ),
-                            errorMsg: t( 'fieldsubmission.confirm.autoquery.msg1' ),
-                            msg: t( 'fieldsubmission.confirm.autoquery.msg2' )
-                        }, {
-                            posButton: t( 'fieldsubmission.confirm.autoquery.automatic' ),
-                            negButton: t( 'fieldsubmission.confirm.autoquery.manual' )
-                        } )
+                        heading: t( 'alert.default.heading' ),
+                        errorMsg: t( 'fieldsubmission.confirm.autoquery.msg1' ),
+                        msg: t( 'fieldsubmission.confirm.autoquery.msg2' )
+                    }, {
+                        posButton: t( 'fieldsubmission.confirm.autoquery.automatic' ),
+                        negButton: t( 'fieldsubmission.confirm.autoquery.manual' )
+                    } )
                         .then( confirmed => {
                             if ( !confirmed ) {
                                 return false;
                             }
                             _autoAddQueries( violations );
+
                             return _closeCompletedRecord( false );
                         } );
                 } else {
@@ -492,6 +496,9 @@ function _redirect( msec ) {
 
 /**
  * Finishes a submission
+ *
+ * @param bypassConfirmation
+ * @param bypassChecks
  */
 function _complete( bypassConfirmation = false, bypassChecks = false ) {
 
@@ -577,8 +584,10 @@ function _complete( bypassConfirmation = false, bypassChecks = false ) {
 }
 
 /**
- * Triggers autoqueries. 
- * @param {*} $questions 
+ * Triggers autoqueries.
+ *
+ * @param {*} $questions
+ * @param questions
  */
 function _autoAddQueries( questions ) {
     questions.forEach( q => {
@@ -597,6 +606,7 @@ function _autoAddReasonQueries( $rfcInputs ) {
 function _doNotSubmit( fullPath ) {
     // no need to check on cloned radiobuttons, selects or textareas
     const pathWithoutPositions = fullPath.replace( /\[[0-9]+\]/g, '' );
+
     return !!form.view.$.get( 0 ).querySelector( `input[oc-external="clinicaldata"][name="${pathWithoutPositions}"]` );
 }
 
@@ -614,6 +624,7 @@ function _setFormEventHandlers() {
         const instanceId = form.instanceID;
         if ( !updated.xmlFragment ) {
             console.error( 'Could not submit repeat removal fieldsubmission. XML fragment missing.' );
+
             return;
         }
         if ( !instanceId ) {
@@ -637,10 +648,12 @@ function _setFormEventHandlers() {
         }
         if ( !updated.xmlFragment ) {
             console.error( 'Could not submit field. XML fragment missing. (If repeat was deleted, this is okay.)' );
+
             return;
         }
         if ( !instanceId ) {
             console.error( 'Could not submit field. InstanceID missing' );
+
             return;
         }
         if ( !updated.fullPath ) {
@@ -674,6 +687,7 @@ function _setFormEventHandlers() {
                 return false;
             }
             reasons.clearAll();
+
             return true;
         } );
     }

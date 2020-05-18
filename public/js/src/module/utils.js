@@ -73,6 +73,7 @@ function blobToArrayBuffer( blob ) {
 
 function blobToString( blob ) {
     var reader = new FileReader();
+
     return new Promise( function( resolve, reject ) {
         reader.onloadend = function() {
             resolve( reader.result );

@@ -17,11 +17,13 @@ Model.prototype.getUpdateEventData = function( el, type ) {
 
     if ( !el ) {
         console.error( new Error( 'XML Node not found. Form probably contains reference to non-existing XML node.' ) );
+
         return {};
     }
     fullPath = getXPath( el, 'instance', true );
     xmlFragment = this.getXmlFragmentStr( el );
     file = ( type === 'binary' ) ? el.textContent : undefined;
+
     return {
         fullPath,
         xmlFragment,
@@ -31,6 +33,7 @@ Model.prototype.getUpdateEventData = function( el, type ) {
 
 Model.prototype.getRemovalEventData = function( el ) {
     const xmlFragment = this.getXmlFragmentStr( el );
+
     return {
         xmlFragment
     };
@@ -63,6 +66,7 @@ Model.prototype.getXmlFragmentStr = function( node ) {
     dataStr = ( new XMLSerializer() ).serializeToString( clone, 'text/xml' );
     // restore default namespaces
     dataStr = dataStr.replace( /\s(data-)(xmlns=("|')[^\s>]+("|'))/g, ' $2' );
+
     return dataStr;
 };
 
@@ -79,6 +83,7 @@ Model.prototype.isMarkedComplete = function() {
         // This crap should be removed once we drop IE11.
         const record = new DOMParser().parseFromString( this.data.instanceStr, 'text/xml' );
         const attribute = record.querySelector( '*' ).getAttribute( `${nsPrefix}:complete` );
+
         return attribute && attribute === 'true';
     } else {
         // This is proper
