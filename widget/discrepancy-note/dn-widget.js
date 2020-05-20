@@ -35,7 +35,7 @@ class Comment extends Widget {
             this.linkedQuestionReadonly = this.linkedQuestion
                 .querySelector( 'input:not(.ignore), textarea:not(.ignore), select:not(.ignore)' ).readOnly;
 
-            // DEBUG 
+            // DEBUG
             // const populate = Math.random() < 0.5;
             // this.element.value = populate ? '{"queries":[{"type":"annotation", "id":"7","date_time":"2019-05-03 11:08:42.242 -06:00","comment":"Source file can be found in the cabin. Forcing ellipsis cut-off hopefully. Forcing ellipsis cut-off hopefully. Forcing ellipsis cut-off hopefully, if all goes very veryveryveryveryveryveryveryverywell.","assigned_to":"","notify":false,"thread_id":"123456"},{"type":"annotation","id":"6","date_time":"2019-05-03 11:08:35.031 -06:00","comment":"The data is out of normal range.","assigned_to":"","notify":false,"thread_id":"123","user":null},{"type":"comment","id":"5", "date_time":"2019-05-03 11:08:31.064 -06:00","comment":"The data should be within 10% of last visit. Please confirm.","status":"updated","assigned_to":"","notify":false,"thread_id":"abc","user":"honoria"},{"type":"comment","id":"4","date_time":"2019-05-03 11:08:26.532 -06:00","comment":"The data is outside normal range. Here is another sentence to force ellipsis cut-off. Please Confirm. Please Confirm. Please Confirm. Please Confirm. Please Confirm.Please confirm.","status":"updated","assigned_to":"","notify":false,"user":null},{"type":"comment","id":"3","date_time":"2019-05-03 11:08:22.892 -06:00","comment":"This field is required.","status":"updated","assigned_to":"honoria","notify":false,"thread_id":"ghi","visible_thread_id": "M001", "user":null},{"type":"comment","id":"2","date_time":"2019-05-03 11:08:16.987 -06:00","comment":"I do not agree.","status":"updated","assigned_to":"honoria","notify":true,"thread_id":"def","user":null},{"type":"comment","id":"1","date_time":"2019-05-03 11:08:06.802 -06:00","comment":"Some outrageous comment.","status":"new","assigned_to":"honoria","notify":false,"thread_id":"abc","user":null}],"logs":[]}' : '';
 
@@ -51,8 +51,8 @@ class Comment extends Widget {
             const lastLabel = [ ...this.linkedQuestion.querySelectorAll( '.question-label' ) ].slice( -1 )[ 0 ];
             if ( !lastLabel ) {
                 /*
-                 * https://github.com/OpenClinica/enketo-express-oc/issues/238 
-                 * 
+                 * https://github.com/OpenClinica/enketo-express-oc/issues/238
+                 *
                  * Offically there is no support for questions without a label, but unfortunately, some forms were created like this.
                  * We just want the widget to keep working (not crash) but accept visual issues (e.g. long hints may overlap icon).
                  */
@@ -109,7 +109,7 @@ class Comment extends Widget {
         const targetPath = element.dataset.for.trim();
         const absoluteTargetPath = this.options.helpers.pathToAbsolute( targetPath, contextPath );
         // The root is nearest repeat or otherwise nearest form. This avoids having to calculate indices, without
-        // diminishing the flexibility in any meaningful way, 
+        // diminishing the flexibility in any meaningful way,
         // as it e.g. wouldn't make sense to place a comment node for a top-level question, inside a repeat.
         const root = element.closest( 'form.or, .or-repeat' );
 
@@ -220,7 +220,7 @@ class Comment extends Widget {
         const target = this.linkedQuestion.querySelector( 'input, select, textarea' );
 
         $( this.linkedQuestion ).on( 'hiding.oc', () => {
-            // For now there is no need to double-check if this question has a relevant attribute 
+            // For now there is no need to double-check if this question has a relevant attribute
             // or has an ancestor group with a relevant attribute. This is because we trust that
             // the "hiding.oc" event is sent only for branches or its children when being closed (by the branch module).
             const linkedVal = that.options.helpers.input.getVal( target );
@@ -232,7 +232,7 @@ class Comment extends Widget {
                 /*
                  * If during a session a query is closed, and this triggers a contraintUpdate of the linked question,
                  * we do not want to generate an autoquery.
-                 * 
+                 *
                  * updated.fullPath includes positions (of repeats) which we need to strip
                  */
                 if ( open && linkedVal.length === 0 ) {
@@ -330,7 +330,7 @@ class Comment extends Widget {
 
     /**
      * Listen for a custom constraintevaluated.oc event in order to create a query if the status is closed.
-     * 
+     *
      * This listener is meant for the following situation:
      * 1. a form is loaded with a query for question A with status 'closed' and a constraint that has a dependency on question B
      * 2. the value of question B is changed, triggering a re-evaluation of the constraint of question A
@@ -344,7 +344,7 @@ class Comment extends Widget {
                 /*
                  * If during a session a query is closed, and this triggers a contraintUpdate of the linked question,
                  * we do not want to generate an autoquery.
-                 * 
+                 *
                  * updated.fullPath includes positions (of repeats) which we need to strip
                  */
                 if ( status === 'closed' && updated.fullPath.replace( /\[\d+\]/g, '' ) !== that.element.getAttribute( 'name' ) ) {
@@ -362,7 +362,7 @@ class Comment extends Widget {
     /**
      * If the linked question is not shown full width, ensure that the comment question is.
      * This correction is meant for the Grid Theme.
-     * 
+     *
      */
     _getFullWidthStyleCorrection() {
         const form = this.linkedQuestion.closest( 'form' );
@@ -399,7 +399,7 @@ class Comment extends Widget {
                         </h3>
                         <ul>
                             ${ this._getThreadFirsts( this.notes, 'comment' )
-        .map( item => 
+        .map( item =>
             `<li class="or-comment-widget__nav__item">
                                         <a href="#"  data-type="comment" data-thread="${item.thread_id || 'NULL'}">
                                             <span class="or-comment-widget__nav__item__start">
@@ -416,7 +416,7 @@ class Comment extends Widget {
                         </h3>
                         <ul>
                             ${ this._getThreadFirsts( this.notes, 'annotation' )
-        .map( item => 
+        .map( item =>
             `<li  class="or-comment-widget__nav__item">
                                         <a href="#"  data-type="annotation" data-thread="${item.thread_id || 'NULL'}">
                                             <span class="or-comment-widget__nav__item__start">
@@ -433,11 +433,11 @@ class Comment extends Widget {
                     ${closeButtonHtml}
                     <form onsubmit="return false;" class="or-comment-widget__content__form" autocomplete="off"></form>
                     <div class="or-comment-widget__content__history">
-                        <div class="or-comment-widget__content__history__content"></div> 
-                            <span class="or-comment-widget__content__history__value-change-filler"></span>              
+                        <div class="or-comment-widget__content__history__content"></div>
+                            <span class="or-comment-widget__content__history__value-change-filler"></span>
                             <input id="dn-show-value-changes" class="or-comment-widget__content__history__value-change-toggle ignore" type="checkbox" name="show-value-changes" checked />
                             <label for="dn-show-value-changes" class="option-label">${t( 'widget.dn.showvaluechanges' )}</span>
-                        </div> 
+                        </div>
                     </div>
                 </div>
             </section>`
@@ -506,7 +506,6 @@ class Comment extends Widget {
             this.linkedQuestion.scrollIntoView( { behavior: 'smooth', block: 'start', inline: 'nearest' } );
         }
 
-
         const closeButton = widget.querySelector( '.or-comment-widget__content__btn-close-x' );
         const overlay = widget.querySelector( '.or-comment-widget__overlay--click-preventer' );
         [ closeButton, overlay ].forEach( el => {
@@ -555,7 +554,7 @@ class Comment extends Widget {
     }
 
     /**
-     * @param {boolean=} readOnly 
+     * @param {boolean=} readOnly
      */
     _setUserOptions( readOnly ) {
         const disabled = readOnly ? 'disabled' : '';
@@ -842,6 +841,7 @@ class Comment extends Widget {
     _renderForm() {
         const form = event.currentTarget.closest( '.or-comment-widget' ).querySelector( 'form' );
         [ ...form.children ].forEach( el => el.remove() );
+
         if ( event.currentTarget.id === 'dn-history' || ( this.type === 'annotation' && this.threadId ) ) {
             return;
         }
@@ -860,7 +860,14 @@ class Comment extends Widget {
             btnsHtml = `<button name="new" class="btn btn-primary or-comment-widget__content__form__btn-submit" type="button">${t( 'widget.dn.addannotationbutton' )}</button>`;
         } else {
             const status = this.type !== 'comment' ? null : ( this.threadId ? this._getQueryThreadStatus( this.notes, this.threadId ) : null );
-            reopen = status === 'closed' || status === 'closed-modified';
+
+            if ( !settings.dnCloseButton && ( status==='closed' || status==='closed-modified' ) ){
+                form.append( range.createContextualFragment( '<div class="alert-box info">You do not have permission to re-open this query. You can add a new query if needed.</div>' ) );
+
+                return;
+            }
+
+            reopen = ( status === 'closed' || status === 'closed-modified' ) && settings.dnCloseButton;
             const newQueryButtonHtml = `<button name="new" class="btn btn-primary or-comment-widget__content__form__btn-submit" type="button">${t( 'widget.dn.addquerybutton' )}</button>`;
             const closeQueryButtonHtml = settings.dnCloseButton !== true ? '' : `<button name="closed" class="btn btn-default or-comment-widget__content__form__btn-submit" type="button">${t( 'widget.dn.closequerytext' )}</button>`;
             const updateQueryButtonHtml =
@@ -1121,9 +1128,9 @@ class Comment extends Widget {
      * Returns notes of a particular thread, optionally with logs
      *
      * @param {object} notes
-     * @param {string} type 
-     * @param {string} threadId 
-     * @param {boolean} includeLogs 
+     * @param {string} type
+     * @param {string} threadId
+     * @param {boolean} includeLogs
      */
     _filteredNotes( notes, type, threadId = '*', includeLogs = true ) {
         let filtered = !type ? notes.queries : notes.queries.filter( item => item.type === type );
@@ -1165,7 +1172,7 @@ class Comment extends Widget {
     /**
      * Checks if there are more than 1 open queries.
      *
-     * @param {*} notes 
+     * @param {*} notes
      * @return {boolean}
      */
     _hasMultipleOpenQueries( notes ) {
@@ -1185,7 +1192,7 @@ class Comment extends Widget {
             } );
     }
 
-    // Amend DN question to optimize for printing. Does not have to be undone, as it is not 
+    // Amend DN question to optimize for printing. Does not have to be undone, as it is not
     // used during regular data entry.
     _printify() {
         let labelText;
@@ -1211,7 +1218,7 @@ class Comment extends Widget {
             `<div class="dn-temp-print">
                 ${items
         .map( item => this._getHistoryRow( item, { timestamp: 'datetime', username: 'full' } ) )
-        .join( '' )}        
+        .join( '' )}
             </div>` ) );
 
         const existingLabel = this.question.querySelector( '.question-label.active' );
