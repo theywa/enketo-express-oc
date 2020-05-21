@@ -1,13 +1,12 @@
-/* global describe, it, expect, beforeEach */
-import Form from '../../public/js/src/module/Form';
 
+import { Form } from '../../public/js/src/module/Form';
 import forms from './forms/forms';
 import chai from 'chai';
 const expect = chai.expect;
-import chaiAsPromised from 'chai-as-promised';
 
 const loadForm = filename => {
     const strings = forms[ filename ];
+
     return new Form( strings.html_form, {
         modelStr: strings.xml_model
     } );
