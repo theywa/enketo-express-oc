@@ -1,5 +1,4 @@
 import './module/radio-tab';
-import $ from 'jquery';
 import gui from './module/gui';
 import controller from './module/controller-webform-fieldsubmission';
 import settings from './module/settings';
@@ -12,7 +11,7 @@ import oc from './module/custom';
 
 const loader = document.querySelector( '.main-loader' );
 const formheader = document.querySelector( '.main > .paper > .form-header' );
-const $footer = $( '.form-footer' );
+const footer = document.querySelector( '.form-footer' );
 const survey = {
     enketoId: settings.enketoId,
     serverUrl: settings.serverUrl,
@@ -68,7 +67,8 @@ function _updateMaxSizeSetting( maxSize ) {
     if ( maxSize ) {
         // overwrite default max size
         settings.maxSize = maxSize;
-        $( 'form.or' ).trigger( 'updateMaxSize' );
+        // TODO: next version of enketo-core will have a custom event defined in event.js
+        document.querySelector( 'form.or' ).dispatchEvent( new CustomEvent( 'updateMaxSize' ) );
     }
 }
 
@@ -91,7 +91,7 @@ function _showErrorOrAuthenticate( error ) {
  */
 function _readonlify( formParts, notesEnabled ) {
     // Styling changes
-    $( 'body' ).addClass( 'oc-view' );
+    document.querySelector( 'body' ).classList.add( 'oc-view' );
 
     // Partially disable calculations in Enketo Core
     console.log( 'Calculations restricted to clinicaldata only.' );
@@ -104,23 +104,27 @@ function _readonlify( formParts, notesEnabled ) {
     console.log( 'Preloaders disabled.' );
     preloadModule.init = () => {};
     // change status message
-    $( '<div class="fieldsubmission-status readonly"/>' ).prependTo( '.form-header' )
-        .add( $( '<div class="form-footer__feedback fieldsubmission-status readonly"/>' ).prependTo( $footer ) )
-        .text( notesEnabled ? t( 'fieldsubmission.noteonly.msg' ) : t( 'fieldsubmission.readonly.msg' ) );
+    const msg = notesEnabled ? t( 'fieldsubmission.noteonly.msg' ) : t( 'fieldsubmission.readonly.msg' );
+    formheader.prepend( range.createContextualFragment( `<div class="fieldsubmission-status readonly">${msg}</div>` ) );
+    footer.prepend( range.createContextualFragment( `<div class="form-footer__feedback fieldsubmission-status readonly">${msg}</div>` ) );
 
-    formParts.form = $( formParts.form );
+    formParts.formFragment = range.createContextualFragment( formParts.form );
+
     // Note: Enketo made a syntax error by adding the readonly attribute on a <select>
     // Hence, we cannot use .prop('readonly', true). We'll continue the syntax error.
-    formParts.form.find( 'input:not([readonly]), textarea:not([readonly]), select:not(#form-languages):not([readonly])' )
-        .filter( function() {
-            return notesEnabled ? $( this ).parent( '.or-appearance-dn' ).length === 0 : true;
-        } )
-        .attr( 'readonly', 'readonly' )
-        .addClass( 'readonly-forced' );
+    [ ...formParts.formFragment.querySelectorAll( 'input:not([readonly]), textarea:not([readonly]), select:not(#form-languages):not([readonly])' ) ]
+        .filter( el =>  notesEnabled ? !el.parentElement( '.or-appearance-dn' ) : true )
+        .forEach( el => {
+            el.setAttribute( 'readonly', 'readonly' );
+            el.classList.add( 'readonly-forced' );
+        } );
+
     // Properly make native selects readonly (for touchscreens)
-    formParts.form.find( 'select:not(#form-languages) option' ).prop( 'disabled', true );
+    formParts.formFragment.querySelectorAll( 'select:not(#form-languages) option' )
+        .forEach( el => el.disabled = true );
     // Prevent adding an Add/Remove UI on repeats
-    formParts.form.find( '.or-repeat-info' ).attr( 'data-repeat-fixed', 'fixed' );
+    formParts.formFragment.querySelectorAll( '.or-repeat-info' )
+        .forEach( el => el.setAttribute( 'data-repeat-fixed', 'fixed' ) );
     // Record load warning but keep loading
     if ( settings.loadWarning ) {
         loadWarnings.push( settings.loadWarning );
@@ -134,7 +138,7 @@ function _init( formParts ) {
 
     return new Promise( ( resolve, reject ) => {
         if ( formParts && formParts.form && formParts.model ) {
-            const formFragment = range.createContextualFragment( formParts.form );
+            const formFragment = formParts.formFragment || range.createContextualFragment( formParts.form );
             formheader.after( formFragment );
             const formEl = document.querySelector( 'form.or' );
 
