@@ -8,6 +8,7 @@ import utils from './module/utils';
 import calculationModule from 'enketo-core/src/js/calculate';
 import preloadModule from 'enketo-core/src/js/preload';
 import oc from './module/custom';
+import events from './module/event';
 
 const loader = document.querySelector( '.main-loader' );
 const formheader = document.querySelector( '.main > .paper > .form-header' );
@@ -67,8 +68,7 @@ function _updateMaxSizeSetting( maxSize ) {
     if ( maxSize ) {
         // overwrite default max size
         settings.maxSize = maxSize;
-        // TODO: next version of enketo-core will have a custom event defined in event.js
-        document.querySelector( 'form.or' ).dispatchEvent( new CustomEvent( 'updateMaxSize' ) );
+        document.querySelector( 'form.or' ).dispatchEvent( events.UpdateMaxSize() );
     }
 }
 
