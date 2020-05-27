@@ -2,7 +2,7 @@
     "name": "enketo-express",
     "description": "Webforms evolved.",
     "homepage": "https://enketo.org",
-    "version": "2.3.3",
+    "version": "2.3.4",
     "main": "./app.js",
     "engines": {
         "node": "4.4.x",
@@ -48,7 +48,7 @@
         "csurf": "1.11.x",
         "db.js": "0.15.0",
         "debug": "4.1.x",
-        "enketo-core": "5.15.4",
+        "enketo-core": "5.15.5",
         "enketo-transformer": "1.40.1",
         "enketo-xpath-extensions-oc": "github:OpenClinica/enketo-xpath-extensions-oc#efa9830",
         "evp_bytestokey": "^1.0.3",
