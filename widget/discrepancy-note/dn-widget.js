@@ -404,7 +404,7 @@ class Comment extends Widget {
                                         <a href="#"  data-type="comment" data-thread="${item.thread_id || 'NULL'}">
                                             <span class="or-comment-widget__nav__item__start">
                                                 <span class="or-comment-widget__nav__item__start__icon icon ${this._getQueryThreadStatus( this.notes, item.thread_id )}"> </span>
-                                                <span class="or-comment-widget__nav__item__start__id">${item.visible_thread_id ? '#'+item.visible_thread_id : ''}</span>
+                                                <span class="or-comment-widget__nav__item__start__id">${item.visible_thread_id ? '#' + item.visible_thread_id : ''}</span>
                                             </span>
                                             <span class="or-comment-widget__nav__item__text ${item.comment.length < 66 ? 'short' : ''}"><span>${item.comment}</span></span>
                                         </a>
@@ -861,7 +861,7 @@ class Comment extends Widget {
         } else {
             const status = this.type !== 'comment' ? null : ( this.threadId ? this._getQueryThreadStatus( this.notes, this.threadId ) : null );
 
-            if ( !settings.dnCloseButton && ( status==='closed' || status==='closed-modified' ) ){
+            if ( !settings.dnCloseButton && ( status === 'closed' || status === 'closed-modified' ) ){
                 form.append( range.createContextualFragment( '<div class="alert-box info">You do not have permission to re-open this query. You can add a new query if needed.</div>' ) );
 
                 return;
@@ -1071,7 +1071,7 @@ class Comment extends Widget {
         return `
             <div class="or-comment-widget__content__history__row ${item.type === 'audit' ? 'audit' : ''}">
                 <div class="or-comment-widget__content__history__row__start">
-                    <span class="or-comment-widget__content__history__row__start__username tooltip" data-title="${fullName}${item.user ? ' ('+item.user+')' : ''}">${options.username === 'full' ? fullName : initials}</span>
+                    <span class="or-comment-widget__content__history__row__start__username tooltip" data-title="${fullName}${item.user ? ' (' + item.user + ')' : ''}">${options.username === 'full' ? fullName : initials}</span>
                     <span class="or-comment-widget__content__history__row__start__datetime tooltip" data-title="${rdDatetime}">${time}</span>
                 </div>
                 <div class="or-comment-widget__content__history__row__main${item.type === 'audit' ? '--audit' : ''}">

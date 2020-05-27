@@ -426,7 +426,7 @@ function _generateWebformUrls( id, req ) {
 
     let url;
 
-    const type = `${req.webformType || 'single'}${req.webformSubType ? '-'+req.webformSubType : ''}`;
+    const type = `${req.webformType || 'single'}${req.webformSubType ? '-' + req.webformSubType : ''}`;
 
     switch ( type ) {
         case 'preview': {
@@ -532,7 +532,7 @@ function _renderPdf( status, id, req, res ) {
 
     return pdf.get( url, req.page )
         .then( function( pdfBuffer ) {
-            const filename = `${req.body.form_id || req.query.form_id}${req.body.instance_id ? '-'+req.body.instance_id : ''}.pdf`;
+            const filename = `${req.body.form_id || req.query.form_id}${req.body.instance_id ? '-' + req.body.instance_id : ''}.pdf`;
             // TODO: We've already set to json content-type in authCheck. This may be bad.
             res
                 .set( 'Content-Type', 'application/pdf' )

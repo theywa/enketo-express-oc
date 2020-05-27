@@ -16,7 +16,7 @@ const settingsMap = [
 
 window.addEventListener( 'message', event => {
     if ( event.origin === window.parent.location.origin ) {
-        document.cookie = `__authToken=${encodeURIComponent( event.data.authToken )}; path=/; max-age=${24*60*60}; samesite = strict `; // TODO secure=true ?
+        document.cookie = `__authToken=${encodeURIComponent( event.data.authToken )}; path=/; max-age=${24 * 60 * 60}; samesite = strict `; // TODO secure=true ?
     }
 }, false );
 
