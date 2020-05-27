@@ -15,11 +15,11 @@ function FieldSubmissionQueue() {
     this.submittedCounter = 0;
     this.queuedSubmitAllRequest = undefined;
     this._uploadStatus.init();
-    this._enabled = true;
+    this._enabled = false;
 }
 
 FieldSubmissionQueue.prototype.enable = function() {
-    // Tbc if this is the best approach. The ability to add submissions to the queue is still there, 
+    // Tbc if this is the best approach. The ability to add submissions to the queue is still there,
     // but they can no longer be submitted.
     console.log( 'fieldsubmissions have been enabled' );
     this._enabled = true;
@@ -104,15 +104,15 @@ FieldSubmissionQueue.prototype.submitAll = function() {
                 if ( that.queuedSubmitAllRequest ) {
                     request = that.queuedSubmitAllRequest();
                     /*
-                     * Any subsequent submitAll requests that arrived while the first request 
+                     * Any subsequent submitAll requests that arrived while the first request
                      * was ongoing have overwritten the that.queuedSubmitAllRequest variable.
                      * Only the last request received in this period is relevant.
                      *
                      * Before we execute the queued request we set the variable to undefined.
                      *
-                     * This means that those subsequent requests will only be executed once. 
+                     * This means that those subsequent requests will only be executed once.
                      * Subsequent stacked request immediate return result.
-                     * In other words, the stack of successive submitAll request will never 
+                     * In other words, the stack of successive submitAll request will never
                      * be larger than 2.
                      */
                     that.queuedSubmitAllRequest = undefined;

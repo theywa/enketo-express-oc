@@ -42,7 +42,7 @@ function init( formEl, data, loadWarnings = [] ) {
         }
 
         // Create separate model just to identify static default values.
-        // We do this before the inputupdate listener to avoid triggering a fieldsubmission for instanceID 
+        // We do this before the inputupdate listener to avoid triggering a fieldsubmission for instanceID
         // in duplicate/triplicate.
         const m = new FormModel( { modelStr: data.modelStr } );
         m.init();
@@ -79,7 +79,7 @@ function init( formEl, data, loadWarnings = [] ) {
 
         const handleGoToIrrelevant = e => {
             let err;
-            // In OC hidden go_to fields should show loadError 
+            // In OC hidden go_to fields should show loadError
             // regular questions:
             if ( !e.target.classList.contains( 'or-appearance-dn' ) ) {
                 err = t( 'alert.goto.irrelevant' );
@@ -124,7 +124,7 @@ function init( formEl, data, loadWarnings = [] ) {
             fieldSubmissionQueue.addFieldSubmission( props.fullPath, props.xmlFragment, form.instanceID );
         } );
 
-        // Make sure audits are logged in DN widget for calculated values during form initialization 
+        // Make sure audits are logged in DN widget for calculated values during form initialization
         // before the DN widget was initialized.
         form.view.html.removeEventListener( events.InputUpdate().type, _addToInputUpdateEventBuffer );
         inputUpdateEventBuffer.forEach( el => el.dispatchEvent( events.FakeInputUpdate() ) );
@@ -216,8 +216,8 @@ function init( formEl, data, loadWarnings = [] ) {
                 console.log( 'doing headless things' );
                 gui.prompt = () => Promise.resolve( true );
                 const resultFragment = document.createRange().createContextualFragment(
-                    `<div 
-                        id="headless-result" 
+                    `<div
+                        id="headless-result"
                         style="position: fixed; width: 100%; background: pink; top: 0; left: 0; border: 5px solid black; padding: 10px 20px; text-align:center;"
                         ></div>`
                 ).querySelector( '#headless-result' );
@@ -243,8 +243,8 @@ function init( formEl, data, loadWarnings = [] ) {
                     .finally( () => {
                         const fieldsubmissions = fieldSubmissionQueue.submittedCounter;
                         resultFragment.append( document.createRange().createContextualFragment(
-                            `<div 
-                                id="fieldsubmissions" 
+                            `<div
+                                id="fieldsubmissions"
                                 style="border: 5px dotted black; display: inline-block; padding: 10px 20px;"
                             >${fieldsubmissions}</div>` ) );
                         document.querySelector( 'body' ).append( resultFragment );
@@ -669,7 +669,7 @@ function _setFormEventHandlers() {
         // remove the Participate class that shows a Close button on every page
         form.view.html.classList.remove( 'empty-untouched' );
 
-        // Only now will we check for the deprecatedID value, which at this point should be (?) 
+        // Only now will we check for the deprecatedID value, which at this point should be (?)
         // populated at the time the instanceID dataupdate event is processed and added to the fieldSubmission queue.
         postHeartbeat();
         fieldSubmissionQueue.addFieldSubmission( updated.fullPath, updated.xmlFragment, instanceId, form.deprecatedID, file );
