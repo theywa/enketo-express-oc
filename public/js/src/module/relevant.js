@@ -80,7 +80,7 @@ branchModule.disable = function( $branchNode, path ) {
  * @param $branchNode
  * @param path
  */
-branchModule.clear = function( $branchNode, path ) {
+branchModule.clear = function( $branchNode ) {
     // Only user can clear values from user-input fields in OC.
     // TODO: when readonly becomes dynamic, we'll have to fix this.
     // Only for readonly items in OC fork:
@@ -89,12 +89,7 @@ branchModule.clear = function( $branchNode, path ) {
         .closest( '.question' )
         .clearInputs( 'change', events.InputUpdate().type );
 
-    // Unchanged from Enketo Core:
-    if ( $branchNode.is( '.or-group, .or-group-data' ) ) {
-        this.form.calc.update( {
-            relevantPath: path
-        } );
-    }
+    // Also changed from Enketo Core, we never update calculated items if relevancy changes:
 };
 
 
