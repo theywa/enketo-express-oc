@@ -1,5 +1,3 @@
-/* global describe, it, beforeEach*/
-
 import chai from 'chai';
 const expect = chai.expect;
 import chaiAsPromised from 'chai-as-promised';
@@ -20,6 +18,7 @@ describe( 'Field Submission', () => {
 
         it( 'adds regular items', () => {
             const q = new FieldSubmissionQueue();
+            q.enable();
             q.addFieldSubmission( p1, '<one>1</one>', id );
             q.addFieldSubmission( p2, '<a>a</a>', id );
 
@@ -34,6 +33,7 @@ describe( 'Field Submission', () => {
 
         it( 'overwrites older values in the queue for the same node', () => {
             const q = new FieldSubmissionQueue();
+            q.enable();
             q.addFieldSubmission( p1, '<one>1</one>', id );
             q.addFieldSubmission( p1, '<two>2</two>', id );
 
@@ -46,6 +46,7 @@ describe( 'Field Submission', () => {
 
         it( 'adds edits of already submitted items', () => {
             const q = new FieldSubmissionQueue();
+            q.enable();
             q.addFieldSubmission( p1, '<one>1</one>', id, did );
             q.addFieldSubmission( p2, '<a>a</a>', id, did );
 
@@ -60,6 +61,7 @@ describe( 'Field Submission', () => {
 
         it( 'overwrites older values of edited already-submitted items', () => {
             const q = new FieldSubmissionQueue();
+            q.enable();
             q.addFieldSubmission( p1, '<one>1</one>', id, did );
             q.addFieldSubmission( p1, '<two>2</two>', id, did );
 
@@ -72,6 +74,7 @@ describe( 'Field Submission', () => {
 
         it( 'adds items that delete a repeat', () => {
             const q = new FieldSubmissionQueue();
+            q.enable();
             q.addRepeatRemoval( '<one>1</one>', id );
             q.addRepeatRemoval( '<a>a</a>', id, did );
 
@@ -93,12 +96,14 @@ describe( 'Field Submission', () => {
         const succeedSubmitOne = () => Promise.resolve( 201 );
         const succeedFailSubmitOne = () => {
             i++;
+
             return ( i % 2 === 0 ) ? failSubmitOne() : succeedSubmitOne();
         };
 
         beforeEach( () => {
             i = 0;
             q = new FieldSubmissionQueue();
+            q.enable();
             q.addFieldSubmission( p1, '1', id );
             q.addFieldSubmission( p2, 'a', id );
         } );
@@ -107,7 +112,8 @@ describe( 'Field Submission', () => {
             q._submitOne = succeedSubmitOne;
 
             const updatedQueueKeys = q.submitAll()
-                .then( results => Object.keys( q.get() ) );
+                .then( () => Object.keys( q.get() ) );
+
             return expect( updatedQueueKeys ).to.eventually.deep.equal( [] );
         } );
 
@@ -115,11 +121,13 @@ describe( 'Field Submission', () => {
             q._submitOne = succeedSubmitOne;
 
             const updatedQueueKeys = q.submitAll()
-                .then( results => {
+                .then( () => {
                     q.addFieldSubmission( p1, '1', id );
                     q.addFieldSubmission( p2, 'a', id );
+
                     return Object.keys( q.get() );
                 } );
+
             return expect( updatedQueueKeys ).to.eventually.deep.equal( [] );
         } );
 
@@ -127,7 +135,8 @@ describe( 'Field Submission', () => {
             q._submitOne = failSubmitOne;
 
             const updatedQueueKeys = q.submitAll()
-                .then( results => Object.keys( q.get() ) );
+                .then( () => Object.keys( q.get() ) );
+
             return expect( updatedQueueKeys ).to.eventually.deep.equal( [ `POST_${p1}`, `POST_${p2}` ] );
         } );
 
@@ -135,26 +144,27 @@ describe( 'Field Submission', () => {
             q._submitOne = succeedFailSubmitOne;
 
             const updatedQueueKeys = q.submitAll()
-                .then( results => Object.keys( q.get() ) );
+                .then( () => Object.keys( q.get() ) );
+
             return expect( updatedQueueKeys ).to.eventually.deep.equal( [ `POST_${p2}` ] );
         } );
 
         it( 'if a field is updated during a failing submission attempt, ' +
             'the old field submission will not be retained in the queue',
-            () => {
-                q._submitOne = succeedFailSubmitOne;
+        () => {
+            q._submitOne = succeedFailSubmitOne;
 
-                const updatedQueue = q.submitAll()
-                    .then( results => q.get() );
+            const updatedQueue = q.submitAll()
+                .then( () => q.get() );
                 // this will complete before updatedQueueKeys is resolved!
-                q.addFieldSubmission( p2, 'b', id );
+            q.addFieldSubmission( p2, 'b', id );
 
-                return Promise.all( [
-                    expect( updatedQueue ).to.eventually.have.property( `POST_${p2}` ),
-                    expect( updatedQueue.then( q => getFieldValue( q[ `POST_${p2}` ] ) ) ).to.eventually.equal( 'b' ),
-                    expect( updatedQueue ).to.eventually.not.have.property( `POST_${p1}` )
-                ] );
-            } );
+            return Promise.all( [
+                expect( updatedQueue ).to.eventually.have.property( `POST_${p2}` ),
+                expect( updatedQueue.then( q => getFieldValue( q[ `POST_${p2}` ] ) ) ).to.eventually.equal( 'b' ),
+                expect( updatedQueue ).to.eventually.not.have.property( `POST_${p1}` )
+            ] );
+        } );
     } );
 
     // TODO
