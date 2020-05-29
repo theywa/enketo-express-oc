@@ -11,9 +11,8 @@ import $ from 'jquery';
  * .or-group.invalid-relevant and .or-group-data.invalid-relevant.
  *
  * @param updated
- * @param forceClearIrrelevant
  */
-branchModule.update = function( updated, forceClearIrrelevant ) {
+branchModule.update = function( updated ) {
     let $nodes;
 
     if ( !this.form ) {
@@ -24,12 +23,12 @@ branchModule.update = function( updated, forceClearIrrelevant ) {
         // the OC customization:
         .add( this.form.getRelatedNodes( 'data-relevant', '.invalid-relevant' ) );
 
-    this.updateNodes( $nodes, forceClearIrrelevant );
+    this.updateNodes( $nodes );
 };
 
 branchModule.originalSelfRelevant = branchModule.selfRelevant;
 
-// Overwrite in order to add the && !branchNode.classList.contains('invalid-relevant') clause because an irrelevant branch in OC, 
+// Overwrite in order to add the && !branchNode.classList.contains('invalid-relevant') clause because an irrelevant branch in OC,
 // would not be disabled if it is a question with a value!
 branchModule.selfRelevant = function( $branchNode ) {
     return this.originalSelfRelevant( $branchNode ) && !$branchNode.hasClass( 'invalid-relevant' );
@@ -53,10 +52,10 @@ branchModule.enable = function( $branchNode, path ) {
 };
 
 /*
- * Overwrite to bypass the overwritten isRelevantCheck.
+ * Overwrite to bypass the overwritten isRelevantCheck, and always call this.clear if not virgin
  * No need for functionality to clear values in irrelevant fields either.
  */
-branchModule.disable = function( $branchNode, path, forceClearIrrelevant ) {
+branchModule.disable = function( $branchNode, path ) {
     const virgin = $branchNode.hasClass( 'pre-init' );
     let change = false;
 
@@ -64,9 +63,7 @@ branchModule.disable = function( $branchNode, path, forceClearIrrelevant ) {
         change = true;
         // if the branch was previously enabled, keep any default values
         if ( !virgin ) {
-            if ( this.form.options.clearIrrelevantImmediately || forceClearIrrelevant ) {
-                this.clear( $branchNode, path );
-            }
+            this.clear( $branchNode, path );
         } else {
             $branchNode.removeClass( 'pre-init' );
         }
@@ -164,13 +161,13 @@ branchModule.deactivate = function( $branchNode ) {
          * (ie. excl discrepancy note questions) has a value.
          * The best way is to do this in the model.
          * Note that we need to check ALL repeats if the repeat parent (with the same /path/to/repeat) has a relevant!
-         * 
-         * First get all the leaf nodes (nodes without children) and then check if there is a calculation 
+         *
+         * First get all the leaf nodes (nodes without children) and then check if there is a calculation
          * or dn question for this node.
-         * 
-         * Then get the concatenated textContent of the filtered leaf nodes and trim to avoid 
+         *
+         * Then get the concatenated textContent of the filtered leaf nodes and trim to avoid
          * recognizing whitespace-only as a value. (whitespace in between is fine as it won't give a false positive)
-         * 
+         *
          * If the result has length > 0, one form control in the group has a value.
          */
         const dataEls = this.form.model.node( name ).getElements();
