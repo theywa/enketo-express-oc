@@ -3,11 +3,13 @@ import { Form } from '../../public/js/src/module/Form';
 import forms from './forms/forms';
 import chai from 'chai';
 const expect = chai.expect;
+const range = document.createRange();
 
 const loadForm = filename => {
     const strings = forms[ filename ];
+    const formEl = range.createContextualFragment( `<div>${strings.html_form}</div>` ).querySelector( 'form' );
 
-    return new Form( strings.html_form, {
+    return new Form( formEl, {
         modelStr: strings.xml_model
     } );
 };
