@@ -1,5 +1,5 @@
 
-import { Form } from '../../public/js/src/module/Form';
+import { Form } from '../../public/js/src/module/form';
 import forms from './forms/forms';
 import chai from 'chai';
 const expect = chai.expect;
