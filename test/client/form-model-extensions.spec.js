@@ -1,4 +1,4 @@
-import Model from '../../public/js/src/module/Form-model';
+import { FormModel as Model } from '../../public/js/src/module/form-model';
 
 describe( 'getting XML fragments', () => {
 

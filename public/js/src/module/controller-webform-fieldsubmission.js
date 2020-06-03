@@ -8,7 +8,7 @@ import gui from './gui';
 
 import settings from './settings';
 import { Form } from './Form'; // modified for OC
-import FormModel from './Form-model'; // modified for OC
+import { FormModel } from './Form-model'; // modified for OC
 import fileManager from './file-manager';
 import events from './event';
 import { t } from './translator';

@@ -91,4 +91,4 @@ Model.prototype.isMarkedComplete = function() {
     }
 };
 
-export default Model;
+export { Model as FormModel };
