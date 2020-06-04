@@ -32,8 +32,9 @@ class Comment extends Widget {
             this.ordinal = 0;
             this.readOnly = this.element.readOnly;
 
-            this.linkedQuestionReadonly = this.linkedQuestion
-                .querySelector( 'input:not(.ignore), textarea:not(.ignore), select:not(.ignore)' ).readOnly;
+            const linkedInput = this.linkedQuestion.querySelector( 'input:not(.ignore), textarea:not(.ignore)' );
+            const linkedReadonlySelect = this.linkedQuestion.querySelector( 'select:not(.ignore)[readonly]' );
+            this.linkedQuestionReadonly = !!( ( linkedInput && linkedInput.readOnly ) || linkedReadonlySelect );
 
             // DEBUG
             // const populate = Math.random() < 0.5;
