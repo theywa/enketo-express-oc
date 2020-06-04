@@ -6,6 +6,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ---------------------
 ##### Changed
 - Some of the background-logic wrt clearing non-relevant values. However, the behavior should be unchanged.
+- No longer stripping querystring from offline-capable URLs after loading.
+
+##### Fixed
+- The autosave feature does not work for drawings, signatures, annotations on mobile browsers.
+- Drawings, signatures and annotations submit empty PNG files on mobile browsers.
+- Readonly select-minimal widgets are not readonly.
 
 [2.3.4] - 2020-05-27
 ---------------------
