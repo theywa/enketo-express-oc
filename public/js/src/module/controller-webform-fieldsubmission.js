@@ -190,6 +190,7 @@ function init( formEl, data, loadWarnings = [] ) {
         } else if ( settings.type !== 'view' ) {
             // Current queue can be submitted, and so can future fieldsubmissions.
             fieldSubmissionQueue.enable();
+            fieldSubmissionQueue.submitAll();
         }
 
         const loadIssues = loadWarnings.concat( loadErrors );
