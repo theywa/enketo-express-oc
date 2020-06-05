@@ -21,7 +21,7 @@ function FieldSubmissionQueue() {
 FieldSubmissionQueue.prototype.enable = function() {
     // Tbc if this is the best approach. The ability to add submissions to the queue is still there,
     // but they can no longer be submitted.
-    console.log( 'fieldsubmissions have been enabled' );
+    // console.log( 'fieldsubmissions have been enabled' );
     this._enabled = true;
 };
 

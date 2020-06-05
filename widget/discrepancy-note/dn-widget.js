@@ -604,7 +604,7 @@ class Comment extends Widget {
                 };
             }
         } catch ( e ) {
-            console.error( e );
+            //console.error( e );
             throw new Error( 'Failed to parse discrepancy notes.' );
         }
     }
