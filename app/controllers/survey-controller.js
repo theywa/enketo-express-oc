@@ -22,6 +22,7 @@ router.param( 'encrypted_enketo_id_single', routerUtils.encryptedEnketoIdSingle 
 router.param( 'encrypted_enketo_id_view', routerUtils.encryptedEnketoIdView );
 router.param( 'encrypted_enketo_id_view_dn', routerUtils.encryptedEnketoIdViewDn );
 router.param( 'encrypted_enketo_id_view_dnc', routerUtils.encryptedEnketoIdViewDnc );
+router.param( 'encrypted_enketo_id_preview', routerUtils.encryptedEnketoIdPreview );
 router.param( 'encrypted_enketo_id_fs_c', routerUtils.encryptedEnketoIdFsC );
 router.param( 'encrypted_enketo_id_fs_participant', routerUtils.encryptedEnketoIdFsParticipant );
 router.param( 'encrypted_enketo_id_rfc', routerUtils.encryptedEnketoIdEditRfc );
@@ -55,8 +56,8 @@ router
         res.status = 200;
         res.send( `connected ${Math.random()}` );
     } )
-    .get( '/preview/:enketo_id', preview )
-    .get( '/preview/:mod/:enketo_id', preview )
+    .get( '/preview/:encrypted_enketo_id_preview', preview )
+    .get( '/preview/:mod/:encrypted_enketo_id_preview', preview )
     .get( '/preview', preview )
     .get( '/preview/:mod', preview )
     .get( '/preview/participant/:mod', preview )

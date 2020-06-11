@@ -26,6 +26,7 @@ router.param( 'encrypted_enketo_id_single', routerUtils.encryptedEnketoIdSingle 
 router.param( 'encrypted_enketo_id_view', routerUtils.encryptedEnketoIdView );
 router.param( 'encrypted_enketo_id_view_dn', routerUtils.encryptedEnketoIdViewDn );
 router.param( 'encrypted_enketo_id_view_dnc', routerUtils.encryptedEnketoIdViewDnc );
+router.param( 'encrypted_enketo_id_preview', routerUtils.encryptedEnketoIdPreview );
 router.param( 'encrypted_enketo_id_fs_c', routerUtils.encryptedEnketoIdFsC );
 router.param( 'encrypted_enketo_id_fs_participant', routerUtils.encryptedEnketoIdFsParticipant );
 router.param( 'encrypted_enketo_id_rfc', routerUtils.encryptedEnketoIdEditRfc );
@@ -40,6 +41,7 @@ router
     } )
     .post( '/xform/:encrypted_enketo_id_single', getSurveyParts )
     .post( '/xform/:encrypted_enketo_id_view', getSurveyParts )
+    .post( '/xform/:encrypted_enketo_id_preview', getSurveyParts )
     .post( '/xform/:encrypted_enketo_id_view_dn', getSurveyParts )
     .post( '/xform/:encrypted_enketo_id_view_dnc', getSurveyParts )
     .post( '/xform/:encrypted_enketo_id_fs_c', getSurveyParts )
