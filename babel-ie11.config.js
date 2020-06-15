@@ -1,5 +1,4 @@
 // Special IE11 build.
-module.exports = { presets };
 const presets = [
     [
         '@babel/preset-env',
@@ -12,3 +11,5 @@ const presets = [
         },
     ],
 ];
+
+module.exports = { presets };

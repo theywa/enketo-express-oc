@@ -91,7 +91,7 @@ module.exports = grunt => {
             buildReadmeBadge: {
                 command: 'node ./tools/update-readme-with-shield-badge.js'
             },
-            ie11polyfill: {
+            'polyfill-ie11': {
                 command: [
                     'mkdir -p public/js/build && curl "https://polyfill.io/v3/polyfill.min.js?ua=ie%2F11.0.0&features=es2015%2Ces2016%2Ces2017%2Ces2018%2Cdefault-3.6%2Cfetch%2CNodeList.prototype.forEach" -o "public/js/build/ie11-polyfill.min.js"',
                     'cp -f node_modules/enketo-core/src/js/obscure-ie11-polyfills.js public/js/build/obscure-ie11-polyfills.js'
@@ -130,6 +130,7 @@ module.exports = grunt => {
                 command: bundles
                     .map( bundle => `npx browserify node_modules/enketo-core/src/js/workarounds-ie11.js ${bundle.replace( '-bundle.', '-ie11-temp-bundle.' )} -o ${bundle.replace( '-bundle.', '-ie11-bundle.' )}` )
                     .concat( [ 'rm -f public/js/build/*ie11-temp-bundle.js' ] )
+                    .join( '&&' )
             },
         },
         eslint: {
@@ -312,7 +313,7 @@ module.exports = grunt => {
     grunt.registerTask( 'default', [ 'locales', 'widgets', 'css', 'js', 'terser' ] );
     grunt.registerTask( 'locales', [ 'shell:clean-locales', 'i18next' ] );
     grunt.registerTask( 'js', [ 'shell:clean-js', 'client-config-file:create', 'widgets', 'shell:rollup', 'shell:babel' ] );
-    grunt.registerTask( 'js-ie11', [ 'js', 'shell:ie11polyfill', 'shell:babel-ie11', 'shell:browserify-ie11' ] );
+    grunt.registerTask( 'js-ie11', [ 'shell:polyfill-ie11', 'shell:babel-ie11', 'shell:browserify-ie11' ] );
     grunt.registerTask( 'build-ie11', [ 'js-ie11', 'terser' ] );
     grunt.registerTask( 'css', [ 'shell:clean-css', 'system-sass-variables:create', 'sass' ] );
     grunt.registerTask( 'test', [ 'env:test', 'transforms', 'js', 'css', 'nyc:cover', 'karma:headless', 'shell:buildReadmeBadge', 'eslint' ] );
