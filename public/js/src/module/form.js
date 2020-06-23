@@ -14,7 +14,7 @@ import './repeat';
  * This function doesn't actually evaluate constraints. It triggers
  * an event on nodes that have constraint dependency on the changed node(s).
  * This event is used in the discrepancy notes widget.
- * 
+ *
  * @param  {[type]} updated - [description]
  */
 const constraintUpdate = function( updated ) {
@@ -23,9 +23,9 @@ const constraintUpdate = function( updated ) {
     if ( !updated.cloned ) {
         this.getRelatedNodes( 'data-constraint', '', updated )
         // The filter below is commented out, because at the moment this.getRelatedNodes already takes
-        // care of this (in enketo-core). However, it is not unrealistic to expect that in the future we will 
+        // care of this (in enketo-core). However, it is not unrealistic to expect that in the future we will
         // not be able to rely on that as it may be considered a performance hack too far. In that case, uncomment below.
-        // 
+        //
         // Filter out the nodes that are inside a repeat instance other than
         // the repeat instance that contains the node that triggered the dataupdate
         // https://github.com/kobotoolbox/enketo-express/issues/741
@@ -56,15 +56,13 @@ const constraintUpdate = function( updated ) {
  * @return {[type]}         [description]
  */
 const relevantErrorUpdate = function( updated ) {
-    let $nodes;
-
-    $nodes = this.getRelatedNodes( 'name', '[data-relevant]', updated )
-        .closest( '.invalid-relevant' )
-        .map( function() {
-            return $( this ).is( '[data-relevant]' ) ? this : this.querySelector( '[data-relevant]' );
+    const nodes = this.getRelatedNodes( 'data-relevant', '', updated ).get()
+        .filter( control => !!control.closest( '.invalid-relevant' ) )
+        .map( n => {
+            return n.matches( '[data-relevant]' ) ? n : n.querySelector( '[data-relevant]' );
         } );
 
-    this.relevant.updateNodes( $nodes );
+    this.relevant.updateNodes( $( nodes ) );
 };
 
 const originalInit = Form.prototype.init;
@@ -96,7 +94,6 @@ Form.prototype.init = function() {
     }
 
     const loadErrors = originalInit.call( this );
-
 
     initialized = true;
 
@@ -144,11 +141,11 @@ Form.prototype.validateInput = function( control ) {
     // There is a condition where a value change results in both an invalid-relevant and invalid-constraint,
     // where the invalid constraint is added *after* the invalid-relevant. I can reproduce in automated test (not manually).
     // It is probably related due to the asynchronicity of the constraint evaluation.
-    // 
+    //
     // To crudely resolve this, we remove any constraint error here.
-    // However we do want some of the other things that validateInput does (ie. updating the required "*" visibility), so 
+    // However we do want some of the other things that validateInput does (ie. updating the required "*" visibility), so
     // we will still run it but then remove any invalid classes.
-    // 
+    //
     // This is very unfortunate, but these are the kind of acrobatics that are necessary to "fight" the built-in behavior of Enketo's form engine.
     return originalValidateInput.call( this, control )
         .then( passed => {
@@ -214,7 +211,7 @@ Form.prototype.strictConstraintCheckHandler = function( evt, input ) {
     // Only now, will we determine the index (expensive).
     n.ind = this.input.getIndex( input );
 
-    // In order to evaluate the constraint, its value has to be set in the model. 
+    // In order to evaluate the constraint, its value has to be set in the model.
     // This would trigger a fieldsubmission, which is what we're trying to prevent.
     // A heavy-handed dumb-but-safe approach is to clone the model and set the value there.
     const modelClone = new FormModel( new XMLSerializer().serializeToString( this.model.xml ) );
