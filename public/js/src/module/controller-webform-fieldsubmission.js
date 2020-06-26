@@ -27,10 +27,9 @@ const formOptions = {
 };
 const inputUpdateEventBuffer = [];
 
-
 function init( formEl, data, loadWarnings = [] ) {
-    let advice;
     let loadErrors = [];
+    let staticDefaultNodes = [];
 
     formprogress = document.querySelector( '.form-progress' );
 
@@ -44,18 +43,17 @@ function init( formEl, data, loadWarnings = [] ) {
         // Create separate model just to identify static default values.
         // We do this before the inputupdate listener to avoid triggering a fieldsubmission for instanceID
         // in duplicate/triplicate.
-        const m = new FormModel( { modelStr: data.modelStr } );
-        m.init();
-        const staticDefaultNodes = [ ...m.node( null, null, { noEmpty: true } ).getElements() ]
-            .filter( node => node !== m.getMetaNode( 'instanceID' ).getElement() );
-
+        if ( !data.instanceStr ){
+            const m = new FormModel( { modelStr: data.modelStr } );
+            m.init();
+            staticDefaultNodes = [ ...m.node( null, null, { noEmpty: true } ).getElements() ]
+                .filter( node => node !== m.getMetaNode( 'instanceID' ).getElement() );
+        }
         form = new Form( formEl, data, formOptions );
 
         // Additional layer of security to disable submissions in readonly views.
         // Should not be necessary to do this.
         fieldSubmissionQueue = new FieldSubmissionQueue();
-
-
 
         // Buffer inputupdate events (DURING LOAD ONLY), in order to eventually log these
         // changes in the DN widget after it has been initalized
@@ -208,7 +206,7 @@ function init( formEl, data, loadWarnings = [] ) {
                 loadErrors.unshift( error.message || t( 'error.unknown' ) );
             }
 
-            advice = ( data.instanceStr ) ? t( 'alert.loaderror.editadvice' ) : t( 'alert.loaderror.entryadvice' );
+            const advice = ( data.instanceStr ) ? t( 'alert.loaderror.editadvice' ) : t( 'alert.loaderror.entryadvice' );
             gui.alertLoadErrors( loadErrors, advice );
         } )
         .then( () => {
