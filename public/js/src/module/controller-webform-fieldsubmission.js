@@ -29,12 +29,13 @@ const inputUpdateEventBuffer = [];
 
 function init( formEl, data, loadWarnings = [] ) {
     let loadErrors = [];
-    let staticDefaultNodes = [];
 
     formprogress = document.querySelector( '.form-progress' );
 
     return new Promise( resolve => {
         const goToErrorLink = settings.goToErrorUrl ? `<a href="${settings.goToErrorUrl}">${settings.goToErrorUrl}</a>` : '';
+
+        fieldSubmissionQueue = new FieldSubmissionQueue();
 
         if ( data.instanceAttachments ) {
             fileManager.setInstanceAttachments( data.instanceAttachments );
@@ -46,14 +47,16 @@ function init( formEl, data, loadWarnings = [] ) {
         if ( !data.instanceStr ){
             const m = new FormModel( { modelStr: data.modelStr } );
             m.init();
-            staticDefaultNodes = [ ...m.node( null, null, { noEmpty: true } ).getElements() ]
-                .filter( node => node !== m.getMetaNode( 'instanceID' ).getElement() );
+            // Create fieldsubmissions for static default values
+            [ ...m.node( null, null, { noEmpty: true } ).getElements() ]
+                .filter( node => node !== m.getMetaNode( 'instanceID' ).getElement() )
+                .forEach( node => {
+                    const props = m.getUpdateEventData( node );
+                    fieldSubmissionQueue.addFieldSubmission( props.fullPath, props.xmlFragment, form.instanceID );
+                } );
         }
-        form = new Form( formEl, data, formOptions );
 
-        // Additional layer of security to disable submissions in readonly views.
-        // Should not be necessary to do this.
-        fieldSubmissionQueue = new FieldSubmissionQueue();
+        form = new Form( formEl, data, formOptions );
 
         // Buffer inputupdate events (DURING LOAD ONLY), in order to eventually log these
         // changes in the DN widget after it has been initalized
@@ -113,14 +116,7 @@ function init( formEl, data, loadWarnings = [] ) {
         // listen for "goto-irrelevant" event and add error
         form.view.html.addEventListener( events.GoToIrrelevant().type, handleGoToIrrelevant );
         form.view.html.addEventListener( events.GoToInvisible().type, handleGoToInvisible );
-
         loadErrors = loadErrors.concat( form.init() );
-
-        // Create fieldsubmissions for static default values
-        staticDefaultNodes.forEach( node => {
-            const props = m.getUpdateEventData( node );
-            fieldSubmissionQueue.addFieldSubmission( props.fullPath, props.xmlFragment, form.instanceID );
-        } );
 
         // Make sure audits are logged in DN widget for calculated values during form initialization
         // before the DN widget was initialized.
