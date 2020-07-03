@@ -646,6 +646,12 @@ function _setFormEventHandlers() {
             // a fieldsubmission.
             return;
         }
+
+        // This is a bit of a hacky test for /meta/instanceID. Both meta and instanceID nodes could theoretically have any namespace prefix.
+        if ( /meta\/.*instanceID$/.test( updated.fullPath ) ){
+            return;
+        }
+
         if ( !updated.xmlFragment ) {
             console.error( 'Could not submit field. XML fragment missing. (If repeat was deleted, this is okay.)' );
 
