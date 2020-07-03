@@ -639,7 +639,7 @@ function _setFormEventHandlers() {
     form.view.html.addEventListener( events.DataUpdate().type, event => {
         const updated = event.detail || {};
         const instanceId = form.instanceID;
-        let file;
+        let filePromise;
 
         if ( updated.cloned ) {
             // This event is fired when a repeat is cloned. It does not trigger
@@ -663,7 +663,9 @@ function _setFormEventHandlers() {
             return;
         }
         if ( updated.file ) {
-            file = fileManager.getCurrentFile( updated.file );
+            filePromise = fileManager.getCurrentFile( updated.file );
+        } else {
+            filePromise = Promise.resolve();
         }
 
         // remove the Participate class that shows a Close button on every page
@@ -672,8 +674,11 @@ function _setFormEventHandlers() {
         // Only now will we check for the deprecatedID value, which at this point should be (?)
         // populated at the time the instanceID dataupdate event is processed and added to the fieldSubmission queue.
         postHeartbeat();
-        fieldSubmissionQueue.addFieldSubmission( updated.fullPath, updated.xmlFragment, instanceId, form.deprecatedID, file );
-        fieldSubmissionQueue.submitAll();
+        filePromise
+            .then( file => {
+                fieldSubmissionQueue.addFieldSubmission( updated.fullPath, updated.xmlFragment, instanceId, form.deprecatedID, file );
+                fieldSubmissionQueue.submitAll();
+            } );
     } );
 
     // Before repeat removal from view and model
