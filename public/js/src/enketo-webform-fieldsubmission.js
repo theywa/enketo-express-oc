@@ -94,14 +94,16 @@ function _readonlify( formParts, notesEnabled ) {
     document.querySelector( 'body' ).classList.add( 'oc-view' );
 
     // Partially disable calculations in Enketo Core
-    console.log( 'Calculations restricted to clinicaldata only.' );
+    console.info( 'Calculations restricted to clinicaldata only.' );
     calculationModule.originalUpdate = calculationModule.update;
     calculationModule.update = function( updated ) {
         return calculationModule.originalUpdate.call( this, updated, '[oc-external="clinicaldata"]' );
     };
+    console.info( 'Setvalue disabled.' );
+    calculationModule.setvalue = () => {};
 
     // Completely disable preload items
-    console.log( 'Preloaders disabled.' );
+    console.info( 'Preloaders disabled.' );
     preloadModule.init = () => {};
     // change status message
     const msg = notesEnabled ? t( 'fieldsubmission.noteonly.msg' ) : t( 'fieldsubmission.readonly.msg' );

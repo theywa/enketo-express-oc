@@ -303,7 +303,7 @@ function _closeRegular( offerAutoqueries = true ) {
 
             return fieldSubmissionQueue.submitAll()
                 .then( () => {
-                    if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
+                    if ( fieldSubmissionQueue.enabled && Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
                         throw new Error( t( 'fieldsubmission.alert.close.msg2' ) );
                     } else {
                         // this event is used in communicating back to iframe parent window
@@ -365,7 +365,7 @@ function _closeSimple() {
 
             return fieldSubmissionQueue.submitAll()
                 .then( () => {
-                    if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
+                    if ( fieldSubmissionQueue.enabled && Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
                         throw new Error( t( 'fieldsubmission.alert.close.msg2' ) );
                     } else {
                         // this event is used in communicating back to iframe parent window
@@ -459,7 +459,7 @@ function _closeParticipant() {
 
     // If the form is untouched, and has not loaded a record, allow closing it without any checks.
     // TODO: can we ignore calculations?
-    if ( settings.type !== 'edit' && Object.keys( fieldSubmissionQueue.get() ).length === 0 && fieldSubmissionQueue.submittedCounter === 0 ) {
+    if ( settings.type !== 'edit' &&  ( Object.keys( fieldSubmissionQueue.get() ).length === 0 || !fieldSubmissionQueue.enabled ) && fieldSubmissionQueue.submittedCounter === 0 ) {
         return Promise.resolve()
             .then( () => {
                 gui.alert( t( 'alert.submissionsuccess.redirectmsg' ), null, 'success' );
@@ -543,9 +543,7 @@ function _complete( bypassConfirmation = false, bypassChecks = false ) {
 
                 return fieldSubmissionQueue.submitAll()
                     .then( () => {
-                        const queueLength = Object.keys( fieldSubmissionQueue.get() ).length;
-
-                        if ( queueLength === 0 ) {
+                        if ( Object.keys( fieldSubmissionQueue.get() ).length === 0 ) {
                             instanceId = form.instanceID;
                             deprecatedId = form.deprecatedID;
                             if ( form.model.isMarkedComplete() ) {
@@ -808,7 +806,7 @@ function _setButtonEventHandlers() {
                     _autoAddQueries( form.view.html.querySelectorAll( '.invalid-constraint' ) );
                     _autoAddReasonQueries( reasons.getInvalidFields() );
                 }
-                if ( Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
+                if ( fieldSubmissionQueue.enabled && Object.keys( fieldSubmissionQueue.get() ).length > 0 ) {
                     return 'Any unsaved data will be lost';
                 }
             }
