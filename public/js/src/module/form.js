@@ -9,6 +9,7 @@ import './relevant';
 import './required';
 import './page';
 import './repeat';
+import './download-utils';
 
 /**
  * This function doesn't actually evaluate constraints. It triggers
