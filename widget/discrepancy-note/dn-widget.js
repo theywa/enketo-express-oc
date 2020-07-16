@@ -385,6 +385,8 @@ class Comment extends Widget {
     _showCommentModal() {
         const range = document.createRange();
         const closeButtonHtml = '<button class="btn-icon-only or-comment-widget__content__btn-close-x" type="button">&times;</button>';
+        const newQueryButtonHtml = `<button class="btn btn-primary small" data-type="comment"><span class="icon icon-plus"> </span> ${t( 'widget.dn.addnewtext' )}</button>`;
+        const newAnnotationButtonHtml = `<button class="btn btn-primary small" data-type="annotation"><span class="icon icon-plus"> </span> ${t( 'widget.dn.addnewtext' )}</button>`;
         this.element.closest( 'form' ).dispatchEvent( events.Heartbeat() );
         const fragment = range.createContextualFragment(
             `<section class="widget or-comment-widget">
@@ -396,7 +398,7 @@ class Comment extends Widget {
                             <a id="dn-history" href="#" data-thread="*">${t( 'widget.dn.allhistory' )}</a>
                         </h3>
                         <h3 class="or-comment-widget__nav__main"><span class="or-comment-widget__nav__main__title">${t( 'widget.dn.queries' )}</span>
-                            <button class="btn btn-primary small" data-type="comment"><span class="icon icon-plus"> </span> ${t( 'widget.dn.addnewtext' )}</button>
+                            ${settings.type !== 'view' ? newQueryButtonHtml : ''}
                         </h3>
                         <ul>
                             ${ this._getThreadFirsts( this.notes, 'comment' )
@@ -413,7 +415,7 @@ class Comment extends Widget {
         .join( '' )}
                         </ul>
                         <h3 class="or-comment-widget__nav__main"><span class="or-comment-widget__nav__main__title">${t( 'widget.dn.annotations' )}</span>
-                            <button class="btn btn-primary small" data-type="annotation"><span class="icon icon-plus"> </span> ${t( 'widget.dn.addnewtext' )}</button>
+                            ${settings.type !== 'view' ? newAnnotationButtonHtml : ''}
                         </h3>
                         <ul>
                             ${ this._getThreadFirsts( this.notes, 'annotation' )
@@ -861,6 +863,10 @@ class Comment extends Widget {
             btnsHtml = `<button name="new" class="btn btn-primary or-comment-widget__content__form__btn-submit" type="button">${t( 'widget.dn.addannotationbutton' )}</button>`;
         } else {
             const status = this.type !== 'comment' ? null : ( this.threadId ? this._getQueryThreadStatus( this.notes, this.threadId ) : null );
+
+            if ( settings.type === 'view' ){
+                return;
+            }
 
             if ( !settings.dnCloseButton && ( status === 'closed' || status === 'closed-modified' ) ){
                 form.append( range.createContextualFragment( '<div class="alert-box info">You do not have permission to re-open this query. You can add a new query if needed.</div>' ) );
