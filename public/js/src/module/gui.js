@@ -602,6 +602,9 @@ function applyPrintStyle() {
 
     imagesLoaded()
         .then( () => {
+            printHelper.openAllDetails();
+            document.querySelectorAll( '.question' ).forEach( question => question.dispatchEvent( events.Printify() ) );
+
             if ( formTheme === 'grid' || ( !formTheme && printHelper.isGrid() ) ) {
                 const paper = { format: settings.format, landscape: settings.landscape, scale: settings.scale, margin: settings.margin };
 
@@ -620,7 +623,7 @@ function applyPrintStyle() {
 
 function imagesLoaded() {
     return new Promise( resolve => {
-        let images = Array.prototype.slice.call( document.images );
+        let images = [ ... document.images ];
         const interval = setInterval( () => {
             images = images.filter( image => !image.complete );
             if ( images.length === 0 ) {
