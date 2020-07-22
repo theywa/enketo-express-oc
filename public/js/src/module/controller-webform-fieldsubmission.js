@@ -645,8 +645,9 @@ function _setFormEventHandlers() {
             return;
         }
 
-        // This is a bit of a hacky test for /meta/instanceID. Both meta and instanceID nodes could theoretically have any namespace prefix.
-        if ( /meta\/.*instanceID$/.test( updated.fullPath ) ){
+        // This is a bit of a hacky test for /meta/instanceID and /meta/deprecatedID. Both meta and instanceID nodes could theoretically have any namespace prefix.
+        // and if the namespace is not in the default or the "http://openrosa.org/xforms" namespace it should actually be submitted.
+        if ( /meta\/(.*:)?instanceID$/.test( updated.fullPath ) || /meta\/(.*:)?deprecatedID$/.test( updated.fullPath ) ){
             return;
         }
 
