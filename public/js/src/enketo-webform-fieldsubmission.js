@@ -4,7 +4,6 @@ import controller from './module/controller-webform-fieldsubmission';
 import settings from './module/settings';
 import connection from './module/connection';
 import { init as initTranslator, t, localize } from './module/translator';
-import utils from './module/utils';
 import calculationModule from 'enketo-core/src/js/calculate';
 import preloadModule from 'enketo-core/src/js/preload';
 import oc from './module/custom';
@@ -85,9 +84,9 @@ function _showErrorOrAuthenticate( error ) {
  * Converts questions to readonly
  * Disables calculations, deprecatedID mechanism and preload items.
  *
- * @param {[type]} formParts - [description]
- * @param notesEnabled
- * @return {[type]}           [description]
+ * @param {object} formParts - formParts object
+ * @param {boolean} notesEnabled - whether notes are enabled
+ * @return {object}          formParts object
  */
 function _readonlify( formParts, notesEnabled ) {
     // Styling changes
@@ -152,8 +151,10 @@ function _init( formParts ) {
             }, loadWarnings ).then( form => {
                 //formParts.languages = form.languages; // be careful form is undefined if there were load errors
                 formParts.htmlView = formEl;
-                const title = utils.getTitleFromFormStr( formParts.form );
-                document.querySelector( 'head>title' ).textContent = settings.pid ? `${settings.pid}: ${title}` : title;
+                const titleEl = document.querySelector( '#form-title' );
+                const titleText = settings.pid ? `${settings.pid}: ${titleEl.textContent}` : titleEl.textContent;
+                document.querySelector( 'head>title' ).textContent = titleText;
+                titleEl.textContent = titleText;
                 if ( formParts.instance ) {
                     oc.addSignedStatus( form );
                 }
