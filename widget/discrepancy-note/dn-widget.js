@@ -164,7 +164,7 @@ class Comment extends Widget {
             const irrelevantGroupAncestor = q.closest( '.invalid-relevant' );
 
             if ( irrelevantGroupAncestor ) {
-                const value = this.options.helpers.getModelValue( $( this.linkedQuestion.querySelector( 'input, select, textarea' ) ) );
+                const value = this.options.helpers.getModelValue( $( this.linkedQuestion.querySelector( 'input:not(.ignore), select:not(.ignore), textarea:not(.ignore)' ) ) );
                 if ( value && currentStatus !== 'updated' && currentStatus !== 'new' ) {
                     // This query may not always select the correct error message if the group contains multiple irrelevant error messages
                     errorEl = irrelevantGroupAncestor ? irrelevantGroupAncestor.querySelector( '.or-relevant-msg.active' ) : null;
@@ -218,7 +218,7 @@ class Comment extends Widget {
      */
     _setDisabledHandler() {
         const that = this;
-        const target = this.linkedQuestion.querySelector( 'input, select, textarea' );
+        const target = this.linkedQuestion.querySelector( 'input:not(.ignore), select:not(.ignore), textarea:not(.ignore)' );
 
         $( this.linkedQuestion ).on( 'hiding.oc', () => {
             // For now there is no need to double-check if this question has a relevant attribute
@@ -252,7 +252,7 @@ class Comment extends Widget {
      */
     _setValueChangeHandler() {
         const that = this;
-        let previousValue = this.options.helpers.getModelValue( $( this.linkedQuestion.querySelector( 'input, select, textarea' ) ) );
+        let previousValue = this.options.helpers.getModelValue( $( this.linkedQuestion.querySelector( 'input:not(.ignore), select:not(.ignore), textarea:not(.ignore)' ) ) );
 
         $( this.linkedQuestion ).on( `${events.XFormsValueChanged().type} inputupdate`, evt => {
             const currentValue = that.options.helpers.getModelValue( $( evt.target ) );
@@ -1229,7 +1229,7 @@ class Comment extends Widget {
             </div>` ) );
 
         const existingLabel = this.question.querySelector( '.question-label.active' );
-        const control = this.linkedQuestion.querySelector( 'input, select, textarea' );
+        const control = this.linkedQuestion.querySelector( 'input:not(.ignore), select:not(.ignore), textarea:not(.ignore)' );
         const name = control ? control.dataset.name || control.name : null;
         const questionName = name ? name.substring( name.lastIndexOf( '/' ) + 1 ) : '?';
         const parser = new DOMParser;
