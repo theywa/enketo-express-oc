@@ -595,11 +595,6 @@ function _delay( delay = 400 ) {
  */
 function applyPrintStyle() {
 
-    const dns = document.querySelectorAll( '.or-appearance-dn' );
-    dns.forEach( ( dn ) => {
-        dn.dispatchEvent( events.Printify() );
-    } );
-
     imagesLoaded()
         .then( () => {
             printHelper.openAllDetails();
