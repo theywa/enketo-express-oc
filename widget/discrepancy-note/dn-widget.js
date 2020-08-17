@@ -241,9 +241,6 @@ class Comment extends Widget {
                     that._addQuery( t( 'widget.dn.autoclosed' ), 'closed', '', false, SYSTEM_USER, 'comment', item.thread_id || 'NULL' );
                 }
             } );
-
-
-
         } );
     }
 
@@ -864,13 +861,7 @@ class Comment extends Widget {
         } else {
             const status = this.type !== 'comment' ? null : ( this.threadId ? this._getQueryThreadStatus( this.notes, this.threadId ) : null );
 
-            if ( settings.type === 'view' ){
-                return;
-            }
-
-            if ( !settings.dnCloseButton && ( status === 'closed' || status === 'closed-modified' ) ){
-                form.append( range.createContextualFragment( '<div class="alert-box info">You do not have permission to re-open this query. You can add a new query if needed.</div>' ) );
-
+            if ( settings.type === 'view' || ( !settings.dnCloseButton && ( status === 'closed' || status === 'closed-modified' ) ) ){
                 return;
             }
 
