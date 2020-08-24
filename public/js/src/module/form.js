@@ -129,6 +129,8 @@ Form.prototype.specialOcLoadValidate = function( includeRequired ) {
     } );
 };
 
+// No-op because OC clears non-relevant values immediately. Save a huge amount of time upon 'Close'.
+Form.prototype.clearNonRelevant = () => {};
 
 /**
  * Skip constraint (and required) validation if question is currently marked with "invalid-relevant" error.
