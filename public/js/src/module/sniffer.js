@@ -16,6 +16,9 @@ export default {
         },
         get firefox() {
             return /firefox|fxios/i.test( ua );
+        },
+        get ie() {
+            return ua.indexOf( 'Trident/' ) >= 0;
         }
     },
     os
