@@ -1,6 +1,17 @@
 // background of default button
 $secondary-color: #eeeeee;
 
+// THIS IS TEMPORARY TO FIX SHOWING READONLY INPUT FIELDS THAT ARE EMPTY. AFTER MERGING 2.3.9, IT CAN BE REMOVED.
+// https://github.com/OpenClinica/enketo-express-oc/issues/382
+.question.readonly {
+
+    input[readonly].empty,
+    select[readonly].empty,
+    textarea[readonly].empty{
+        display: none;
+    }
+}
+
 // error block inside a modal dialog (e.g. upon Complete button click).
 .vex.vex-theme-plain .vex-dialog-form .vex-dialog-message {
     color: inherit;
