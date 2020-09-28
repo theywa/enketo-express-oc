@@ -55,10 +55,6 @@ module.exports = grunt => {
             }
         },
         watch: {
-            config: {
-                files: [ 'config/*.json' ],
-                tasks: [ 'client-config-file:create' ]
-            },
             sass: {
                 files: [ 'app/views/styles/**/*.scss', 'widget/**/*.scss', '!app/views/styles/component/_system_variables.scss' ],
                 tasks: [ 'sass' ],
@@ -104,7 +100,7 @@ module.exports = grunt => {
                 command: 'find locales -name "translation-combined.json" -delete && rm -fr locales/??'
             },
             'clean-js': {
-                command: 'rm -f public/js/build/* && rm -f public/js/*.js && rm -f public/temp-client-config.json'
+                command: 'rm -f public/js/build/* && rm -f public/js/*.js'
             },
             translation: {
                 command: 'echo "No automatic translation key generation at the moment."'
@@ -113,13 +109,6 @@ module.exports = grunt => {
             },
             rollup: {
                 command: 'npx rollup --config'
-            },
-            // Babel only serves to deal with the inability of Edge Legacy (18) to deal with Object spread {...o} syntax
-            // It can be removed again once Microsoft pro-actively starts upgrading Edge.
-            babel: {
-                command: bundles
-                    .map( bundle => `npx babel ${bundle} --out-file ${bundle}` )
-                    .join( '&&' )
             },
             'babel-ie11': {
                 command: bundles
@@ -225,21 +214,6 @@ module.exports = grunt => {
         }
     } );
 
-    grunt.registerTask( 'client-config-file', 'Temporary client-config file', task => {
-        const CLIENT_CONFIG_PATH = 'public/js/build/client-config.js';
-        if ( task === 'create' ) {
-            // https://github.com/enketo/enketo-express/issues/102
-            // The require cache may contain stale configuration from another task. Purge it.
-            delete require.cache[ require.resolve( './app/models/config-model' ) ];
-            const config = require( './app/models/config-model' );
-            grunt.file.write( CLIENT_CONFIG_PATH, `export default ${JSON.stringify( config.client )};` );
-            grunt.log.writeln( `File ${CLIENT_CONFIG_PATH} created` );
-        } else if ( task === 'remove' ) {
-            grunt.file.delete( CLIENT_CONFIG_PATH );
-            grunt.log.writeln( `File ${CLIENT_CONFIG_PATH} removed` );
-        }
-    } );
-
     grunt.registerTask( 'system-sass-variables', 'Creating _system_variables.scss', () => {
         const SYSTEM_SASS_VARIABLES_PATH = 'app/views/styles/component/_system_variables.scss';
         const config = require( './app/models/config-model' );
@@ -312,12 +286,12 @@ module.exports = grunt => {
 
     grunt.registerTask( 'default', [ 'locales', 'widgets', 'css', 'js', 'terser' ] );
     grunt.registerTask( 'locales', [ 'shell:clean-locales', 'i18next' ] );
-    grunt.registerTask( 'js', [ 'shell:clean-js', 'client-config-file:create', 'widgets', 'shell:rollup', 'shell:babel' ] );
+    grunt.registerTask( 'js', [ 'shell:clean-js', 'widgets', 'shell:rollup' ] );
     grunt.registerTask( 'js-ie11', [ 'shell:polyfill-ie11', 'shell:babel-ie11', 'shell:browserify-ie11' ] );
-    grunt.registerTask( 'build-ie11', [ 'js-ie11', 'terser' ] );
+    grunt.registerTask( 'build-ie11', [ 'js-ie11', 'terser' ]);
     grunt.registerTask( 'css', [ 'shell:clean-css', 'system-sass-variables:create', 'sass' ] );
-    grunt.registerTask( 'test', [ 'env:test', 'transforms', 'js', 'css', 'nyc:cover', 'karma:headless', 'shell:buildReadmeBadge', 'eslint' ] );
-    grunt.registerTask( 'test-browser', [ 'env:test', 'css', 'client-config-file:create', 'karma:browsers' ] );
+    grunt.registerTask( 'test', [ 'env:test', 'js', 'css', 'nyc:cover', 'karma:headless', 'shell:buildReadmeBadge', 'eslint:check' ] );
+    grunt.registerTask( 'test-browser', [ 'env:test', 'css', 'karma:browsers' ] );
     grunt.registerTask( 'develop', [ 'env:develop', 'i18next', 'js', 'css', 'concurrent:develop' ] );
     grunt.registerTask( 'develop-ie11', [ 'env:develop', 'i18next', 'js-ie11', 'css', 'concurrent:develop' ] );
     grunt.registerTask( 'test-and-build', [ 'env:test', 'mochaTest:all', 'karma:headless', 'env:production', 'default' ] );

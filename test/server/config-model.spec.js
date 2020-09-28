@@ -28,6 +28,7 @@ describe( 'Config Model', () => {
 
 
     describe( 'can be set using flat environment variables instead of config.json', () => {
+        const originalConsoleWarn = console.warn;
         const testStringValue = 'test';
 
         before( () => {
@@ -36,6 +37,7 @@ describe( 'Config Model', () => {
             } catch ( e ) {
                 console.error( e );
             }
+            console.warn = () => {};
         } );
 
         after( () => {
@@ -45,6 +47,7 @@ describe( 'Config Model', () => {
             } catch ( e ) {
                 console.error( e );
             }
+            console.warn = originalConsoleWarn;
         } );
 
         it( 'for string values in a top level config item', () => {

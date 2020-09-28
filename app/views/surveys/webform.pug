@@ -11,8 +11,8 @@ block style
     include ../../../public/css/common.css
 
   - var media = print ? 'all' : 'print';
-  link(rel='stylesheet', media='all', type='text/css' href=`${basePath}${offlinePath || ''}/css/theme-${defaultTheme}.css`) 
-  link(rel='stylesheet', media=`${media}`, type='text/css' href=`${basePath}${offlinePath || ''}/css/theme-${defaultTheme}.print.css`) 
+  link(rel='stylesheet', media='all', type='text/css' href=`${basePath}${offlinePath || ''}/css/theme-${defaultTheme}.css`)
+  link(rel='stylesheet', media=`${media}`, type='text/css' href=`${basePath}${offlinePath || ''}/css/theme-${defaultTheme}.print.css`)
 
 block script
   - var suffix = (type && type !== 'preview' && type !== 'single') ? '-' + type : ''
@@ -39,6 +39,8 @@ block script
       jiniSheet.type = 'text/css';
       jiniSheet.media = 'all';
       document.head.appendChild(jiniSheet);
+  script.
+    var env = !{JSON.stringify(clientConfig).replace(/<\//g, '<\\/')};
 
 block content
   include component/_notification

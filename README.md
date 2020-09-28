@@ -1,4 +1,4 @@
-![coverage-shield-badge-1](https://img.shields.io/badge/coverage-62.22%25-yellow.svg)
+![coverage-shield-badge-1](https://img.shields.io/badge/coverage-67.93%25-yellow.svg)
 [![Build Status](https://travis-ci.org/OpenClinica/enketo-express-oc.svg?branch=master)](https://travis-ci.org/OpenClinica/enketo-express-oc) [![Dependency Status](https://david-dm.org/OpenClinica/enketo-express-oc.svg)](https://david-dm.org/OpenClinica/enketo-express-oc)
 
 

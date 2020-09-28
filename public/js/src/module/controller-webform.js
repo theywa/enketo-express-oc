@@ -22,9 +22,6 @@ const formOptions = {
 };
 
 function init( formEl, data ) {
-    let advice;
-    let loadErrors = [];
-
     formData = data;
 
     return _initializeRecords()
@@ -51,7 +48,7 @@ function init( formEl, data ) {
             }
 
             form = new Form( formEl, data, formOptions );
-            loadErrors = form.init();
+            let loadErrors = form.init();
 
             if ( !settings.headless && data.instanceStr ) {
                 form.specialOcLoadValidate();
@@ -85,16 +82,6 @@ function init( formEl, data ) {
             }
 
             return form;
-        } )
-        .catch( error => {
-            if ( Array.isArray( error ) ) {
-                loadErrors = error;
-            } else {
-                loadErrors.unshift( error.message || t( 'error.unknown' ) );
-            }
-
-            advice = ( data.instanceStr ) ? t( 'alert.loaderror.editadvice' ) : t( 'alert.loaderror.entryadvice' );
-            gui.alertLoadErrors( loadErrors, advice );
         } );
 }
 
@@ -175,7 +162,7 @@ function _resetForm( confirmed ) {
 /**
  * Loads a record from storage
  *
- * @param  {string} instanceId - [description]
+ * @param  { string } instanceId - [description]
  * @param  {=boolean?} confirmed -  [description]
  */
 function _loadRecord( instanceId, confirmed ) {
@@ -315,7 +302,7 @@ function _submitRecord() {
                     $( 'form.or' ).empty();
                     $( 'button#submit-form' ).remove();
                     d.setTime( d.getTime() + age * 1000 );
-                    document.cookie = `${settings.enketoId}=${now.getTime()};path=/single;max-age=${age};expires=${d.toGMTString()};`;
+                    document.cookie = `${settings.enketoId}=${now.getTime()};path=${settings.basePath}/single;max-age=${age};expires=${d.toGMTString()};`;
                 }
                 msg += t( 'alert.submissionsuccess.redirectmsg' );
                 gui.alert( msg, t( 'alert.submissionsuccess.heading' ), level );
@@ -683,7 +670,7 @@ function setLogoutLinkVisibility() {
 /**
  * Determines whether the page is loaded inside an iframe
  *
- * @return {boolean} [description]
+ * @return { boolean } [description]
  */
 function inIframe() {
     try {
@@ -696,7 +683,7 @@ function inIframe() {
 /**
  * Attempts to send a message to the parent window, useful if the webform is loaded inside an iframe.
  *
- * @param  {{type: string}} event
+ * @param  {Event} event - event
  */
 function postEventAsMessageToParentWindow( event ) {
     if ( event && event.type ) {

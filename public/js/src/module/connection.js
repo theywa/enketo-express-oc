@@ -14,7 +14,7 @@ const TRANSFORM_HASH_URL = `${settings.basePath}/transform/xform/hash/${settings
 const INSTANCE_URL = ( settings.enketoId ) ? `${settings.basePath}/submission/${settings.enketoId}` : null;
 const MAX_SIZE_URL = ( settings.enketoId ) ? `${settings.basePath}/submission/max-size/${settings.enketoId}` :
     `${settings.basePath}/submission/max-size/?xformUrl=${encodeURIComponent( settings.xformUrl )}`;
-const ABSOLUTE_MAX_SIZE = 100 * 1024 * 1024;
+const ABSOLUTE_MAX_SIZE = 100 * 1000 * 1000;
 
 /**
 /**
@@ -35,7 +35,7 @@ function getOnlineStatus() {
  * Uploads a complete record
  *
  * @param  {{xml: string, files: [File]}} record
- * @return {Promise}
+ * @return { Promise }
  */
 function uploadRecord( record ) {
     let batches;
@@ -51,7 +51,7 @@ function uploadRecord( record ) {
         batch.deprecatedId = record.deprecatedId;
     } );
 
-    // Perform batch uploads sequentially for to avoid issues when connections are very poor and 
+    // Perform batch uploads sequentially for to avoid issues when connections are very poor and
     // a serious issue with ODK Aggregate (https://github.com/kobotoolbox/enketo-express/issues/400)
     return batches.reduce( ( prevPromise, batch ) => prevPromise.then( () => _uploadBatch( batch ) ), Promise.resolve() )
         .then( results => {
@@ -64,9 +64,8 @@ function uploadRecord( record ) {
 /**
  * Uploads a single batch of a single record.
  *
- * @param {{formData: FormData, failedFiles: [string]}} data - formData object to send
- * @param recordBatch
- * @return {Promise}      [description]
+ * @param {{formData: FormData, failedFiles: [string]}} recordBatch - formData object to send
+ * @return { Promise }      [description]
  */
 function _uploadBatch( recordBatch ) {
     return new Promise( ( resolve, reject ) => {
@@ -120,8 +119,7 @@ function _uploadBatch( recordBatch ) {
 /**
  * Builds up a record array including media files, divided into batches
  *
- * @param { { name: string, data: string } } record[ description ]
- * @param record
+ * @param { { name: string, data: string } } record - record object
  */
 function _prepareFormDataArray( record ) {
     const recordDoc = parser.parseFromString( record.xml, 'text/xml' );
@@ -184,6 +182,8 @@ function _prepareFormDataArray( record ) {
         const fd = new FormData();
 
         fd.append( 'xml_submission_file', xmlSubmissionBlob, 'xml_submission_file' );
+        const csrfToken = ( document.cookie.split( '; ' ).find( c => c.startsWith( '__csrf' ) ) || '' ).split( '=' )[1];
+        if ( csrfToken ) fd.append( '__csrf', csrfToken );
 
         // batch with XML data
         batchPrepped = {
@@ -221,7 +221,6 @@ function _divideIntoBatches( fileSizes, limit ) {
     const sizes = [];
     const batches = [];
 
-    //limit = limit || 5 * 1024 * 1024;
     for ( i = 0; i < fileSizes.length; i++ ) {
         sizes.push( {
             'index': i,
@@ -257,44 +256,29 @@ function _divideIntoBatches( fileSizes, limit ) {
 /**
  * Returns the value of the X-OpenRosa-Content-Length header returned by the OpenRosa server for this form.
  *
- * @return {Promise} [description]
+ * @param {object} survey - survey object
+ * @return { Promise } a Promise that resolves with the provided survey object with added maxSize property if successful
  */
-function getMaximumSubmissionSize() {
-    let maxSubmissionSize;
-
-    return new Promise( resolve => {
-
-        if ( MAX_SIZE_URL ) {
-            $.ajax( MAX_SIZE_URL, {
-                type: 'GET',
-                timeout: 5 * 1000,
-                dataType: 'json'
-            } )
-                .done( response => {
-                    if ( response && response.maxSize && !isNaN( response.maxSize ) ) {
-                        maxSubmissionSize = ( Number( response.maxSize ) > ABSOLUTE_MAX_SIZE ) ? ABSOLUTE_MAX_SIZE : Number( response.maxSize );
-                        resolve( maxSubmissionSize );
-                    } else {
-                        console.error( 'Error retrieving maximum submission size. Unexpected response: ', response );
-                        // Note that in /previews the MAX_SIZE_URL is null, which will immediately call this handler
-                        resolve( null );
-                    }
-                } )
-                .fail( () => {
-                    resolve( null );
-                } );
-        } else {
-            resolve( null );
-        }
-    } );
+function getMaximumSubmissionSize( survey ) {
+    // TODO: add 5 sec timeout?
+    return fetch ( MAX_SIZE_URL )
+        .then( response => response.json() )
+        .then( data  => {
+            if ( data && data.maxSize && !isNaN( data.maxSize ) ) {
+                survey.maxSize = Number( data.maxSize ) > ABSOLUTE_MAX_SIZE ? ABSOLUTE_MAX_SIZE : Number( data.maxSize );
+            } else {
+                console.error( 'Error retrieving maximum submission size. Unexpected response: ', data );
+            }
+        } )
+        .catch( () => {} )
+        .then( () => survey );
 }
 
 /**
  * Obtains HTML Form, XML Model and External Instances
  *
- * @param
- * @param props
- * @return { Promise }
+ * @param { object } props - form properties object
+ * @return { Promise } a Promise that resolves with a form parts object
  */
 function getFormParts( props ) {
     let error;
@@ -370,8 +354,8 @@ function _getExternalData( survey ) {
  * Obtains a media file
  * JQuery ajax doesn't support blob responses, so we're going native here.
  *
- * @param url
- * @return {Promise} [description]
+ * @param { string } url - a URL to a media file
+ * @return {Promise<{url: string, item: Blob}>} a Promise that resolves with a media file object
  */
 function getMediaFile( url ) {
     let error;
@@ -405,9 +389,9 @@ function getMediaFile( url ) {
 /**
  * Obtains a data/text file
  *
- * @param url
- * @param languageMap
- * @return {Promise} [description]
+ * @param { string } url - URL to data tile
+ * @param {object } languageMap - language map object with language name properties and IANA subtag values
+ * @return {Promise<XMLDocument>} a Promise that resolves with an XML Document
  */
 function _getDataFile( url, languageMap ) {
     let contentType;
@@ -449,8 +433,8 @@ function _getDataFile( url, languageMap ) {
 /**
  * Extracts version from service worker script
  *
- * @param serviceWorkerUrl
- * @return {Promise} [description]
+ * @param { string } serviceWorkerUrl - service worker URL
+ * @return {Promise<string>} a Promise that resolves with the version of the service worker or 'unknown'
  */
 function getServiceWorkerVersion( serviceWorkerUrl ) {
 
@@ -487,9 +471,8 @@ function getFormPartsHash() {
 /**
  * Obtains XML instance that is cached at the server
  *
- * @param
- * @param props
- * @return { Promise }
+ * @param { object } props - form properties object
+ * @return { Promise<string> } a Promise that resolves with an XML instance as text
  */
 function getExistingInstance( props ) {
     let error;

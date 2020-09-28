@@ -2,6 +2,51 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[2.4.0] - 2020-09-28
+----------------------
+##### Changed
+- Client configuration no longer part of JS build.
+
+##### Fixed
+- In custom (OC) analog-scale widget, if the widget itself is a page (not its parent group), it is not hidden when it should be when the page is not current.
+- When pasting an invalid number into a number field with an existing value, the existing value does not get cleared in the model.
+
+[2.3.12] - 2020-08-28
+----------------------
+##### Changed
+- Build task no longer includes Babel transpilation (possibly affecting support for obscure outdated browsers).
+- Ordered markdown lists should always be preceded by a newline character (partially reverted change in 2.38) because it's very common to number labels in forms.
+
+##### Fixed
+- Maximum file size of upload questions sometimes reverts to default 5MB if server response is not received quick enough.
+- Maximum file size of upload questions is displayed using mebibytes (2<sup>20</sup> bytes) instead of megabytes (10<sup>6 bytes).
+
+[2.3.11] - 2020-08-19
+----------------------
+##### Fixed
+- Single submission "once" protection not enabled when served from base path.
+
+[2.3.10] - 2020-08-17
+----------------------
+##### Changed
+- Updated German translation.
+- Removed animation when removing a repeat.
+
+##### Fixed
+- When a `setvalue` element has no `value` attribute and no textContent, it does not work to reset a value.
+- When nested repeats using jr:count have values that empty or 0, a nested repeat can never be created (exception occurs).
+- When Enketo is served from a base path, the form type is not identified causing things such as redirects in single-submission views to break.
+
+[2.3.9] - 2020-08-03
+----------------------
+##### Changed
+- Add csrf cookie to submission if it exists.
+
+##### Fixed
+- Xforms-version check relies on specific namespace prefix.
+- jr:choice-name() not working if parameters are relative paths.
+- Readonly empty fields are displayed but should be invisible (regression in 2.3.8).
+
 [2.3.8] - 2020-07-23
 ----------------------
 ##### Changed

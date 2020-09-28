@@ -1,5 +1,21 @@
 All configuration is done in config/config.json or with equivalent environment variables (see [sample.env](https://github.com/enketo/enketo-express/blob/master/config/sample.env)). **Leave config/default-config.json unchanged.** Whichever of these 2 methods you choose, will override the defaults set in config/default-config.json.
 
+### When to rebuild
+
+Javascript only needs to be rebuilt when changes to these configuration items are made:
+
+* [widgets](#widgets)
+
+CSS only needs to be rebuilt when changes to these configuration items are made:
+
+* [widgets](#widgets)
+* [base path](#base-path)
+
+In all other case, changes to configuration items, only require restarting the app.
+
+
+### All items
+
 Below is a complete list of all configuration items. The **bold items are important to set**. Others are less important.
 
 #### app name
@@ -42,9 +58,9 @@ This is the default authentication that lets Enketo collect credentials from the
 
 ##### External cookie authentication
 
-This allows a deeper integration for a custom server. It configures a (required) `url` on your form/data server where Enketo should redirect a user to when the server returns a 401 response. That url should set a cookie that Enketo will pass to the server whenever it needs to retrieve a form resource or submit data. The url should contain a {RETURNURL} portion which Enketo will populate to send the user back to the webform once authentication has completed.
+This allows a deeper integration with a custom server. To use cookie auth, your Enketo configuration must define a `url` on your form/data server where Enketo should redirect a user to when the server returns a 401 response. That url should set a cookie that Enketo will pass to the server whenever it needs to retrieve a form resource or submit data. The url should contain a {RETURNURL} portion which Enketo will populate to send the user back to the webform once authentication has completed.
 
-This mechanism requires any enketo-express webform to have access to these browser cookies so the form/data server and Enketo Express would have to be on the same domain (a different subdomain is possible when setting cross-domain cookies).
+Cookie authentication is vulnerable to Cross-Site Request Forgery (CSRF) attacks in which a malicious website could trick the user into submitting bad data to the data server by forwarding the same authentication cookie as Enketo does. To protect against this, the data server should set the [`SameSite`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite) attribute as strictly as possible. However, this may not be respected by all browsers and may not be appropriate for all data server implementations because of other cookie-based integrations. For additional protection, if the data server provides a JavaScript-readable `__csrf` cookie field, Enketo will include a `__csrf` form data field on the submission `POST` with the value from the `__csrf` cookie. This allows the data server to verify that the `POST` definitively came from the same origin.
 
 ```json
 "authentication" : {
@@ -141,7 +157,7 @@ The `maps` configuration can include an array of Mapbox TileJSON objects (or a s
 For GMaps layers you have the four options as tiles values: `"GOOGLE_SATELLITE"`, `"GOOGLE_ROADMAP"`, `"GOOGLE_HYBRID"`, `"GOOGLE_TERRAIN"`. You can also add other TileJSON properties, such as minZoom, maxZoom, id to all layers.
 
 #### query parameter to pass to submission
-For most form servers this item does nothing. If you would like to pass a particular ID to any online-only webform url as a query parameter and track submissions with this ID, you can provide the parameter name here. The parameter and its value will be copied to the submission URL. The query parameter will also be added to /formList requests which would allow you e.g. to perform form access control per URL or serve custom external data files per user.
+Specifies the name of a query parameter that will be copied from an Enketo URL to the submission and formList requests. The value of this parameter can be used by the data server to e.g. track submission sources, perform form access control, or serve custom external data per user. **Does not apply to offline-capable webforms.**
 
 #### redis
 * main -> host: The IP address of the main redis database instance. If installed on the same server as Enketo Express, the value is `"127.0.0.1"`
