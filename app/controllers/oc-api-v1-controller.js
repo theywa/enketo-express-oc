@@ -342,7 +342,7 @@ function _setGoTo( req, res, next ) {
     const goTo = req.body.go_to;
     req.goTo = goTo ? `#${encodeURIComponent( goTo )}` : '';
     const goToErrorUrl = req.body.go_to_error_url;
-    req.goToErrorUrl = goTo && goToErrorUrl ? `goToErrorUrl=${encodeURIComponent( goToErrorUrl )}` : '';
+    req.goToErrorUrl = goTo && goToErrorUrl ? `go_to_error_url=${encodeURIComponent( goToErrorUrl )}` : '';
     next();
 }
 
@@ -378,7 +378,7 @@ function _setJini( req, res, next ) {
 
 function _setLoadWarning( req, res, next ) {
     const warning = req.body.load_warning;
-    req.loadWarning = ( warning ) ? `loadWarning=${encodeURIComponent( warning )}` : '';
+    req.loadWarning = ( warning ) ? `load_warning=${encodeURIComponent( warning )}` : '';
     next();
 }
 
@@ -386,7 +386,7 @@ function _setParentWindow( req, res, next ) {
     const parentWindowOrigin = req.body.parent_window_origin;
 
     if ( parentWindowOrigin ) {
-        req.parentWindowOriginParam = `parentWindowOrigin=${encodeURIComponent( parentWindowOrigin )}`;
+        req.parentWindowOriginParam = `parent_window_origin=${encodeURIComponent( parentWindowOrigin )}`;
     }
     next();
 }
@@ -395,7 +395,7 @@ function _setReturnQueryParam( req, res, next ) {
     const returnUrl = req.body.return_url;
 
     if ( returnUrl ) {
-        req.returnQueryParam = `returnUrl=${encodeURIComponent( returnUrl )}`;
+        req.returnQueryParam = `return_url=${encodeURIComponent( returnUrl )}`;
     }
     next();
 }
@@ -455,7 +455,7 @@ function _generateWebformUrls( id, req ) {
         case 'headless':
         case 'headless-rfc': {
             const rfcPath = req.webformType === 'headless-rfc' ? 'rfc/' : '';
-            const queryString = _generateQueryString( [ req.ecid, `instance_id=${req.body.instance_id}`, req.completeButtonParam, req.interfaceQueryParam, ] );
+            const queryString = _generateQueryString( [ req.ecid, `instance_id=${req.body.instance_id}`, req.interfaceQueryParam, ] );
             url = `${BASEURL}edit/${FSPATH}${rfcPath}headless/${idEditHeadless}${queryString}`;
             break;
         }

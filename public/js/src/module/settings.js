@@ -11,7 +11,10 @@ const settingsMap = [
     'instanceId', { q: 'instance_id', s: 'instanceId' },
     'parentWindowOrigin', { q: 'parent_window_origin', s: 'parentWindowOrigin' },
     'print', 'format', 'landscape', 'margin', 'touch',
-    { q: 'PID', s: 'pid' }, 'completeButton', 'loadWarning', 'goToErrorUrl', 'interface'
+    { q: 'PID', s: 'pid' },
+    'loadWarning', { q: 'load_warning', s: 'loadWarning' },
+    'goToErrorUrl', { q: 'go_to_error_url', s: 'goToErrorUrl' },
+    'interface'
 ];
 
 window.addEventListener( 'message', event => {
