@@ -27,8 +27,7 @@ const formOptions = {
 };
 const inputUpdateEventBuffer = [];
 
-function init( formEl, data, loadWarnings = [] ) {
-    let loadErrors = [];
+function init( formEl, data, loadErrors = [] ) {
 
     formprogress = document.querySelector( '.form-progress' );
 
@@ -101,13 +100,13 @@ function init( formEl, data, loadWarnings = [] ) {
             // the goto-irrelevant event will be fired twice. We can safely remove the eventlistener after the first
             // event is caught (for all cases).
             form.view.html.removeEventListener( events.GoToIrrelevant().type, handleGoToIrrelevant );
-            loadWarnings.push( err );
+            loadErrors.push( err );
         };
 
         const handleGoToInvisible = () => {
             form.view.html.removeEventListener( events.GoToInvisible().type, handleGoToInvisible );
             if ( settings.interface === 'sdv' ) {
-                loadWarnings.push( `${t( 'alert.goto.invisible' )} ` );
+                loadErrors.push( `${t( 'alert.goto.invisible' )} ` );
             }
         };
 
@@ -174,7 +173,7 @@ function init( formEl, data, loadWarnings = [] ) {
                     goToErrors = [ replacementError ];
                 }
             }
-            loadWarnings = loadWarnings.concat( goToErrors );
+            loadErrors = loadErrors.concat( goToErrors );
         }
 
         if ( form.encryptionKey ) {
@@ -186,16 +185,12 @@ function init( formEl, data, loadWarnings = [] ) {
         if ( loadErrors.length > 0 ) {
             document.querySelectorAll( '.form-footer__content__main-controls button' )
                 .forEach( button => button.remove() );
+
+            throw loadErrors;
         } else if ( settings.type !== 'view' ) {
             // Current queue can be submitted, and so can future fieldsubmissions.
             fieldSubmissionQueue.enable();
             fieldSubmissionQueue.submitAll();
-        }
-
-        const loadIssues = loadWarnings.concat( loadErrors );
-
-        if ( loadIssues.length ) {
-            throw loadIssues;
         }
 
         resolve( form );

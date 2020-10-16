@@ -378,11 +378,12 @@ function _getExternalData( survey ) {
                     } )
                     .catch( e => {
                         survey.externalData.splice( index, 1 );
-                        // let external data files fail quietly in previews with ?form= parameter
-                        if ( !survey.enketoId ){
-                            return;
+                        // Custom OC: record all errors (including when using ?form= queryparameter)
+                        // but store the messages for later to output as load errors without blocking
+                        if ( !survey.loadErrors ){
+                            survey.loadErrors = [];
                         }
-                        throw e;
+                        survey.loadErrors.push( e.message );
                     } ) );
             } );
 

@@ -7,7 +7,6 @@ import { init as initTranslator, t, localize } from './module/translator';
 import calculationModule from 'enketo-core/src/js/calculate';
 import preloadModule from 'enketo-core/src/js/preload';
 import oc from './module/custom';
-import events from './module/event';
 
 const loader = document.querySelector( '.main-loader' );
 const formheader = document.querySelector( '.main > .paper > .form-header' );
@@ -20,7 +19,6 @@ const survey = {
     instanceId: settings.instanceId
 };
 const range = document.createRange();
-const loadWarnings = [];
 
 initTranslator( survey )
     .then( connection.getFormParts )
@@ -129,7 +127,10 @@ function _readonlify( formParts, notesEnabled ) {
         .forEach( el => el.setAttribute( 'data-repeat-fixed', 'fixed' ) );
     // Record load warning but keep loading
     if ( settings.loadWarning ) {
-        loadWarnings.push( settings.loadWarning );
+        if( !formParts.loadErrors ){
+            formParts.loadErrors = [];
+        }
+        formParts.loadErrors.push( settings.loadWarning );
     }
 
     return formParts;
@@ -149,7 +150,7 @@ function _init( formParts ) {
                 instanceStr: formParts.instance,
                 external: formParts.externalData,
                 instanceAttachments: formParts.instanceAttachments
-            }, loadWarnings ).then( form => {
+            }, formParts.loadErrors ).then( form => {
                 //formParts.languages = form.languages; // be careful form is undefined if there were load errors
                 formParts.htmlView = formEl;
                 const titleEl = document.querySelector( '#form-title' );
