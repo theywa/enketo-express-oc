@@ -2,7 +2,7 @@
 // safer to ensure this here (in addition to grunt:env:test)
 process.env.NODE_ENV = 'test';
 
-/* 
+/*
  * Some of these tests use the special test Api Token and Server URLs defined in the API spec
  * at http://apidocs.enketo.org.
  */
@@ -55,6 +55,7 @@ describe( 'api', () => {
                 if ( err ) {
                     return done( err );
                 }
+
                 return instanceModel.set( {
                     openRosaServer: validServer,
                     openRosaId: validFormId,
@@ -107,35 +108,35 @@ describe( 'api', () => {
             `and ${server}, ${id}, ${ret}, ${instance}, ${instanceId}, ${test.theme}, ` +
             `parentWindowOrigin: ${test.parentWindowOrigin}, defaults: ${JSON.stringify( test.defaults )}, ` +
             `interface:${interfce}, pid:${pid}, ecid:${ecid}, jini:${test.jini} responds with ${test.status}`,
-            done => {
-                request( app )[ test.method ]( `/oc/api/v${version}${endpoint}` )
-                    .set( auth )[ dataSendMethod ]( {
-                        server_url: server,
-                        form_id: id,
-                        ecid,
-                        pid,
-                        instance,
-                        instance_id: instanceId,
-                        return_url: ret,
-                        go_to: test.goTo,
-                        go_to_error_url: test.goToErrorUrl,
-                        jini: test.jini,
-                        format: test.format,
-                        margin: test.margin,
-                        landscape: test.landscape,
-                        defaults: test.defaults,
-                        load_warning: test.warning,
-                        parent_window_origin: test.parentWindowOrigin,
-                        interface: interfce
-                    } )
-                    .expect( test.status )
-                    .expect( resp => {
-                        if ( test.expected ) {
-                            return responseCheck( resp.body.url, test.expected );
-                        }
-                    } )
-                    .end( done );
-            } );
+        done => {
+            request( app )[ test.method ]( `/oc/api/v${version}${endpoint}` )
+                .set( auth )[ dataSendMethod ]( {
+                    server_url: server,
+                    form_id: id,
+                    ecid,
+                    pid,
+                    instance,
+                    instance_id: instanceId,
+                    return_url: ret,
+                    go_to: test.goTo,
+                    go_to_error_url: test.goToErrorUrl,
+                    jini: test.jini,
+                    format: test.format,
+                    margin: test.margin,
+                    landscape: test.landscape,
+                    defaults: test.defaults,
+                    load_warning: test.warning,
+                    parent_window_origin: test.parentWindowOrigin,
+                    interface: interfce
+                } )
+                .expect( test.status )
+                .expect( resp => {
+                    if ( test.expected ) {
+                        return responseCheck( resp.body.url, test.expected );
+                    }
+                } )
+                .end( done );
+        } );
     }
 
     describe( 'oc/api/v1 endpoints', () => {
@@ -195,7 +196,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/single\/fs\/i\/[A-z0-9]{8,10}.*(\?|&)parentWindowOrigin=http%3A%2F%2Fexample\.com/,
+                expected: /\/single\/fs\/i\/[A-z0-9]{8,10}.*(\?|&)parent_window_origin=http%3A%2F%2Fexample\.com/,
             } );
             // POST /survey/collect/c
             testResponse( {
@@ -216,7 +217,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/single\/fs\/c\/i\/[A-z0-9]{32}.*(\?|&)parentWindowOrigin=http%3A%2F%2Fexample\.com/,
+                expected: /\/single\/fs\/c\/i\/[A-z0-9]{32}.*(\?|&)parent_window_origin=http%3A%2F%2Fexample\.com/,
             } );
             // POST /survey/view
             testResponse( {
@@ -249,7 +250,7 @@ describe( 'api', () => {
                 ret: false,
                 auth: true,
                 status: 200,
-                expected: /\/view\/fs\/i\/[A-z0-9]{32}.*(\?|&)goToErrorUrl=http%3A%2F%2Fexample\.com%2Fminiform#%2F%2Fmyquestion/,
+                expected: /\/view\/fs\/i\/[A-z0-9]{32}.*(\?|&)go_to_error_url=http%3A%2F%2Fexample\.com%2Fminiform#%2F%2Fmyquestion/,
             } );
             // POST /survey/view without go_to and with (ignored) go_to_error_url
             testResponse( {
@@ -271,7 +272,7 @@ describe( 'api', () => {
                 warning: 'hey you',
                 auth: true,
                 status: 200,
-                expected: /\/view\/fs\/i\/[A-z0-9]{32}.*(\?|&)loadWarning=hey%20you/,
+                expected: /\/view\/fs\/i\/[A-z0-9]{32}.*(\?|&)load_warning=hey%20you/,
             } );
             // POST /survey/preview
             testResponse( {
@@ -305,7 +306,7 @@ describe( 'api', () => {
                     instanceId: 'AAA',
                     instance: true,
                     status: 201,
-                    // includes proper enketoID and not e.g. null 
+                    // includes proper enketoID and not e.g. null
                     expected: /[A-z0-9]{8,10}/
                 },
                 // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
@@ -316,7 +317,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    // includes proper enketoID and not e.g. null 
+                    // includes proper enketoID and not e.g. null
                     expected: /[A-z0-9]{8,10}/
                 },
                 // already being edited
@@ -335,7 +336,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /.+(\?|&)returnUrl=https%3A%2F%2Fenke.to/,
+                    expected: /.+(\?|&)return_url=https%3A%2F%2Fenke.to/,
                 },
                 // invalid parameters
                 {
@@ -368,6 +369,7 @@ describe( 'api', () => {
             ].map( obj => {
                 obj.version = version;
                 obj.endpoint = '/instance/edit';
+
                 return obj;
             } ).forEach( testResponse );
 
@@ -457,6 +459,7 @@ describe( 'api', () => {
                 }
             } ].map( obj => {
                 obj.version = version;
+
                 return obj;
             } ).forEach( testResponse );
 
@@ -477,7 +480,7 @@ describe( 'api', () => {
                 instanceId: 'AAA',
                 instance: true,
                 status: 201,
-                // includes proper enketoID and not e.g. null 
+                // includes proper enketoID and not e.g. null
                 expected: /\/edit\/fs\/rfc\/i\/[A-z0-9]{32}.*(\?|&)instance_id=AAA/
             }, {
                 // edit with RFC UI and with Close button in dn widget
@@ -487,10 +490,11 @@ describe( 'api', () => {
                 instanceId: 'AAA',
                 instance: true,
                 status: 201,
-                // includes proper enketoID and not e.g. null 
+                // includes proper enketoID and not e.g. null
                 expected: /\/edit\/fs\/rfc\/c\/i\/[A-z0-9]{32}.*(\?|&)instance_id=AAA/
             } ].map( obj => {
                 obj.version = version;
+
                 return obj;
             } ).forEach( testResponse );
 
@@ -502,7 +506,7 @@ describe( 'api', () => {
                     instanceId: 'AAA',
                     instance: true,
                     status: 201,
-                    // includes proper enketoID and not e.g. null 
+                    // includes proper enketoID and not e.g. null
                     expected: /\/edit\/fs\/dn(\/c)?\/i\/[A-z0-9]{32}.*(\?|&)instance_id=AAA/
                 },
                 // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
@@ -513,7 +517,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    // includes proper enketoID and not e.g. null 
+                    // includes proper enketoID and not e.g. null
                     expected: /\/edit\/fs\/dn(\/c)?\/i\/[A-z0-9]{32}.*(\?|&)instance_id/
                 },
                 // already being edited
@@ -532,7 +536,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /.+(\?|&)returnUrl=https%3A%2F%2Fenke.to/
+                    expected: /.+(\?|&)return_url=https%3A%2F%2Fenke.to/
                 },
                 // test parentWindowOrigin
                 {
@@ -554,7 +558,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /.+&goToErrorUrl=http%3A%2F%2Fexample\.com%2Ferror#%2F%2Fhell$/
+                    expected: /.+&go_to_error_url=http%3A%2F%2Fexample\.com%2Ferror#%2F%2Fhell$/
                 },
                 // invalid parameters
                 {
@@ -589,12 +593,14 @@ describe( 'api', () => {
             noteOnlyInstanceTests.map( obj => {
                 obj.version = version;
                 obj.endpoint = '/instance/note';
+
                 return obj;
             } ).forEach( testResponse );
 
             noteOnlyInstanceTests.map( obj => {
                 obj.version = version;
                 obj.endpoint = '/instance/note/c';
+
                 return obj;
             } ).forEach( testResponse );
 
@@ -607,7 +613,7 @@ describe( 'api', () => {
                     instanceId: 'AAA',
                     instance: true,
                     status: 201,
-                    // includes proper enketoID and not e.g. null 
+                    // includes proper enketoID and not e.g. null
                     expected: /\/view\/fs\/i\/[A-z0-9]{32}.*(\?|&)instance_id=AAA/
                 },
                 // valid token and not being edited, but formId doesn't exist in db yet (no enketoId)
@@ -618,7 +624,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    // includes proper enketoID and not e.g. null 
+                    // includes proper enketoID and not e.g. null
                     expected: /\/view\/fs\/i\/[A-z0-9]{32}.*(\?|&)instance_id/
                 },
                 // already being edited
@@ -637,7 +643,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /.+(\?|&)loadWarning=A%20warning/
+                    expected: /.+(\?|&)load_warning=A%20warning/
                 },
                 // test return url in response
                 {
@@ -647,7 +653,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /.+(\?|&)returnUrl=https%3A%2F%2Fenke.to/
+                    expected: /.+(\?|&)return_url=https%3A%2F%2Fenke.to/
                 },
                 // test parentWindowOrigin
                 {
@@ -658,7 +664,7 @@ describe( 'api', () => {
                     instanceId: true,
                     instance: true,
                     status: 201,
-                    expected: /.+(\?|&)parentWindowOrigin=http%3A%2F%2Fexample\.com/,
+                    expected: /.+(\?|&)parent_window_origin=http%3A%2F%2Fexample\.com/,
                 },
                 // invalid parameters
                 {
@@ -691,6 +697,7 @@ describe( 'api', () => {
             ].map( obj => {
                 obj.version = version;
                 obj.endpoint = '/instance/view';
+
                 return obj;
             } ).forEach( testResponse );
 
@@ -727,6 +734,7 @@ describe( 'api', () => {
                 status: 400
             } ].map( obj => {
                 obj.version = version;
+
                 return obj;
             } ).forEach( testResponse );
         } );
@@ -761,7 +769,7 @@ describe( 'api', () => {
                     status: endpoint.startsWith( '/instance' ) ? 201 : 200,
                 };
                 obj.parentWindowOrigin = 'http://example.com';
-                obj.expected = /.+(\?|&)parentWindowOrigin=http%3A%2F%2Fexample\.com/;
+                obj.expected = /.+(\?|&)parent_window_origin=http%3A%2F%2Fexample\.com/;
                 testResponse( obj );
             } );
 
