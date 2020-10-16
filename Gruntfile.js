@@ -221,37 +221,36 @@ module.exports = grunt => {
         grunt.log.writeln( `File ${SYSTEM_SASS_VARIABLES_PATH} created` );
     } );
 
-    grunt.registerTask( 'transforms', 'Creating forms.json', function() {
+    grunt.registerTask( 'transforms', 'Creating forms.js', function() {
         const forms = {};
         const done = this.async();
         const jsonStringify = require( 'json-pretty' );
-        const formsJsonPath = 'test/client/forms/forms.json';
+        const formsJsPath = 'test/client/forms/forms.js';
         const xformsPaths = grunt.file.expand( {}, 'test/client/forms/*.xml' );
         const transformer = require( 'enketo-transformer' );
-
-        xformsPaths.reduce( function( prevPromise, filePath ) {
-            return prevPromise.then( function() {
+        grunt.log.write( 'Transforming XForms ' );
+        xformsPaths
+            .reduce( ( prevPromise, filePath ) => prevPromise.then( () => {
                 const xformStr = grunt.file.read( filePath );
-                grunt.log.writeln( `Transforming ${filePath}...` );
+                grunt.log.write( '.' );
 
                 return transformer.transform( {
                     xform: xformStr,
-                    includeRelevantMsg: true
+                    openclinica: true
                 } )
-                    .then( function( result ) {
-                        forms[ filePath.substring( filePath.lastIndexOf( '/' ) + 1 ) ] = {
+                    .then( result => {
+                        forms[filePath.substring( filePath.lastIndexOf( '/' ) + 1 )] = {
                             html_form: result.form,
                             xml_model: result.model
                         };
                     } );
-            } );
-
-        }, Promise.resolve() )
-            .then( function() {
-                grunt.file.write( formsJsonPath, jsonStringify( forms ) );
+            } ), Promise.resolve() )
+            .then( () => {
+                grunt.file.write( formsJsPath, `export default ${jsonStringify( forms )};` );
                 done();
             } );
     } );
+
 
     grunt.registerTask( 'widgets', 'generate widget reference files', () => {
         const WIDGETS_JS_LOC = 'public/js/build/';
@@ -288,10 +287,10 @@ module.exports = grunt => {
     grunt.registerTask( 'locales', [ 'shell:clean-locales', 'i18next' ] );
     grunt.registerTask( 'js', [ 'shell:clean-js', 'widgets', 'shell:rollup' ] );
     grunt.registerTask( 'js-ie11', [ 'shell:polyfill-ie11', 'shell:babel-ie11', 'shell:browserify-ie11' ] );
-    grunt.registerTask( 'build-ie11', [ 'js-ie11', 'terser' ]);
+    grunt.registerTask( 'build-ie11', [ 'js-ie11', 'terser' ] );
     grunt.registerTask( 'css', [ 'shell:clean-css', 'system-sass-variables:create', 'sass' ] );
-    grunt.registerTask( 'test', [ 'env:test', 'js', 'css', 'nyc:cover', 'karma:headless', 'shell:buildReadmeBadge', 'eslint:check' ] );
-    grunt.registerTask( 'test-browser', [ 'env:test', 'css', 'karma:browsers' ] );
+    grunt.registerTask( 'test', [ 'env:test', 'transforms', 'js', 'css', 'nyc:cover', 'karma:headless', 'shell:buildReadmeBadge', 'eslint:check' ] );
+    grunt.registerTask( 'test-browser', [ 'env:test', 'transforms', 'css', 'karma:browsers' ] );
     grunt.registerTask( 'develop', [ 'env:develop', 'i18next', 'js', 'css', 'concurrent:develop' ] );
     grunt.registerTask( 'develop-ie11', [ 'env:develop', 'i18next', 'js-ie11', 'css', 'concurrent:develop' ] );
     grunt.registerTask( 'test-and-build', [ 'env:test', 'mochaTest:all', 'karma:headless', 'env:production', 'default' ] );

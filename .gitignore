@@ -20,7 +20,7 @@ setup/docker/secrets/*
 setup/docker/redis_main_data/*
 logs/submissions*
 logs/logrotate
-test/client/forms/forms.json
+test/client/forms/forms.js
 .nyc_output
 test-coverage
 coverage.shield.badge.md

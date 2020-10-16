@@ -1,5 +1,3 @@
-/* global describe, it, expect */
-
 import Dn from '../../widget/discrepancy-note/dn-widget';
 Dn.prototype._init = () => {};
 const fragment = document.createRange().createContextualFragment(
