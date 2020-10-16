@@ -97,7 +97,7 @@ function _readonlify( formParts, notesEnabled ) {
     console.info( 'Calculations restricted to clinicaldata only.' );
     calculationModule.originalUpdate = calculationModule.update;
     calculationModule.update = function( updated ) {
-        return calculationModule.originalUpdate.call( this, updated, '[oc-external="clinicaldata"]' );
+        return calculationModule.originalUpdate.call( this, updated, '[data-oc-external="clinicaldata"]' );
     };
     console.info( 'Setvalue disabled.' );
     calculationModule.setvalue = () => {};

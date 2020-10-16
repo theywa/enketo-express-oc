@@ -126,7 +126,7 @@ function _getFormDirectly( survey ) {
 }
 
 function _addSettings( survey ) {
-    survey.includeRelevantMsg = true;
+    survey.openclinica = true;
 
     return survey;
 }
