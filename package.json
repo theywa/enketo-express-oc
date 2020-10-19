@@ -111,7 +111,6 @@
         "istanbul": "^0.4.5",
         "istanbul-reporter-shield-badge": "^1.2.1",
         "jsdoc": "^3.6.6",
-        "json-pretty": "0.0.1",
         "karma": "^5.2.3",
         "karma-chrome-launcher": "3.1.x",
         "karma-coverage": "^1.1.2",

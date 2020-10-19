@@ -4,6 +4,7 @@ module.exports = grunt => {
         '!**/offline-app-worker-partial.js',
         '!**/node_modules/**',
         '!test/**/*.spec.js',
+        '!test/client/forms/forms.js',
         '!public/js/build/*',
         '!test/client/config/karma.conf.js',
         '!docs/**',
@@ -224,7 +225,6 @@ module.exports = grunt => {
     grunt.registerTask( 'transforms', 'Creating forms.js', function() {
         const forms = {};
         const done = this.async();
-        const jsonStringify = require( 'json-pretty' );
         const formsJsPath = 'test/client/forms/forms.js';
         const xformsPaths = grunt.file.expand( {}, 'test/client/forms/*.xml' );
         const transformer = require( 'enketo-transformer' );
@@ -246,7 +246,7 @@ module.exports = grunt => {
                     } );
             } ), Promise.resolve() )
             .then( () => {
-                grunt.file.write( formsJsPath, `export default ${jsonStringify( forms )};` );
+                grunt.file.write( formsJsPath, `export default ${ JSON.stringify( forms, null, 4 ) };` );
                 done();
             } );
     } );
