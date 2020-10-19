@@ -152,15 +152,15 @@ Form.prototype.validateInput = function( control ) {
     //
     // This is very unfortunate, but these are the kind of acrobatics that are necessary to "fight" the built-in behavior of Enketo's form engine.
     return originalValidateInput.call( this, control )
-        .then( passed => {
-            if ( !passed ) {
+        .then( result => {
+            if ( !result.requiredValid || !result.constraintValid ) {
                 const question = control.closest( '.question' );
                 if ( question && question.classList.contains( 'invalid-relevant' ) ) {
                     that.setValid( control, 'constraint' );
                 }
             }
 
-            return passed;
+            return result;
         } );
 };
 

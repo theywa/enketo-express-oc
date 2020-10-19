@@ -115,8 +115,8 @@ describe( 'Customized Branching Logic', () => {
             it( 'shows relevant error but not constraint error when form.validate() is called', () => form.validate()
                 .then( result => Promise.all( [
                     expect( result ).to.equal( false ),
-                    expect( form.view.$.find( c ).closest( '.question' ).hasClass( 'invalid-relevant' ) ).to.equal( true ),
-                    expect( form.view.$.find( c ).closest( '.question' ).hasClass( 'invalid-constraint' ) ).to.equal( false ),
+                    expect( form.view.html.querySelector( c ).closest( '.question' ).classList.contains( 'invalid-relevant' ) ).to.equal( true ),
+                    expect( form.view.html.querySelector( c ).closest( '.question' ).classList.contains( 'invalid-constraint' ) ).to.equal( false ),
                 ] ) ) );
 
         } );
