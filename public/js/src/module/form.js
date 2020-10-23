@@ -80,14 +80,14 @@ Form.prototype.init = function() {
     if ( settings.strictViolationSelector ) {
         this.view.$
             .on( 'change.file',
-                'input:not(.ignore)[data-required][oc-required-type="strict"], select:not(.ignore)[data-required][oc-required-type="strict"], textarea:not(.ignore)[data-required][oc-required-type="strict"]',
+                'input:not(.ignore)[data-required][data-oc-required-type="strict"], select:not(.ignore)[data-required][data-oc-required-type="strict"], textarea:not(.ignore)[data-required][data-oc-required-type="strict"]',
                 function( evt ) {
                     if ( initialized ) {
                         that.strictRequiredCheckHandler( evt, this );
                     }
                 } )
             .on( 'change.file',
-                'input:not(.ignore)[data-constraint][oc-constraint-type="strict"], select:not(.ignore)[data-constraint][oc-constraint-type="strict"], textarea:not(.ignore)[data-constraint][oc-constraint-type="strict"]',
+                'input:not(.ignore)[data-constraint][data-oc-constraint-type="strict"], select:not(.ignore)[data-constraint][data-oc-constraint-type="strict"], textarea:not(.ignore)[data-constraint][data-oc-constraint-type="strict"]',
                 function( evt ) {
                     if ( initialized ) {
                         that.strictConstraintCheckHandler( evt, this );
