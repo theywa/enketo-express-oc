@@ -1,7 +1,7 @@
 import events from 'enketo-core/src/js/event';
 
 events.ReasonChange = function( detail ) {
-    return new CustomEvent( 'reasonchange', { detail } );
+    return new CustomEvent( 'reasonchange', { detail, bubbles: true } );
 };
 
 events.Heartbeat = function() {

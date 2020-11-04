@@ -592,8 +592,10 @@ function _autoAddQueries( questions ) {
     } );
 }
 
-function _autoAddReasonQueries( $rfcInputs ) {
-    $rfcInputs.val( t( 'widget.dn.autonoreason' ) ).trigger( 'change' );
+function _autoAddReasonQueries( rfcInputs ) {
+    rfcInputs.forEach( input => {
+        input.dispatchEvent( events.ReasonChange( { type:'autoquery', reason: t( 'widget.dn.autonoreason' ) } ) );
+    } );
 }
 
 function _doNotSubmit( fullPath ) {

@@ -32,6 +32,7 @@ repeatModule.confirmDelete = function( repeatEl ) {
                     // TODO: something
                     return;
                 } else {
+                    values.type = 'remove';
                     questions.forEach( q => q.dispatchEvent( events.ReasonChange( values ) ) );
                     that.remove( $( repeatEl ) );
                     reasons.updateNumbering();

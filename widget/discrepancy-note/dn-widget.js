@@ -284,18 +284,27 @@ class Comment extends Widget {
         this._addAudit( comment, '', false );
 
         if ( settings.reasonForChange && !this.linkedQuestionReadonly ) {
-            reasons.addField( this.linkedQuestion )
-                .on( 'change', evt => {
+            const reasonQuestion = reasons.addField( this.linkedQuestion );
+
+            if ( reasonQuestion ){
+                reasonQuestion.addEventListener( events.Change().type, evt => {
                     // Also for empty onchange values
                     // TODO: exclude empty values if RFC field never had a value?
                     this._addReason( evt.target.value );
                     reasons.setSubmitted( evt.target );
-                } )
-                .on( 'input', evt => {
+                } );
+                reasonQuestion.addEventListener( events.ReasonChange().type, evt => {
+                    if ( evt.detail && evt.detail.type === 'autoquery' ){
+                        this._addQuery( evt.detail.reason );
+                    }
+                } );
+                reasonQuestion.addEventListener( 'input', evt => {
                     if ( evt.target.value && evt.target.value.trim() ) {
                         reasons.setEdited( evt.target );
                     }
                 } );
+
+            }
 
             reasons.applyToAll();
         }
@@ -316,11 +325,13 @@ class Comment extends Widget {
         const that = this;
         if ( settings.reasonForChange && !that.linkedQuestionReadonly ) {
             this.linkedQuestion.addEventListener( events.ReasonChange().type, function( event ) {
-                if ( event.detail && event.detail.reason ) {
-                    that._addReason( event.detail.reason );
-                    reasons.removeField( this );
-                } else {
-                    console.error( 'no reason provided' );
+                if ( event.detail && event.type === 'remove' ){
+                    if ( event.detail.reason ) {
+                        that._addReason( event.detail.reason );
+                        reasons.removeField( this );
+                    } else {
+                        console.error( 'no reason provided' );
+                    }
                 }
             } );
         }

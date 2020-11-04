@@ -1,11 +1,35 @@
-import $ from 'jquery';
 import { t } from './translator';
+import events from './event';
+
+const range = document.createRange();
 
 export default {
-    get $section() {
+    /*get $section() {
         this._$section = this._$section || $( `<section class="reason-for-change"><header class="reason-for-change__header"><h5>${t( 'fieldsubmission.reason.heading' )}</h5><div class="question reason-for-change__header__apply-to-all"><input class="ignore" type="text" name="common-rfc" placeholder="${t( 'fieldsubmission.reason.placeholder1' )}"/><div class="option-wrapper"><label class=""><input class="ignore" type="checkbox" name="apply-to-all"/><span lang="" class="option-label active">${t( 'fieldsubmission.reason.applytoall' )}</span></label></div></div></header></section>` ).insertBefore( '.form-footer' );
 
         return this._$section;
+    },*/
+    get section() {
+        this._section = this._section ||
+        document.querySelector( '.form-footer' ).insertAdjacentElement( 'beforebegin',
+            range.createContextualFragment(
+                `<section class="reason-for-change">
+                    <header class="reason-for-change__header">
+                        <h5>${t( 'fieldsubmission.reason.heading' )}</h5>
+                        <div class="question reason-for-change__header__apply-to-all">
+                            <input class="ignore" type="text" name="common-rfc" placeholder="${t( 'fieldsubmission.reason.placeholder1' )}"/>
+                            <div class="option-wrapper">
+                                <label class="">
+                                    <input class="ignore" type="checkbox" name="apply-to-all"/>
+                                    <span lang="" class="option-label active">${t( 'fieldsubmission.reason.applytoall' )}</span>
+                                </label>
+                            </div>
+                        </div>
+                    </header>
+                </section>` ).firstElementChild
+        );
+
+        return this._section;
     },
     get questionMsg() {
         this._questionMsg = this._questionMsg || `<span class="oc-reason-msg active">${t( 'fieldsubmission.reason.questionmsg' )}</span>`;
@@ -15,52 +39,58 @@ export default {
     fields: [],
     numbers: [],
     addField( question ) {
-        let $field;
-        let $repeatNumber;
-        let repeatNumber;
-        let index;
-
         if ( this.fields.length === 0 ) {
             this.setApplyToAllHandler();
         }
-        if ( this.fields.indexOf( question ) === -1 ) {
+        if ( !this.fields.includes( question ) ) {
             // No need to worry about nested repeats as OC doesn't use them.
-            $repeatNumber = $( question ).closest( '.or-repeat' ).find( '.repeat-number' );
-            if ( $repeatNumber.length ) {
-                repeatNumber = $repeatNumber.text() || 1;
-                index = this.numbers.indexOf( $repeatNumber[ 0 ] );
+            const closestRepeatEl = question.closest( '.or-repeat' );
+            const repeatNumberEl = closestRepeatEl ? closestRepeatEl.querySelector( '.repeat-number' ) : null;
+            let index;
+            let repeatNumber;
+            if ( repeatNumberEl ) {
+                repeatNumber = repeatNumberEl.textContent || 1;
+                index = this.numbers.indexOf( repeatNumberEl );
                 if ( index === -1 ) {
                     index = this.numbers.length;
-                    this.numbers[ index ] = $repeatNumber[ 0 ];
+                    this.numbers[ index ] = repeatNumberEl;
                 }
             }
-            $field = $( `<div class="reason-for-change__item"><span class="reason-for-change__item__label">${$( question ).find( '.question-label.active' ).text()}</span>${repeatNumber ? `<span class="reason-for-change__item__repeat-number" data-index="${index}">(${repeatNumber})</span>` : ''}<input class="ignore" type="text" placeholder="${t( 'fieldsubmission.reason.placeholder2' )}"/></div>` );
+            const labelEl =  question.querySelector( '.question-label.active' );
+            const labelText = labelEl ? labelEl.textContent : '';
+            const repeatNumberHtml = repeatNumber ? `<span class="reason-for-change__item__repeat-number" data-index="${index}">(${repeatNumber})</span>` : '';
+            const fieldFragment = range.createContextualFragment(
+                `<div class="reason-for-change__item">
+                    <span class="reason-for-change__item__label">${labelText}</span>${repeatNumberHtml}
+                    <input class="ignore" type="text" placeholder="${t( 'fieldsubmission.reason.placeholder2' )}"/>
+                </div>` );
             this.fields.push( question );
-            $( question ).append( this.questionMsg );
+            question.append( range.createContextualFragment( this.questionMsg ) );
+            this.section.append( fieldFragment );
 
-            return $field.appendTo( this.$section );
+            return this.section.lastChild;
         }
 
-        return $();
+        return null;
     },
     removeField( question ) {
         const index = this.fields.indexOf( question );
         if ( index !== -1 ) {
             this.fields.splice( index, 1 );
             // is this robust?
-            this.$section.find( '.reason-for-change__item' ).eq( index ).remove();
+            this.section.querySelectorAll( '.reason-for-change__item' )[index].remove();
         }
     },
     clearAll() {
-        this.$section.find( '.reason-for-change__item' ).remove();
-        this.$section.find( 'input[name="apply-to-all"]' ).prop( 'checked', false );
-        this.$section.find( 'input[name="common-rfc"]' ).val( '' );
+        this.section.querySelectorAll( '.reason-for-change__item' ).forEach( el => el.remove() );
+        this.section.querySelector( 'input[name="apply-to-all"]' ).checked = false;
+        this.section.querySelector( 'input[name="common-rfc"]' ).value = '';
         this.fields = [];
     },
     getInvalidFields() {
         this.validate();
 
-        return this.$section.find( '.reason-for-change__item.invalid input' );
+        return [ ...this.section.querySelectorAll( '.reason-for-change__item.invalid input' ) ];
     },
     setInvalid( inputEl ) {
         this.changeFieldStatus( inputEl, 'invalid' );
@@ -84,7 +114,7 @@ export default {
         el.textContent = `(${number})`;
     },
     getIndex( inputEl ) {
-        return this.$section.find( '.reason-for-change__item' ).index( $( inputEl ).closest( '.reason-for-change__item' ) );
+        return [ ...this.section.querySelectorAll( '.reason-for-change__item' ) ].findIndex( item =>  item === inputEl.closest( '.reason-for-change__item' ) );
     },
     hasSubmitted( inputEl ) {
         return inputEl.parentNode.classList.contains( 'added' );
@@ -105,49 +135,39 @@ export default {
                 existingMsg.remove();
             }
         } else if ( !existingMsg ) {
-            $( question ).append( this.questionMsg );
+            question.append( this.questionMsg );
         }
     },
     updateNumbering() {
-        const that = this;
-        // removing repeats has a delay
-        setTimeout( () => {
-            that.$section.find( '.reason-for-change__item__repeat-number' ).each( function() {
-                that.setNumber( this, that.numbers[ this.dataset.index ].textContent );
-            } );
-        }, 800 );
+        this.section.querySelectorAll( '.reason-for-change__item__repeat-number' ).forEach( el => this.setNumber( el, this.numbers[ el.dataset.index ].textContent ) );
     },
     validate() {
-        const that = this;
-        let valid = true;
+        this.section.querySelectorAll( '.reason-for-change__item:not(.added) input' ).forEach( el => {
+            this.setInvalid( el );
 
-        this.$section.find( '.reason-for-change__item:not(.added) input' ).each( function() {
-            that.setInvalid( this );
-            valid = false;
+            return false;
         } );
 
-        return valid;
+        return true;
     },
     getFirstInvalidField() {
-        return this.$section[ 0 ].querySelector( '.invalid input' );
+        return this.section.querySelector( '.invalid input' );
     },
     setValue( el, newVal ) {
         if ( el.value.trim() !== newVal.trim() ) {
-            $( el ).val( newVal ).trigger( 'change' );
+            el.value = newVal;
+            el.dispatchEvent( events.Change() );
         }
     },
     applyToAll() {
-        const that = this;
-        const $checkbox = this.$section.find( 'input[name="apply-to-all"]' );
-        const $input = this.$section.find( 'input[name="common-rfc"]' );
-        if ( $checkbox.is( ':checked' ) ) {
-            that.$section.find( '.reason-for-change__item input[type="text"]' ).each( function() {
-                that.setValue( this, $input.val() );
-            } );
+        const checkbox = this.section.querySelector( 'input[name="apply-to-all"]' );
+        const input = this.section.querySelector( 'input[name="common-rfc"]' );
+        if ( checkbox.matches( ':checked' ) ) {
+            this.section.querySelectorAll( '.reason-for-change__item input[type="text"]' ).forEach( el => this.setValue( el, input.value ) );
         }
     },
     setApplyToAllHandler() {
-        this.$section.find( '.reason-for-change__header' )
-            .on( 'change', this.applyToAll.bind( this ) );
+        this.section.querySelector( '.reason-for-change__header' )
+            .addEventListener( events.Change().type, this.applyToAll.bind( this ) );
     }
 };
