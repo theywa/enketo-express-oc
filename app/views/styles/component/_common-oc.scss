@@ -322,7 +322,8 @@ $secondary-color: #eeeeee;
                 }
 
                 #finish-form,
-                #close-form-participant {
+                #close-form-participant,
+                #next-prompt {
                     visibility: hidden;
                 }
 
@@ -363,7 +364,8 @@ $secondary-color: #eeeeee;
         #finish-form,
         #submit-form,
         #close-form-participant,
-        #validate-form {
+        #validate-form,
+        #next-prompt {
             visibility: visible;
         }
     }

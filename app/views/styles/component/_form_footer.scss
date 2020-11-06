@@ -145,6 +145,62 @@
         &__main-controls {
             margin-bottom: 0;
             margin-top: 0;
+
+            .next-prompt-container {
+                width: 100%;
+                margin-bottom: 10px;
+                text-align: center;
+
+                input[type=checkbox] {
+                    vertical-align: -3px;
+                    appearance: none;
+                    -moz-appearance: none;
+                    -webkit-appearance: none;
+                    -ms-appearance: none;
+                    display: inline-block;
+                    width: 20px;
+                    height: 20px;
+                    margin-right: 10px;
+                    margin-bottom: 0;
+                    margin-top: 0;
+                    border-width: 3px;
+                    border-style: solid;
+                    border-radius: 0;
+                    background-color: transparent;
+                    border-color: #666666;
+                    margin: 4px 0 0;
+                    line-height: normal;
+                    border-width: 1px;
+
+                    &:checked {
+                        border-color: black;
+                        background-image: url(data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20stroke%3D%27transparent%27%20fill%3D%27black%27%20width%3D%2732%27%20height%3D%2732%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M25.1%2012.5l-3.4-3.3-8%208-2.9-3-3.4%203.4%206.3%206.3z%27%2F%3E%3C%2Fsvg%3E);
+                        background-size: 20px 20px;
+                        background-position: -3px;
+                        background-position: -1px;
+
+                        &:focus {
+                            outline: 0;
+                            -webkit-box-shadow: 0 0 0 1px #66afe9, 0 0 8px rgba(102, 175, 233, 0.6);
+                            box-shadow: 0 0 0 1px #66afe9, 0 0 8px rgba(102, 175, 233, 0.6);
+                        }
+                    }
+
+                    &:focus {
+                        outline: 0;
+                        -webkit-box-shadow: 0 0 0 1px #66afe9, 0 0 8px rgba(102, 175, 233, 0.6);
+                        box-shadow: 0 0 0 1px #66afe9, 0 0 8px rgba(102, 175, 233, 0.6);
+                    }
+                }
+
+
+                span {
+                    font-family: 'OpenSans', Arial, sans-serif;
+                    font-weight: normal;
+                    font-size: 16px;
+                    margin-left: 5px;
+                }
+            }
         }
     }
 

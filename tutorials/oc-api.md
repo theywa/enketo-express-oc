@@ -41,6 +41,7 @@ Returns a URL that points to a regular fieldsubmission view to collect a new rec
 - Has a **required** `ecid` parameter with string value.
 - Has an optional `pid` parameter.
 - Has an optional `jini` parameter with string value `"true"` or `"false"`. Defaults to `"false"`. Only works if jini was configured in config.json.
+- Has an optional `next_prompt` parameter that will add a tickbox with the `next_prompt` value (URL-decoded) above close button (on last page only).
 
 Otherwise, use exactly as [POST /survey/single/iframe](https://apidocs.enketo.org/v2#/post-survey-single-iframe)
 
@@ -51,6 +52,7 @@ Returns a URL that points to a regular fieldsubmission view to collect a new rec
 - Has a **required** `ecid` parameter with string value.
 - Has an optional `pid` parameter.
 - Has an optional `jini` parameter with string value `"true"` or `"false"`. Defaults to `"false"`. Only works if jini was configured in config.json.
+- Has an optional `next_prompt` parameter that will add a tickbox with the `next_prompt` value (URL-decoded) above close button (on last page only).
 
 Otherwise, use exactly as POST /survey/collect.
 
