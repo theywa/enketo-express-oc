@@ -8,9 +8,10 @@ section.form-footer
             span(data-i18n='formfooter.validate.btn')= t('formfooter.validate.btn')
         else if type === 'fieldsubmission' || type === 'view'
           if nextPrompt && completeButton
-            .next-prompt-container#next-prompt
-              input( type='checkbox' name='next-prompt' ) 
-              span  #{nextPrompt}
+            fieldset.draft.question.next-prompt
+              .option-wrapper: label 
+                input.ignore(type='checkbox', name='next-prompt') 
+                span #{nextPrompt}
           button(id=`close-form-${closeButtonIdSuffix}`, class=`btn ${completeButton ? 'btn-default' : 'btn-primary'}`, data-i18n='alert.default.button')= t('alert.default.button')
           if completeButton
             button#finish-form.btn.btn-primary

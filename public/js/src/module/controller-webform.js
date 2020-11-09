@@ -691,7 +691,7 @@ function postEventAsMessageToParentWindow( event ) {
         try {
             window.parent.postMessage( JSON.stringify( {
                 enketoEvent: event.type,
-                nextForm: nextPrompt && nextPrompt.checked ? true : false
+                nextForm: nextPrompt && nextPrompt.checked
             } ), settings.parentWindowOrigin );
         } catch ( error ) {
             console.error( error );

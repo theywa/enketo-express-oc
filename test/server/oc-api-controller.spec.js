@@ -127,7 +127,8 @@ describe( 'api', () => {
                     defaults: test.defaults,
                     load_warning: test.warning,
                     parent_window_origin: test.parentWindowOrigin,
-                    interface: interfce
+                    interface: interfce,
+                    next_prompt: test.nextPrompt
                 } )
                 .expect( test.status )
                 .expect( resp => {
@@ -198,6 +199,17 @@ describe( 'api', () => {
                 status: 200,
                 expected: /\/single\/fs\/i\/[A-z0-9]{8,10}.*(\?|&)parent_window_origin=http%3A%2F%2Fexample\.com/,
             } );
+            // POST /survey/collect with next_prompt
+            testResponse( {
+                version,
+                endpoint: '/survey/collect',
+                method: 'post',
+                nextPrompt: '添加其他表格',
+                ret: false,
+                auth: true,
+                status: 200,
+                expected: /\/single\/fs\/i\/[A-z0-9]{8,10}.*(\?|&)next_prompt=%E6%B7%BB%E5%8A%A0%E5%85%B6%E4%BB%96%E8%A1%A8%E6%A0%BC/,
+            } );
             // POST /survey/collect/c
             testResponse( {
                 version,
@@ -218,6 +230,17 @@ describe( 'api', () => {
                 auth: true,
                 status: 200,
                 expected: /\/single\/fs\/c\/i\/[A-z0-9]{32}.*(\?|&)parent_window_origin=http%3A%2F%2Fexample\.com/,
+            } );
+            // POST /survey/collect/c with next_prompt
+            testResponse( {
+                version,
+                endpoint: '/survey/collect/c',
+                method: 'post',
+                nextPrompt: '添加其他表格',
+                ret: false,
+                auth: true,
+                status: 200,
+                expected: /\/single\/fs\/c\/i\/[A-z0-9]{32}.*(\?|&)next_prompt=%E6%B7%BB%E5%8A%A0%E5%85%B6%E4%BB%96%E8%A1%A8%E6%A0%BC/,
             } );
             // POST /survey/view
             testResponse( {
