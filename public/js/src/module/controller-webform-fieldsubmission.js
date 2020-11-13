@@ -26,6 +26,7 @@ const formOptions = {
     printRelevantOnly: settings.printRelevantOnly
 };
 const inputUpdateEventBuffer = [];
+const delayChangeEventBuffer = [];
 
 function init( formEl, data, loadErrors = [] ) {
 
@@ -58,6 +59,10 @@ function init( formEl, data, loadErrors = [] ) {
         // Buffer inputupdate events (DURING LOAD ONLY), in order to eventually log these
         // changes in the DN widget after it has been initalized
         form.view.html.addEventListener( events.InputUpdate().type, _addToInputUpdateEventBuffer );
+        // Delay firing change events that were the result of DN autoqueries during load
+        // These events have not yet updated the model and triggered fieldsubmissions because widgets are not
+        // supposed to change values during initialization and no event handlers are in place at that time.
+        form.view.html.addEventListener( events.DelayChange().type, _addToDelayChangeEventBuffer );
 
         // For Participant emtpy-form view in order to show Close button on all pages
         if ( settings.strictViolationSelector && settings.type !== 'edit' ) {
@@ -121,6 +126,11 @@ function init( formEl, data, loadErrors = [] ) {
             const props = m.getUpdateEventData( node );
             fieldSubmissionQueue.addFieldSubmission( props.fullPath, props.xmlFragment, form.instanceID );
         } );
+
+        // Fire change events for any autoqueries that were generated during form initialization,
+        // https://github.com/OpenClinica/enketo-express-oc/issues/393
+        form.view.html.removeEventListener( events.DelayChange().type, _addToDelayChangeEventBuffer );
+        delayChangeEventBuffer.forEach( el => el.dispatchEvent( events.Change() ) );
 
         // Make sure audits are logged in DN widget for calculated values during form initialization
         // before the DN widget was initialized.
@@ -252,6 +262,10 @@ function init( formEl, data, loadErrors = [] ) {
 
 function _addToInputUpdateEventBuffer( event ) {
     inputUpdateEventBuffer.push( event.target );
+}
+
+function _addToDelayChangeEventBuffer( event ) {
+    delayChangeEventBuffer.push( event.target );
 }
 
 /**

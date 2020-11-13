@@ -28,6 +28,10 @@ events.FakeInputUpdate = function() {
     return new CustomEvent( 'fakeinputupdate', { bubbles: true } );
 };
 
+events.DelayChange = function(){
+    return new CustomEvent( 'delaychange', { bubbles: true } );
+};
+
 events.OfflineLaunchCapable = function( detail ) {
     return new CustomEvent( 'offlinelaunchcapable', { detail, bubbles: true } );
 };

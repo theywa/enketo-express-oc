@@ -213,7 +213,7 @@ class Comment extends Widget {
 
     /**
      * Observes the disabled state of the linked question, and automatically generates
-     * an audit log if:
+     * an autoquery:
      * 1. The question gets disabled and any query threads are currently 'open'.
      */
     _setDisabledHandler() {
@@ -251,7 +251,7 @@ class Comment extends Widget {
         const that = this;
         let previousValue = this.options.helpers.getModelValue( $( this.linkedQuestion.querySelector( 'input:not(.ignore), select:not(.ignore), textarea:not(.ignore)' ) ) );
 
-        $( this.linkedQuestion ).on( `${events.XFormsValueChanged().type} inputupdate`, evt => {
+        $( this.linkedQuestion ).on( `${events.XFormsValueChanged().type} ${events.InputUpdate().type}`, evt => {
             const currentValue = that.options.helpers.getModelValue( $( evt.target ) );
 
             if ( previousValue !== currentValue ) {
@@ -724,8 +724,14 @@ class Comment extends Widget {
             queries: that.notes.queries
         } );
 
-        // Update XML Model
+        // Update form control and XML Model
         this.originalInputValue = modelDataStr;
+        // If the form has not finished initializing, the originalInputValue setter function (in the Widget super class)
+        // won't actually trigger a model change, so we use a special event to delay firing a change event.
+        // This event will do nothing after the form has initialized.
+        // Issue https://github.com/OpenClinica/enketo-express-oc/issues/393
+        this.element.dispatchEvent( events.DelayChange() );
+
         const error = this._commentHasError();
         this._setCommentButtonState( error ? 'invalid' : this._getCurrentStatus( this.notes ), this._hasAnnotation( this.notes ), this._hasMultipleOpenQueries( this.notes ) );
     }
