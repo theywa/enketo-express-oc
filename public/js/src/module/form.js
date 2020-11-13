@@ -140,8 +140,6 @@ Form.prototype.clearNonRelevant = () => {};
  * @return {[type]}        [description]
  */
 Form.prototype.validateInput = function( control ) {
-    const that = this;
-
     // There is a condition where a value change results in both an invalid-relevant and invalid-constraint,
     // where the invalid constraint is added *after* the invalid-relevant. I can reproduce in automated test (not manually).
     // It is probably related due to the asynchronicity of the constraint evaluation.
@@ -153,10 +151,10 @@ Form.prototype.validateInput = function( control ) {
     // This is very unfortunate, but these are the kind of acrobatics that are necessary to "fight" the built-in behavior of Enketo's form engine.
     return originalValidateInput.call( this, control )
         .then( result => {
-            if ( !result.requiredValid || !result.constraintValid ) {
+            if ( result && ( !result.requiredValid || !result.constraintValid ) ) {
                 const question = control.closest( '.question' );
                 if ( question && question.classList.contains( 'invalid-relevant' ) ) {
-                    that.setValid( control, 'constraint' );
+                    this.setValid( control, 'constraint' );
                 }
             }
 
