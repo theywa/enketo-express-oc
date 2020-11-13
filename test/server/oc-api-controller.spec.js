@@ -307,7 +307,18 @@ describe( 'api', () => {
                 status: 200,
                 expected: /\/preview\/i\/[A-z0-9]{8,10}/,
             } );
-            // POST /survey/preview
+            // POST /survey/preview with next_prompt
+            testResponse( {
+                version,
+                endpoint: '/survey/preview',
+                method: 'post',
+                nextPrompt: '添加其他表格',
+                ret: false,
+                auth: true,
+                status: 200,
+                expected: /\/preview\/i\/[A-z0-9]{8,10}.*(\?|&)next_prompt=%E6%B7%BB%E5%8A%A0%E5%85%B6%E4%BB%96%E8%A1%A8%E6%A0%BC/,
+            } );
+            // POST /survey/preview/participant
             testResponse( {
                 version,
                 endpoint: '/survey/preview/participant',

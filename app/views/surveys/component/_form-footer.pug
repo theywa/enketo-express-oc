@@ -3,6 +3,11 @@ section.form-footer
     if !headless
       .form-footer__content__main-controls  
         if type === 'preview'
+          if nextPrompt
+            fieldset.draft.question.next-prompt
+              .option-wrapper: label 
+                input.ignore(type='checkbox', name='next-prompt') 
+                span #{nextPrompt}
           button#validate-form.btn.btn-primary
             i.icon.icon-check= ' '
             span(data-i18n='formfooter.validate.btn')= t('formfooter.validate.btn')

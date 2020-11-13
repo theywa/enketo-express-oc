@@ -47,6 +47,7 @@ router
     } )
     .get( '*/headless*', _setHeadless )
     .get( '/preview*', _setJini )
+    .get( '/preview*', _setNextPrompt )
     .get( /\/(single|edit)\/fs(\/rfc)?(\/c)?\/i/, _setJini )
     .get( /\/(single)\/fs(\/rfc)?(\/c)?\/i/, _setNextPrompt )
     .get( /\/(edit|single)\/fs\/(?!(participant|rfc|dn|view))/, _setCompleteButton )
@@ -218,7 +219,8 @@ function preview( req, res, next ) {
         type: 'preview',
         jini: req.jini,
         iframe: req.iframe || !!req.query.iframe,
-        notification: utils.pickRandomItemFromArray( config.notifications )
+        notification: utils.pickRandomItemFromArray( config.notifications ),
+        nextPrompt: req.nextPrompt
     };
 
     _renderWebform( req, res, next, options );

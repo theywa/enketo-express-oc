@@ -441,7 +441,7 @@ function _generateWebformUrls( id, req ) {
 
     switch ( type ) {
         case 'preview': {
-            const queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam, req.goToErrorUrl, req.jini ] );
+            const queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam, req.goToErrorUrl, req.jini, req.nextPromptParam ] );
             url = `${BASEURL}preview/${IFRAMEPATH}${idPreview}${queryString}${hash}`;
             break;
         }

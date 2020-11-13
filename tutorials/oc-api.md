@@ -93,7 +93,7 @@ Returns a URL that points to an **empty** form preview.
 - Has an optional `jini` parameter with string value `"true"` or `"false"`. Defaults to `"false"`. Only works if jini was configured in config.json.
 - Has an optional `go_to` parameter with a string value consisting of the absolute path of the question. A fragment identifier (#hash) can be added to point to a specific discrepancy note thread_id. E.g. `go_to=/path/to/node_comment#345saUDfg`.
 - Has an optional `go_to_error_url` parameter that in conjunction with `go_to` will prompt the user to redirect to a _mini form_ if the go_to target is not available or hidden.
-
+- Has an optional `next_prompt` parameter that will add a tickbox with the `next_prompt` value (URL-decoded) above close button (on last page only).
 
 Otherwise, use exactly as [POST /survey/preview/iframe](http://apidocs.enketo.org/v2/#/post-survey-preview-iframe)
 
