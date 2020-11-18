@@ -2,14 +2,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased]
+[2.5.0] - 2020-11-18
 -----------------------
 ##### Changed
 - Improved timings of print script for Grid Theme forms.
 - API now returning consistent query parameter names (with underscores, no camelcase).
+- Updated German, Swedish, Dutch, French, Slovak, and Spanish translations.
 
 ##### Fixed
 - A missing external data file does not show a loading error if the XForm contains dummy content.
+- Geopicker on mobile devices won't show map any more after first map reveal.
+- jr:choice-name not working for questions with radiobuttons.
+- If a ref or nodeset attribute starts with a space, the absolute path is not determined correctly.
 
 [2.4.0] - 2020-09-28
 ----------------------
