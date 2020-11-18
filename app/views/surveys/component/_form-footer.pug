@@ -4,19 +4,19 @@ section.form-footer
       .form-footer__content__main-controls  
         if type === 'preview'
           if nextPrompt
-            fieldset.draft.question.next-prompt
+            fieldset.question.next-prompt
               .option-wrapper: label 
                 input.ignore(type='checkbox', name='next-prompt') 
-                span #{nextPrompt}
+                span.option-label #{nextPrompt}
           button#validate-form.btn.btn-primary
             i.icon.icon-check= ' '
             span(data-i18n='formfooter.validate.btn')= t('formfooter.validate.btn')
         else if type === 'fieldsubmission' || type === 'view'
           if nextPrompt && completeButton
-            fieldset.draft.question.next-prompt
+            fieldset.question.next-prompt
               .option-wrapper: label 
                 input.ignore(type='checkbox', name='next-prompt') 
-                span #{nextPrompt}
+                span.option-label #{nextPrompt}
           button(id=`close-form-${closeButtonIdSuffix}`, class=`btn ${completeButton ? 'btn-default' : 'btn-primary'}`, data-i18n='alert.default.button')= t('alert.default.button')
           if completeButton
             button#finish-form.btn.btn-primary

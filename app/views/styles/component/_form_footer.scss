@@ -148,6 +148,14 @@
 
             .next-prompt {
                 border: none;
+                display: none;
+                &:not(.focus):hover {
+                    background: transparent;
+                }
+
+                .option-wrapper {
+                    display: inline-block;
+                }
                 
                 input[type=checkbox] {
                     float: none;
@@ -155,12 +163,18 @@
 
                 span {
                     vertical-align: top;
+                    margin-left: 0;
+                    display: inline-block;
                 }
             }
         }
     }
 
     &.end {
+        .next-prompt {
+            display: block;
+            width: 100%;
+        }
         .logout {
             margin-bottom: 50px;
         }
