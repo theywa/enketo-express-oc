@@ -366,6 +366,43 @@ $secondary-color: #eeeeee;
         #validate-form {
             visibility: visible;
         }
+        .next-prompt {
+            display: block;
+            width: 100%;
+        }
+        .logout {
+            margin-bottom: 50px;
+        }
+    }
+}
+
+.pages~.form-footer, form:not(.pages)~.form-footer {
+    .next-prompt {
+        border: none;
+        display: none;
+        &:not(.focus):hover {
+            background: transparent;
+        }
+
+        .option-wrapper {
+            display: inline-block;
+        }
+        
+        input[type=checkbox] {
+            float: none;
+        }
+
+        span {
+            vertical-align: top;
+            margin-left: 0;
+            display: inline-block;
+        }
+    }
+}
+
+form:not(.pages)~.form-footer {
+    .next-prompt {
+        display: block;
     }
 }
 
