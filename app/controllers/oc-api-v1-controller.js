@@ -76,6 +76,7 @@ router
     .post( '*', _setReturnQueryParam ) // is this actually used by OC?
     .post( '*', _setGoTo )
     .post( '*', _setParentWindow )
+    .post( '*', _setNextPrompt )
     .post( /\/(survey|instance)\/(collect|edit|view|note|headless)/, _setEcid ) // excl preview
     .post( /\/(survey|instance)\/(collect|edit|preview)(?!\/participant)/, _setJini ) // excl view, note, and participant
     .post( /\/(survey|instance)\/(collect|edit|view|note)(?!\/participant)/, _setPid ) // excl preview, and participant
@@ -391,6 +392,15 @@ function _setParentWindow( req, res, next ) {
     next();
 }
 
+function _setNextPrompt( req, res, next ) {
+    const nextPrompt = req.body.next_prompt;
+
+    if ( nextPrompt ) {
+        req.nextPromptParam = `next_prompt=${encodeURIComponent( nextPrompt )}`;
+    }
+    next();
+}
+
 function _setReturnQueryParam( req, res, next ) {
     const returnUrl = req.body.return_url;
 
@@ -431,7 +441,7 @@ function _generateWebformUrls( id, req ) {
 
     switch ( type ) {
         case 'preview': {
-            const queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam, req.goToErrorUrl, req.jini ] );
+            const queryString = _generateQueryString( [ req.defaultsQueryParam, req.parentWindowOriginParam, req.goToErrorUrl, req.jini, req.nextPromptParam ] );
             url = `${BASEURL}preview/${IFRAMEPATH}${idPreview}${queryString}${hash}`;
             break;
         }
@@ -461,7 +471,7 @@ function _generateWebformUrls( id, req ) {
         }
         case 'single': {
             const idToUse = dnClosePart ? idFsC : id;
-            const queryString = _generateQueryString( [ req.ecid, req.pid, req.defaultsQueryParam, req.returnQueryParam, req.parentWindowOriginParam, req.jini ] );
+            const queryString = _generateQueryString( [ req.ecid, req.pid, req.defaultsQueryParam, req.returnQueryParam, req.parentWindowOriginParam, req.jini, req.nextPromptParam ] );
             url = `${BASEURL}single/${FSPATH}${dnClosePart}${IFRAMEPATH}${idToUse}${queryString}`;
             break;
         }

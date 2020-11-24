@@ -47,7 +47,9 @@ router
     } )
     .get( '*/headless*', _setHeadless )
     .get( '/preview*', _setJini )
+    .get( '/preview*', _setNextPrompt )
     .get( /\/(single|edit)\/fs(\/rfc)?(\/c)?\/i/, _setJini )
+    .get( /\/(single)\/fs(\/rfc)?(\/c)?\/i/, _setNextPrompt )
     .get( /\/(edit|single)\/fs\/(?!(participant|rfc|dn|view))/, _setCompleteButton )
     .get( '*', _setCloseButtonClass )
     .get( `${config[ 'offline path' ]}/:enketo_id`, offlineWebform )
@@ -149,6 +151,12 @@ function _setJini( req, res, next ) {
     next();
 }
 
+function _setNextPrompt( req, res, next ) {
+    req.nextPrompt = req.query.next_prompt ? req.query.next_prompt : null;
+    next();
+}
+
+
 function _setCompleteButton( req, res, next ) {
     req.completeButton = true;
     next();
@@ -179,6 +187,7 @@ function fieldSubmission( req, res, next ) {
         participant: req.participant,
         completeButton: req.completeButton,
         closeButtonIdSuffix: req.closeButtonIdSuffix,
+        nextPrompt: req.nextPrompt,
         headless: !!req.headless
     };
 
@@ -210,7 +219,8 @@ function preview( req, res, next ) {
         type: 'preview',
         jini: req.jini,
         iframe: req.iframe || !!req.query.iframe,
-        notification: utils.pickRandomItemFromArray( config.notifications )
+        notification: utils.pickRandomItemFromArray( config.notifications ),
+        nextPrompt: req.nextPrompt
     };
 
     _renderWebform( req, res, next, options );
