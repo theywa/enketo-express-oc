@@ -122,10 +122,7 @@ function init( formEl, data, loadErrors = [] ) {
         loadErrors = loadErrors.concat( form.init() );
 
         // Create fieldsubmissions for static default values
-        staticDefaultNodes.forEach( node => {
-            const props = m.getUpdateEventData( node );
-            fieldSubmissionQueue.addFieldSubmission( props.fullPath, props.xmlFragment, form.instanceID );
-        } );
+        _addFieldsubmissionsForModelNodes( m, staticDefaultNodes );
 
         // Fire change events for any autoqueries that were generated during form initialization,
         // https://github.com/OpenClinica/enketo-express-oc/issues/393
@@ -266,6 +263,19 @@ function _addToInputUpdateEventBuffer( event ) {
 
 function _addToDelayChangeEventBuffer( event ) {
     delayChangeEventBuffer.push( event.target );
+}
+
+/**
+ * Submit fieldsubmissions for all provided model (leaf) nodes. Meant to submit static defaults.
+ *
+ * @param model
+ * @param {*} modelNodes
+ */
+function _addFieldsubmissionsForModelNodes( model, modelNodes ){
+    modelNodes.forEach( node => {
+        const props = model.getUpdateEventData( node );
+        fieldSubmissionQueue.addFieldSubmission( props.fullPath, props.xmlFragment, form.instanceID );
+    } );
 }
 
 /**
@@ -620,6 +630,16 @@ function _doNotSubmit( fullPath ) {
 }
 
 function _setFormEventHandlers() {
+
+    // Trigger fieldsubmissions for static defaults in added repeat instance
+    // It is important that this listener comes before the NewRepeat and AddRepeat listeners in enketo-core
+    // that will also run setvalue/odk-new-repeat actions, calculations, and other stuff
+    form.view.html.addEventListener( events.NewRepeat().type, event => {
+        // Note: in XPath, a predicate position is 1-based! The event.detail includes a 0-based index.
+        const selector =  `${event.detail.repeatPath}[${event.detail.repeatIndex + 1}]//*`;
+        const staticDefaultNodes = [ ...form.model.node( selector, null, { noEmpty: true } ).getElements() ];
+        _addFieldsubmissionsForModelNodes( form.model, staticDefaultNodes );
+    } );
 
     form.view.html.addEventListener( events.ProgressUpdate().type, event => {
         if ( event.target.classList.contains( 'or' ) && formprogress && event.detail ) {
