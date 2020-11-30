@@ -124,8 +124,6 @@ branchModule.originalDeactivate = branchModule.deactivate;
 // Overwrite deactivate function
 branchModule.deactivate = function( $branchNode ) {
     const branchNode = $branchNode[ 0 ];
-    let name;
-    let index = 0;
     let value;
     const $control = $( $branchNode[ 0 ].querySelector( 'input:not(.ignore), select:not(.ignore), textarea:not(.ignore)' ) );
     const control = $control[ 0 ];
@@ -133,8 +131,8 @@ branchModule.deactivate = function( $branchNode ) {
     if ( $branchNode.is( '.question' ) ) {
 
 
-        name = this.form.input.getName( control );
-        index = this.form.input.getIndex( control );
+        const name = this.form.input.getName( control );
+        const index = this.form.input.getIndex( control );
         value = this.form.model.node( name, index ).getVal();
 
         if ( value !== '' ) {
@@ -150,7 +148,8 @@ branchModule.deactivate = function( $branchNode ) {
         }
 
     } else if ( $branchNode.is( '.or-group, .or-group-data' ) ) {
-        name = this.form.input.getName( branchNode );
+        const name = this.form.input.getName( branchNode );
+        const index = this.form.input.getIndex( branchNode );
         /*
          * We need to check if any of the fields with a form control or calculations
          * (ie. excl discrepancy note questions) has a value.
@@ -165,7 +164,7 @@ branchModule.deactivate = function( $branchNode ) {
          *
          * If the result has length > 0, one form control in the group has a value.
          */
-        const dataEls = this.form.model.node( name ).getElements();
+        const dataEls = this.form.model.node( name, index ).getElements();
 
         if ( !dataEls.length ) {
             value = false;
