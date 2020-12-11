@@ -1,4 +1,5 @@
 import Widget from 'enketo-core/src/js/widget';
+import { getSiblingElements } from 'enketo-core/src/js/dom-utils';
 import $ from 'jquery';
 import { t } from '../../public/js/src/module/translator';
 import settings from '../../public/js/src/module/settings';
@@ -274,8 +275,8 @@ class Comment extends Widget {
         // change comment for those that doesn't mention the filename, we don't need to fix that.
         if ( evt.target.type !== 'file' ) {
             comment = t( 'widget.dn.valuechange', {
-                'new': `"${currentValue}"`,
-                'previous': `"${previousValue}"`
+                'new': `"${this._getLabelForSelectValue( currentValue )}"`,
+                'previous': `"${this._getLabelForSelectValue( previousValue )}"`
             } );
         } else {
             comment = currentValue ? t( 'widget.dn.newfile' ) : t( 'widget.dn.fileremoved' );
@@ -319,6 +320,44 @@ class Comment extends Widget {
             }
         } );
 
+    }
+
+    /**
+     * Finding display label belonging to a select option value.
+     * Borrowed code from enketo-core's replaceChoiceNameFn function.
+     *
+     * @param {*} value
+     */
+    _getLabelForSelectValue( value ){
+        let label = '';
+        let control;
+
+        if ( value ){
+            if ( this.linkedQuestion.classList.contains( 'simple-select' ) ){
+                // checkboxes, radio buttons
+                const input = this.linkedQuestion.querySelector( `[value="${value}"]` );
+                const labelEls = getSiblingElements( input, '.option-label.active' );
+                label = labelEls.length ? labelEls[0].textContent : label;
+            } else if ( (  control = this.linkedQuestion.querySelector( 'select:not(.ignore)' ) ) ){
+                // pulldown selects
+                const option = control.querySelector( `[value="${value}"]` );
+                label =  option ? option.textContent : '';
+            } else if ( ( control = this.linkedQuestion.querySelector( 'input[list]:not(.ignore)' ) ) ){
+                // autocomplete widgets
+                const list = control.getAttribute( 'list' );
+                const siblingListEls = getSiblingElements( control, `datalist#${CSS.escape( list )}` );
+                if ( siblingListEls.length ){
+                    const optionEl = siblingListEls[0].querySelector( `[data-value="${value}"]` );
+                    label = optionEl ? optionEl.getAttribute( 'value' ) : '';
+                }
+            }
+        }
+
+        if ( label ) {
+            return `${label} (${value})`;
+        }
+
+        return value;
     }
 
     _setRepeatRemovalReasonChangeHandler() {
