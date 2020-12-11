@@ -543,7 +543,7 @@ function _setEventHandlers() {
                                 if ( strictViolations ) {
                                     gui.alert( t( 'fieldsubmission.confirm.autoquery.msg1' ), null, 'oc-strict-error' );
                                 } else {
-                                    gui.alert( t( 'alert.validationsuccess.msg' ), t( 'alert.validationsuccess.heading' ), 'success' );
+                                    gui.alert( t( 'alert.validationerror.msg' ) );
                                 }
                             } else {
                                 gui.alert( t( 'alert.validationerror.msg' ) );
