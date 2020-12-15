@@ -8,6 +8,10 @@ events.Heartbeat = function() {
     return new CustomEvent( 'heartbeat' );
 };
 
+events.Hiding = function() {
+    return new CustomEvent ( 'hiding.oc' );
+};
+
 events.QueueSubmissionSuccess = function( detail ) {
     return new CustomEvent( 'queuesubmissionsuccess', { detail, bubbles: true } );
 };

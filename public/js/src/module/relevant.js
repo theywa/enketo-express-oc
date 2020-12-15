@@ -4,8 +4,6 @@ import branchModule from 'enketo-core/src/js/relevant';
 import { getXPath } from 'enketo-core/src/js/dom-utils';
 import events from 'enketo-core/src/js/event';
 
-import $ from 'jquery';
-
 /**
  * Overwrite core functionality by **always** adding
  * .or-group.invalid-relevant and .or-group-data.invalid-relevant.
@@ -13,25 +11,23 @@ import $ from 'jquery';
  * @param updated
  */
 branchModule.update = function( updated ) {
-    let $nodes;
-
     if ( !this.form ) {
         throw new Error( 'Branch module not correctly instantiated with form property.' );
     }
 
-    $nodes = this.form.getRelatedNodes( 'data-relevant', '', updated )
+    const  nodes = this.form.getRelatedNodes( 'data-relevant', '', updated )
         // the OC customization:
-        .add( this.form.getRelatedNodes( 'data-relevant', '.invalid-relevant' ) );
+        .add( this.form.getRelatedNodes( 'data-relevant', '.invalid-relevant' ) ).get();
 
-    this.updateNodes( $nodes );
+    this.updateNodes( nodes );
 };
 
 branchModule.originalSelfRelevant = branchModule.selfRelevant;
 
 // Overwrite in order to add the && !branchNode.classList.contains('invalid-relevant') clause because an irrelevant branch in OC,
 // would not be disabled if it is a question with a value!
-branchModule.selfRelevant = function( $branchNode ) {
-    return this.originalSelfRelevant( $branchNode ) && !$branchNode.hasClass( 'invalid-relevant' );
+branchModule.selfRelevant = function( branchNode ) {
+    return this.originalSelfRelevant( branchNode ) && !branchNode.classList.contains( 'invalid-relevant' );
 };
 
 branchModule.originalEnable = branchModule.enable;
@@ -41,65 +37,58 @@ branchModule.originalEnable = branchModule.enable;
  * The reason for this customization is to remove any shown irrelevant errors on the group (and perhaps question as well?)
  * once it becomes relevant again.
  *
- * @param $branchNode
+ * @param branchNode
  * @param path
  */
-branchModule.enable = function( $branchNode, path ) {
-    const change = this.originalEnable( $branchNode, path );
-    $branchNode.removeClass( 'invalid-relevant' );
+branchModule.enable = function( branchNode, path ) {
+    const change = this.originalEnable( branchNode, path );
+    branchNode.classList.remove( 'invalid-relevant' );
 
     return change;
 };
 
 /*
- * Overwrite to bypass the overwritten isRelevantCheck, and always call this.clear if not virgin
+ * Overwrite to bypass the overwritten isRelevantCheck, and always call this.clear if ever enabled
  * No need for functionality to clear values in irrelevant fields either.
  */
-branchModule.disable = function( $branchNode, path ) {
-    const virgin = $branchNode.hasClass( 'pre-init' );
-    let change = false;
+branchModule.disable = function( branchNode, path ) {
+    const neverEnabled = branchNode.classList.contains( 'pre-init' );
+    let changed = false;
 
-    if ( virgin || !$branchNode.hasClass( 'disabled' ) ) {
-        change = true;
-        // if the branch was previously enabled, keep any default values
-        if ( !virgin ) {
-            this.clear( $branchNode, path );
-        } else {
-            $branchNode.removeClass( 'pre-init' );
-        }
+    if ( neverEnabled || !branchNode.classList.contains( 'disabled' ) ) {
+        changed = true;
 
-        this.deactivate( $branchNode );
+        this.clear( branchNode, path );
+        this.deactivate( branchNode );
     }
 
-    return change;
+    return changed;
 };
 
 /**
  * Overwrite clear function
  *
- * @param $branchNode
+ * @param branchNode
  * @param path
  */
-branchModule.clear = function( $branchNode ) {
+branchModule.clear = function( branchNode ) {
     // Only user can clear values from user-input fields in OC.
     // TODO: when readonly becomes dynamic, we'll have to fix this.
     // Only for readonly items in OC fork:
-    $branchNode
-        .find( 'input[readonly]:not(.ignore), select[readonly]:not(.ignore), textarea[readonly]:not(.ignore)' )
-        .closest( '.question' )
-        .clearInputs( 'change', events.InputUpdate().type );
+    [ ...branchNode.querySelectorAll( 'input[readonly]:not(.ignore), select[readonly]:not(.ignore), textarea[readonly]:not(.ignore)' ) ]
+        .map( control => control.closest( '.question' ) )
+        .forEach( question => this.form.input.clear( question, events.Change(), events.InputUpdate() ) );
 
     // Also changed from Enketo Core, we never update calculated items if relevancy changes:
 };
 
 
-branchModule.activate = function( $branchNode ) {
-    const branchNode = $branchNode[ 0 ];
+branchModule.activate = function( branchNode ) {
     let required;
 
-    this.setDisabledProperty( $branchNode, false );
+    this.setDisabledProperty( branchNode, false );
     if ( branchNode.matches( '.question' ) ) {
-        const control = $branchNode[ 0 ].querySelector( 'input:not(.ignore), select:not(.ignore), textarea:not(.ignore)' );
+        const control = branchNode.querySelector( 'input:not(.ignore), select:not(.ignore), textarea:not(.ignore)' );
         this.form.setValid( control, 'relevant' );
         // Re-show any constraint error message when the relevant error has been removed.
         // Since validateInput looks at both required and constraint, and we don't want required
@@ -122,15 +111,11 @@ branchModule.activate = function( $branchNode ) {
 branchModule.originalDeactivate = branchModule.deactivate;
 
 // Overwrite deactivate function
-branchModule.deactivate = function( $branchNode ) {
-    const branchNode = $branchNode[ 0 ];
+branchModule.deactivate = function( branchNode ) {
     let value;
-    const $control = $( $branchNode[ 0 ].querySelector( 'input:not(.ignore), select:not(.ignore), textarea:not(.ignore)' ) );
-    const control = $control[ 0 ];
+    const control = branchNode.querySelector( 'input:not(.ignore), select:not(.ignore), textarea:not(.ignore)' );
 
-    if ( $branchNode.is( '.question' ) ) {
-
-
+    if ( branchNode.matches( '.question' ) ) {
         const name = this.form.input.getName( control );
         const index = this.form.input.getIndex( control );
         value = this.form.model.node( name, index ).getVal();
@@ -143,11 +128,11 @@ branchModule.deactivate = function( $branchNode ) {
             this.form.setValid( control, 'required' );
         } else {
             this.form.setValid( control, 'relevant' );
-            this.originalDeactivate( $branchNode );
-            $branchNode.trigger( 'hiding.oc' );
+            this.originalDeactivate( branchNode );
+            branchNode.dispatchEvent( events.Hiding() );
         }
 
-    } else if ( $branchNode.is( '.or-group, .or-group-data' ) ) {
+    } else if ( branchNode.matches( '.or-group, .or-group-data' ) ) {
         const name = this.form.input.getName( branchNode );
         const index = this.form.input.getIndex( branchNode );
         /*
@@ -193,9 +178,9 @@ branchModule.deactivate = function( $branchNode ) {
             this.form.setInvalid( branchNode, 'relevant' );
         } else {
             this.form.setValid( branchNode, 'relevant' );
-            this.originalDeactivate( $branchNode );
+            this.originalDeactivate( branchNode );
             // trigger on all questions inside this group that possibly have a discrepancy note attached to them.
-            $branchNode.find( '.question' ).trigger( 'hiding.oc' );
+            branchNode.querySelectorAll( '.question' ).forEach( question => question.dispatchEvent( events.Hiding() ) );
         }
     }
 };

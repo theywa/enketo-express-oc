@@ -221,7 +221,7 @@ class Comment extends Widget {
         const that = this;
         const target = this.linkedQuestion.querySelector( 'input:not(.ignore), select:not(.ignore), textarea:not(.ignore)' );
 
-        $( this.linkedQuestion ).on( 'hiding.oc', () => {
+        $( this.linkedQuestion ).on( events.Hiding().type, () => {
             // For now there is no need to double-check if this question has a relevant attribute
             // or has an ancestor group with a relevant attribute. This is because we trust that
             // the "hiding.oc" event is sent only for branches or its children when being closed (by the branch module).
