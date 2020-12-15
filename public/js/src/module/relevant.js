@@ -15,7 +15,7 @@ branchModule.update = function( updated ) {
         throw new Error( 'Branch module not correctly instantiated with form property.' );
     }
 
-    const  nodes = this.form.getRelatedNodes( 'data-relevant', '', updated )
+    const nodes = this.form.getRelatedNodes( 'data-relevant', '', updated )
         // the OC customization:
         .add( this.form.getRelatedNodes( 'data-relevant', '.invalid-relevant' ) ).get();
 

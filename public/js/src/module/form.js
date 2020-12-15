@@ -64,7 +64,7 @@ const relevantErrorUpdate = function( updated ) {
             return n.matches( '[data-relevant]' ) ? n : n.querySelector( '[data-relevant]' );
         } );
 
-    this.relevant.updateNodes( $( nodes ) );
+    this.relevant.updateNodes(  nodes );
 };
 
 const originalInit = Form.prototype.init;
