@@ -1,6 +1,5 @@
 // Extend the Enketo Core Form class, and expose it for local testing.
 import { Form, FormModel } from 'enketo-core';
-import $ from 'jquery';
 import gui from './gui';
 import settings from './settings';
 import events from 'enketo-core/src/js/event';

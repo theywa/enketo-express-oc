@@ -142,13 +142,13 @@ export default {
         this.section.querySelectorAll( '.reason-for-change__item__repeat-number' ).forEach( el => this.setNumber( el, this.numbers[ el.dataset.index ].textContent ) );
     },
     validate() {
+        let valid = true;
         this.section.querySelectorAll( '.reason-for-change__item:not(.added) input' ).forEach( el => {
             this.setInvalid( el );
-
-            return false;
+            valid = false;
         } );
 
-        return true;
+        return valid;
     },
     getFirstInvalidField() {
         return this.section.querySelector( '.invalid input' );
