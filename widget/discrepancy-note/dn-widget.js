@@ -116,7 +116,7 @@ class Comment extends Widget {
         const root = element.closest( 'form.or, .or-repeat' );
 
         return this.options.helpers.input
-            .getWrapNode( root.querySelector( `[name="${absoluteTargetPath}"], [data-name="${absoluteTargetPath}"]` ) );
+            .getWrapNode( root.querySelector( `[name="${absoluteTargetPath}"]:not([data-event="xforms-value-changed"]), [data-name="${absoluteTargetPath}"]:not([data-event="xforms-value-changed"])` ) );
     }
 
     _setCommentButtonState( state = '', annotation = false, multi = false, ) {
