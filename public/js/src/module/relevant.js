@@ -48,14 +48,12 @@ branchModule.enable = function( branchNode, path ) {
 };
 
 /*
- * Overwrite to bypass the overwritten isRelevantCheck, and always call this.clear if ever enabled
- * No need for functionality to clear values in irrelevant fields either.
+ * Overwrite to always call this.clear if ever enabled and currently relevant.
  */
 branchModule.disable = function( branchNode, path ) {
-    const neverEnabled = branchNode.classList.contains( 'pre-init' );
     let changed = false;
 
-    if ( neverEnabled || !branchNode.classList.contains( 'disabled' ) ) {
+    if ( this.selfRelevant( branchNode ) ) {
         changed = true;
 
         this.clear( branchNode, path );
