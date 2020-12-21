@@ -60,6 +60,11 @@ branchModule.disable = function( branchNode, path ) {
 
         this.clear( branchNode, path );
         this.deactivate( branchNode );
+    } else {
+        // This processing (for OC) likely affects loading performance negatively for forms with lots of relevant conditions
+        // that are false by default.
+        // If a non-relevant question has a value upon load (dynamic default e.g.) OC would like to show a relevantError.
+        this.deactivate( branchNode );
     }
 
     return changed;

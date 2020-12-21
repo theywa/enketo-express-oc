@@ -94,13 +94,17 @@ $secondary-color: #eeeeee;
             }
         }
 
-        // hide constraint and required messages that are descendants of an 
+        // hide constraint and required messages that are descendants of an
         // irrelevant group
         .or-constraint-msg.active,
         .or-required-msg.active {
             display: none;
         }
     }
+}
+
+.or-branch.or-branch.pre-init.invalid-relevant {
+    display: inherit;
 }
 
 
@@ -387,7 +391,7 @@ $secondary-color: #eeeeee;
         .option-wrapper {
             display: inline-block;
         }
-        
+
         input[type=checkbox] {
             float: none;
         }
