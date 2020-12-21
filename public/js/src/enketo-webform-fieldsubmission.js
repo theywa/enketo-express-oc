@@ -113,6 +113,7 @@ function _readonlify( formParts, notesEnabled ) {
     // Note: Enketo made a syntax error by adding the readonly attribute on a <select>
     // Hence, we cannot use .prop('readonly', true). We'll continue the syntax error.
     [ ...formParts.formFragment.querySelectorAll( 'input:not([readonly]), textarea:not([readonly]), select:not(#form-languages):not([readonly])' ) ]
+        .filter( el => !el.closest( '#or-calculated-items, #or-preload-items, #or-setvalue-items' ) )
         .filter( el =>  notesEnabled ? !el.closest( '.or-appearance-dn' ) : true )
         .forEach( el => {
             el.setAttribute( 'readonly', 'readonly' );
