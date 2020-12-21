@@ -296,7 +296,7 @@ class Comment extends Widget {
                 } );
                 reasonQuestion.addEventListener( events.ReasonChange().type, evt => {
                     if ( evt.detail && evt.detail.type === 'autoquery' ){
-                        this._addQuery( evt.detail.reason );
+                        this._addQuery( evt.detail.reason, 'new', '', false, SYSTEM_USER );
                     }
                 } );
                 reasonQuestion.addEventListener( 'input', evt => {
