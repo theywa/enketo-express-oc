@@ -147,7 +147,7 @@ branchModule.deactivate = function( branchNode ) {
          * Note that we need to check ALL repeats if the repeat parent (with the same /path/to/repeat) has a relevant!
          *
          * First get all the leaf nodes (nodes without children) and then check if there is a calculation
-         * or dn question for this node.
+         * or dn question, or readonly question for this node.
          *
          * Then get the concatenated textContent of the filtered leaf nodes and trim to avoid
          * recognizing whitespace-only as a value. (whitespace in between is fine as it won't give a false positive)
@@ -164,7 +164,7 @@ branchModule.deactivate = function( branchNode ) {
                     .filter( el => {
                         if ( el.children.length === 0 ) {
                             const path = getXPath( el, 'instance' );
-                            const selector = `.calculation > [name="${path}"], .or-appearance-dn > [name="${path}"]`;
+                            const selector = `.calculation > [name="${path}"], .or-appearance-dn > [name="${path}"], [readonly][name="${path}"]`;
                             // If a repeat has zero instances, the search for .or-appearance-dn in form.html will result in null, which means the dn-detection would fail.
                             const searchElements = [ this.form.view.html ].concat( Object.entries( this.form.repeats.templates ).map( entries => entries[ 1 ] ) );
                             const ignore = searchElements.some( e => !!e.querySelector( selector ) );
