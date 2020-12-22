@@ -189,15 +189,22 @@ function init( formEl, data, loadErrors = [] ) {
 
         rc.setLogoutLinkVisibility();
 
-        if ( loadErrors.length > 0 ) {
+        const loadWarningIsOnlyError = loadErrors.length === 1 && loadErrors[0] === settings.loadWarning;
+        if ( loadErrors.length > 0 && !loadWarningIsOnlyError ) {
             document.querySelectorAll( '.form-footer__content__main-controls button' )
                 .forEach( button => button.remove() );
 
             throw loadErrors;
-        } else if ( settings.type !== 'view' ) {
-            // Current queue can be submitted, and so can future fieldsubmissions.
-            fieldSubmissionQueue.enable();
-            fieldSubmissionQueue.submitAll();
+        } else {
+            if ( settings.type !== 'view' ){
+                console.info( 'Submissions enabled' );
+                // Current queue can be submitted, and so can future fieldsubmissions.
+                fieldSubmissionQueue.enable();
+                fieldSubmissionQueue.submitAll();
+            }
+            if ( loadWarningIsOnlyError ){
+                throw loadErrors;
+            }
         }
 
         resolve( form );
