@@ -329,32 +329,45 @@ class Comment extends Widget {
      * @param {*} value
      */
     _getLabelForSelectValue( value ){
-        let label = '';
+        const labels = [];
+        const multiple = !!this.linkedQuestion.querySelector( 'select[multiple]:not(.ignore), input[type="checkbox"]:not(.ignore)' );
+        const values = multiple ? value.split( ' ' ) : [ value ];
         let control;
 
-        if ( value ){
+        if ( values[0] ){
             if ( this.linkedQuestion.classList.contains( 'simple-select' ) ){
                 // checkboxes, radio buttons
-                const input = this.linkedQuestion.querySelector( `[value="${value}"]` );
-                const labelEls = getSiblingElements( input, '.option-label.active' );
-                label = labelEls.length ? labelEls[0].textContent : label;
+                values.forEach( val => {
+                    const input = this.linkedQuestion.querySelector( `[value="${val}"]` );
+                    const labelEls = getSiblingElements( input, '.option-label.active' );
+                    if( labelEls.length ) {
+                        labels.push( labelEls[0].textContent );
+                    }
+                } );
             } else if ( (  control = this.linkedQuestion.querySelector( 'select:not(.ignore)' ) ) ){
                 // pulldown selects
-                const option = control.querySelector( `[value="${value}"]` );
-                label =  option ? option.textContent : '';
+                values.forEach( val => {
+                    const option = control.querySelector( `[value="${val}"]` );
+                    if ( option ){
+                        labels.push( option.textContent );
+                    }
+                } );
             } else if ( ( control = this.linkedQuestion.querySelector( 'input[list]:not(.ignore)' ) ) ){
                 // autocomplete widgets
                 const list = control.getAttribute( 'list' );
                 const siblingListEls = getSiblingElements( control, `datalist#${CSS.escape( list )}` );
                 if ( siblingListEls.length ){
                     const optionEl = siblingListEls[0].querySelector( `[data-value="${value}"]` );
-                    label = optionEl ? optionEl.getAttribute( 'value' ) : '';
+                    if ( optionEl ){
+                        labels.push( optionEl.getAttribute( 'value' ) );
+                    }
                 }
             }
         }
 
-        if ( label ) {
-            return `${label} (${value})`;
+        // If length is unequal just give up. I think this cannot occur.
+        if ( labels.length && labels.length === values.length ) {
+            return labels.map( ( label, i ) => `${label} (${values[i]})` ).join( ', ' );
         }
 
         return value;
