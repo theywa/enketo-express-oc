@@ -50,7 +50,7 @@
         "db.js": "0.15.0",
         "debug": "4.1.x",
         "enketo-core": "5.16.16",
-        "enketo-transformer": "1.41.3",
+        "enketo-transformer": "1.41.4",
         "enketo-xpath-extensions-oc": "github:OpenClinica/enketo-xpath-extensions-oc#efa9830",
         "evp_bytestokey": "^1.0.3",
         "express": "^4.17.1",
