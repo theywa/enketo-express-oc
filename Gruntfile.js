@@ -91,7 +91,8 @@ module.exports = grunt => {
             'polyfill-ie11': {
                 command: [
                     'mkdir -p public/js/build && curl "https://polyfill.io/v3/polyfill.min.js?ua=ie%2F11.0.0&features=es2015%2Ces2016%2Ces2017%2Ces2018%2Cdefault-3.6%2Cfetch%2CNodeList.prototype.forEach" -o "public/js/build/ie11-polyfill.min.js"',
-                    'cp -f node_modules/enketo-core/src/js/obscure-ie11-polyfills.js public/js/build/obscure-ie11-polyfills.js'
+                    'cp -f node_modules/enketo-core/src/js/obscure-ie11-polyfills.js public/js/build/obscure-ie11-polyfills.js',
+                    'cp -f node_modules/css.escape/css.escape.js public/js/build/css.escape.js'
                 ].join( '&&' )
             },
             'clean-css': {

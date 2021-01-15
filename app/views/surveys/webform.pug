@@ -35,6 +35,10 @@ block script
       obscureIe11PolyfillScript.type = 'text/javascript';
       obscureIe11PolyfillScript.src = mainScriptSrc.split('/js/build/')[0] + '/js/build/obscure-ie11-polyfills.js';
       document.body.appendChild( obscureIe11PolyfillScript );
+      var cssEscapeScript = document.createElement( 'script' );
+      cssEscapeScript.type = 'text/javascript';
+      cssEscapeScript.src = mainScriptSrc.split('/js/build/')[0] + '/js/build/css.escape.js';
+      document.body.appendChild( cssEscapeScript );
       var script = document.createElement( 'script' );
       script.type = 'text/javascript';
       script.src = mainScriptSrc.replace('-bundle.', '-ie11-bundle.');
