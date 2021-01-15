@@ -49,9 +49,9 @@ initTranslator( survey )
     } )
     .then( formParts => {
         if ( /\/fs\/dnc?\//.test( window.location.pathname ) ) {
-            return _readonlify( formParts, true );
+            return _convertToReadonly( formParts, true );
         } else if ( settings.type === 'view' ) {
-            return _readonlify( formParts, false );
+            return _convertToReadonly( formParts, false );
         }
 
         return formParts;
@@ -87,7 +87,7 @@ function _showErrorOrAuthenticate( error ) {
  * @param {boolean} notesEnabled - whether notes are enabled
  * @return {object}          formParts object
  */
-function _readonlify( formParts, notesEnabled ) {
+function _convertToReadonly( formParts, notesEnabled ) {
     // Styling changes
     document.querySelector( 'body' ).classList.add( 'oc-view' );
 
@@ -112,8 +112,7 @@ function _readonlify( formParts, notesEnabled ) {
 
     // Note: Enketo made a syntax error by adding the readonly attribute on a <select>
     // Hence, we cannot use .prop('readonly', true). We'll continue the syntax error.
-    [ ...formParts.formFragment.querySelectorAll( 'input:not([readonly]), textarea:not([readonly]), select:not(#form-languages):not([readonly])' ) ]
-        .filter( el => !el.closest( '#or-calculated-items, #or-preload-items, #or-setvalue-items' ) )
+    [ ...formParts.formFragment.querySelectorAll( '.question input:not([readonly]), .question textarea:not([readonly]), .question select:not([readonly])' ) ]
         .filter( el =>  notesEnabled ? !el.closest( '.or-appearance-dn' ) : true )
         .forEach( el => {
             el.setAttribute( 'readonly', 'readonly' );
