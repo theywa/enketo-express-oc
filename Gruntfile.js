@@ -175,14 +175,13 @@ module.exports = grunt => {
                 args: [ 'grunt', 'mochaTest:all' ]
             }
         },
-        terser: { 
+        terser: {
             'default': {
                 options: {
                     // https://github.com/enketo/enketo-express/issues/72
                     keep_classnames: true,
                 },
                 files: bundles
-                    .concat( bundles.map( bundle => bundle.replace( '-bundle.', '-ie11-bundle.' ) ) )
                     .map( bundle => [ bundle.replace( '.js', '.min.js' ), [ bundle ] ] )
                     .reduce( ( o, [ key, value ] ) => {
                         o[ key ] = value;
@@ -198,7 +197,7 @@ module.exports = grunt => {
                     keep_fnames: true
                 },
                 files: bundles
-                    .concat( bundles.map( bundle => bundle.replace( '-bundle.', '-ie11-bundle.' ) ) )
+                    .map( bundle => bundle.replace( '-bundle.', '-ie11-bundle.' ) )
                     .map( bundle => [ bundle.replace( '.js', '.min.js' ), [ bundle ] ] )
                     .reduce( ( o, [ key, value ] ) => {
                         o[ key ] = value;
