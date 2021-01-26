@@ -41,7 +41,11 @@ block script
       document.body.appendChild( cssEscapeScript );
       var script = document.createElement( 'script' );
       script.type = 'text/javascript';
-      script.src = mainScriptSrc.replace('-bundle.', '-ie11-bundle.');
+      if ( /rv:11.0/i.test(navigator.userAgent)) {
+        script.src = mainScriptSrc.replace('-bundle.', '-ie11-bundle.');
+      } else {
+        script.src = mainScriptSrc.replace('-bundle.', '-edgel-bundle.');
+      }
       document.body.appendChild( script );
     }
 

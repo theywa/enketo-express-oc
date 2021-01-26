@@ -123,6 +123,14 @@ module.exports = grunt => {
                     .concat( [ 'rm -f public/js/build/*ie11-temp-bundle.js' ] )
                     .join( '&&' )
             },
+            'ie-to-edgel': {
+                command: ['cp -f public/js/build/enketo-offline-fallback-ie11-bundle.js public/js/build/enketo-offline-fallback-edgel-bundle.js',
+                    'cp -f public/js/build/enketo-webform-edit-ie11-bundle.js public/js/build/enketo-webform-edit-edgel-bundle.js',
+                    'cp -f public/js/build/enketo-webform-fieldsubmission-ie11-bundle.js public/js/build/enketo-webform-fieldsubmission-edgel-bundle.js',
+                    'cp -f public/js/build/enketo-webform-view-ie11-bundle.js public/js/build/enketo-webform-view-edgel-bundle.js',
+                    'cp -f public/js/build/enketo-webform-ie11-bundle.js public/js/build/enketo-webform-edgel-bundle.js'
+                ].join( '&&' )
+            },
         },
         eslint: {
             check: {
@@ -189,7 +197,21 @@ module.exports = grunt => {
                         return o;
                     }, {} )
             },
-            'edge': {
+            'ie-11': {
+                options: {
+                    // https://github.com/enketo/enketo-express/issues/72
+                    keep_classnames: true,
+                },
+                files: bundles
+                    .map( bundle => bundle.replace( '-bundle.', '-ie11-bundle.' ) )
+                    .map( bundle => [ bundle.replace( '.js', '.min.js' ), [ bundle ] ] )
+                    .reduce( ( o, [ key, value ] ) => {
+                        o[ key ] = value;
+
+                        return o;
+                    }, {} )
+            },
+            'edge-legacy': {
                 options: {
                     // https://github.com/enketo/enketo-express/issues/72
                     keep_classnames: true,
@@ -197,7 +219,7 @@ module.exports = grunt => {
                     keep_fnames: true
                 },
                 files: bundles
-                    .map( bundle => bundle.replace( '-bundle.', '-ie11-bundle.' ) )
+                    .map( bundle => bundle.replace( '-bundle.', '-edgel-bundle.' ) )
                     .map( bundle => [ bundle.replace( '.js', '.min.js' ), [ bundle ] ] )
                     .reduce( ( o, [ key, value ] ) => {
                         o[ key ] = value;
@@ -303,11 +325,13 @@ module.exports = grunt => {
     grunt.registerTask( 'locales', [ 'shell:clean-locales', 'i18next' ] );
     grunt.registerTask( 'js', [ 'shell:clean-js', 'widgets', 'shell:rollup' ] );
     grunt.registerTask( 'js-ie11', [ 'shell:polyfill-ie11', 'shell:babel-ie11', 'shell:browserify-ie11' ] );
-    grunt.registerTask( 'build-ie11', [ 'js-ie11', 'terser:edge' ] );
+    grunt.registerTask( 'build-ie11', [ 'js-ie11', 'terser:ie-11' ] );
+    grunt.registerTask( 'build-edgel', [ 'build-ie11', 'shell:ie-to-edgel', 'terser:edge-legacy' ] );
     grunt.registerTask( 'css', [ 'shell:clean-css', 'system-sass-variables:create', 'sass' ] );
     grunt.registerTask( 'test', [ 'env:test', 'transforms', 'js', 'css', 'nyc:cover', 'karma:headless', 'shell:buildReadmeBadge', 'eslint:check' ] );
     grunt.registerTask( 'test-browser', [ 'env:test', 'transforms', 'css', 'karma:browsers' ] );
     grunt.registerTask( 'develop', [ 'env:develop', 'i18next', 'js', 'css', 'concurrent:develop' ] );
     grunt.registerTask( 'develop-ie11', [ 'env:develop', 'i18next', 'js-ie11', 'css', 'concurrent:develop' ] );
     grunt.registerTask( 'test-and-build', [ 'env:test', 'mochaTest:all', 'karma:headless', 'env:production', 'default' ] );
+    grunt.registerTask( 'develop-test', [ 'env:develop', 'i18next', 'default', 'build-edgel', 'concurrent:develop' ] );
 };
