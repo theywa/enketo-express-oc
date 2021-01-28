@@ -176,12 +176,13 @@ module.exports = grunt => {
             }
         },
         terser: {
-            'default': {
-                options: {
-                    // https://github.com/enketo/enketo-express/issues/72
-                    keep_classnames: true,
-                },
+            options: {
+                // https://github.com/enketo/enketo-express/issues/72
+                keep_classnames: true,
+            },
+            all: {
                 files: bundles
+                    .concat( bundles.map( bundle => bundle.replace( '-bundle.', '-ie11-bundle.' ) ) )
                     .map( bundle => [ bundle.replace( '.js', '.min.js' ), [ bundle ] ] )
                     .reduce( ( o, [ key, value ] ) => {
                         o[ key ] = value;
@@ -189,22 +190,6 @@ module.exports = grunt => {
                         return o;
                     }, {} )
             },
-            'edge': {
-                options: {
-                    // https://github.com/enketo/enketo-express/issues/72
-                    keep_classnames: true,
-                    // https://github.com/OpenClinica/enketo-express-oc/issues/426
-                    keep_fnames: true
-                },
-                files: bundles
-                    .map( bundle => bundle.replace( '-bundle.', '-ie11-bundle.' ) )
-                    .map( bundle => [ bundle.replace( '.js', '.min.js' ), [ bundle ] ] )
-                    .reduce( ( o, [ key, value ] ) => {
-                        o[ key ] = value;
-
-                        return o;
-                    }, {} )
-            }
         },
         env: {
             develop: {
@@ -227,6 +212,21 @@ module.exports = grunt => {
                     return `${dest + src}translation-combined.json`;
                 },
                 dest: 'locales/build/'
+            }
+        }, 
+        replace: {
+            // https://github.com/OpenClinica/enketo-express-oc/issues/426
+            // widget.name is not working properly on IE 11 win 10
+            'widgets-controller': {
+                src: [ 'node_modules/enketo-core/src/js/widgets-controller.js' ],
+                overwrite: true,
+                replacements: [ {
+                    from: "Widget.name",
+                    to: "Widget.selector"
+                }, {
+                    from: "have a name",
+                    to: "have a selector"
+                } ]
             }
         }
     } );
@@ -299,11 +299,11 @@ module.exports = grunt => {
         grunt.log.writeln( `File ${WIDGETS_SASS} created` );
     } );
 
-    grunt.registerTask( 'default', [ 'locales', 'widgets', 'css', 'js', 'terser:default' ] );
+    grunt.registerTask( 'default', [ 'locales', 'widgets', 'css', 'js', 'terser' ] );
     grunt.registerTask( 'locales', [ 'shell:clean-locales', 'i18next' ] );
-    grunt.registerTask( 'js', [ 'shell:clean-js', 'widgets', 'shell:rollup' ] );
+    grunt.registerTask( 'js', [ 'shell:clean-js', 'replace:widgets-controller', 'widgets', 'shell:rollup' ] );
     grunt.registerTask( 'js-ie11', [ 'shell:polyfill-ie11', 'shell:babel-ie11', 'shell:browserify-ie11' ] );
-    grunt.registerTask( 'build-ie11', [ 'js-ie11', 'terser:edge' ] );
+    grunt.registerTask( 'build-ie11', [ 'js-ie11', 'terser' ] );
     grunt.registerTask( 'css', [ 'shell:clean-css', 'system-sass-variables:create', 'sass' ] );
     grunt.registerTask( 'test', [ 'env:test', 'transforms', 'js', 'css', 'nyc:cover', 'karma:headless', 'shell:buildReadmeBadge', 'eslint:check' ] );
     grunt.registerTask( 'test-browser', [ 'env:test', 'transforms', 'css', 'karma:browsers' ] );
