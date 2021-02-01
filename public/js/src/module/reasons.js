@@ -10,9 +10,7 @@ export default {
         return this._$section;
     },*/
     get section() {
-        this._section = this._section ||
-        document.querySelector( '.form-footer' ).insertAdjacentElement( 'beforebegin',
-            range.createContextualFragment(
+        const contextual = range.createContextualFragment(
                 `<section class="reason-for-change">
                     <header class="reason-for-change__header">
                         <h5>${t( 'fieldsubmission.reason.heading' )}</h5>
@@ -26,9 +24,10 @@ export default {
                             </div>
                         </div>
                     </header>
-                </section>` ).firstElementChild
-        );
-
+                </section>` );
+        const firstElementChild = contextual.firstElementChild || contextual.children[0];
+        this._section = this._section ||
+        document.querySelector( '.form-footer' ).insertAdjacentElement( 'beforebegin', firstElementChild );
         return this._section;
     },
     get questionMsg() {
