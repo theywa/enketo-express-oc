@@ -35,6 +35,8 @@ function init( formEl, data, loadErrors = [] ) {
     return new Promise( resolve => {
         let staticDefaultNodes = [];
         let m;
+        let goToErrors = [];
+        let goToHiddenErrors = [];
         const goToErrorLink = settings.goToErrorUrl ? `<a href="${settings.goToErrorUrl}">${settings.goToErrorUrl}</a>` : '';
 
         fieldSubmissionQueue = new FieldSubmissionQueue();
@@ -105,6 +107,7 @@ function init( formEl, data, loadErrors = [] ) {
             // the goto-irrelevant event will be fired twice. We can safely remove the eventlistener after the first
             // event is caught (for all cases).
             form.view.html.removeEventListener( events.GoToIrrelevant().type, handleGoToIrrelevant );
+            goToHiddenErrors = [ err ];
             loadErrors.push( err );
         };
 
@@ -165,7 +168,7 @@ function init( formEl, data, loadErrors = [] ) {
         if ( settings.goTo && location.hash ) {
             // form.goTo returns an array of 1 error if it has error. We're using our special
             // knowledge of Enketo Core to replace this error
-            let goToErrors = form.goTo( decodeURIComponent( location.hash.substring( 1 ) ).split( '#' )[ 0 ] );
+            goToErrors = form.goTo( decodeURIComponent( location.hash.substring( 1 ) ).split( '#' )[ 0 ] );
             const replacementError = `${t( 'alert.goto.notfound' )} `;
             if ( goToErrors.length ) {
                 if ( settings.interface === 'queries' ) {
@@ -189,8 +192,8 @@ function init( formEl, data, loadErrors = [] ) {
 
         rc.setLogoutLinkVisibility();
 
-        const loadWarningIsOnlyError = loadErrors.length === 1 && loadErrors[0] === settings.loadWarning;
-        if ( loadErrors.length > 0 && !loadWarningIsOnlyError ) {
+        const numberOfNotSoSeriousErrors = ( loadErrors[0] && loadErrors[0] === settings.loadWarning ? 1 : 0 ) + goToErrors.length + goToHiddenErrors.length;
+        if ( loadErrors.length > numberOfNotSoSeriousErrors ) {
             document.querySelectorAll( '.form-footer__content__main-controls button' )
                 .forEach( button => button.remove() );
 
@@ -202,7 +205,7 @@ function init( formEl, data, loadErrors = [] ) {
                 fieldSubmissionQueue.enable();
                 fieldSubmissionQueue.submitAll();
             }
-            if ( loadWarningIsOnlyError ){
+            if ( loadErrors.length ){
                 throw loadErrors;
             }
         }
