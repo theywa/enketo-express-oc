@@ -218,7 +218,7 @@ module.exports = grunt => {
             // https://github.com/OpenClinica/enketo-express-oc/issues/426
             // widget.name is not working properly on IE 11 win 10
             'widgets-controller': {
-                src: [ 'node_modules/enketo-core/src/js/widgets-controller.js' ],
+                src: [ 'public/js/build/*ie11-bundle.js' ],
                 overwrite: true,
                 replacements: [ {
                     from: "Widget.name",
@@ -301,8 +301,8 @@ module.exports = grunt => {
 
     grunt.registerTask( 'default', [ 'locales', 'widgets', 'css', 'js', 'terser' ] );
     grunt.registerTask( 'locales', [ 'shell:clean-locales', 'i18next' ] );
-    grunt.registerTask( 'js', [ 'shell:clean-js', 'replace:widgets-controller', 'widgets', 'shell:rollup' ] );
-    grunt.registerTask( 'js-ie11', [ 'shell:polyfill-ie11', 'shell:babel-ie11', 'shell:browserify-ie11' ] );
+    grunt.registerTask( 'js', [ 'shell:clean-js', 'widgets', 'shell:rollup' ] );
+    grunt.registerTask( 'js-ie11', [ 'shell:polyfill-ie11', 'shell:babel-ie11', 'shell:browserify-ie11', 'replace:widgets-controller' ] );
     grunt.registerTask( 'build-ie11', [ 'js-ie11', 'terser' ] );
     grunt.registerTask( 'css', [ 'shell:clean-css', 'system-sass-variables:create', 'sass' ] );
     grunt.registerTask( 'test', [ 'env:test', 'transforms', 'js', 'css', 'nyc:cover', 'karma:headless', 'shell:buildReadmeBadge', 'eslint:check' ] );
