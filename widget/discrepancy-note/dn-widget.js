@@ -218,18 +218,17 @@ class Comment extends Widget {
      * 1. The question gets disabled and any query threads are currently 'open'.
      */
     _setDisabledHandler() {
-        const that = this;
         const target = this.linkedQuestion.querySelector( 'input:not(.ignore), select:not(.ignore), textarea:not(.ignore)' );
 
-        $( this.linkedQuestion ).on( events.Hiding().type, () => {
+        this.linkedQuestion.addEventListener( events.Hiding().type, () => {
             // For now there is no need to double-check if this question has a relevant attribute
             // or has an ancestor group with a relevant attribute. This is because we trust that
-            // the "hiding.oc" event is sent only for branches or its children when being closed (by the branch module).
-            const linkedVal = that.options.helpers.input.getVal( target );
+            // the "hiding" event is sent only for branches or its children when being closed (by the branch module).
+            const linkedVal = this.options.helpers.input.getVal( target );
             // Note that getVal() can return an empty array.
 
-            that._getThreadFirsts( that.notes ).forEach( item => {
-                const status = that._getQueryThreadStatus( that.notes, item.thread_id );
+            this._getThreadFirsts( this.notes ).forEach( item => {
+                const status = this._getQueryThreadStatus( this.notes, item.thread_id );
                 const open = status === 'updated' || status === 'new';
                 /*
                  * If during a session a query is closed, and this triggers a contraintUpdate of the linked question,
@@ -239,7 +238,7 @@ class Comment extends Widget {
                  */
                 if ( open && linkedVal.length === 0 ) {
                     // This will not be triggered if a form is loaded with a value for an irrelevant question and an open query.
-                    that._addQuery( t( 'widget.dn.autoclosed' ), 'closed', '', false, SYSTEM_USER, 'comment', item.thread_id || 'NULL' );
+                    this._addQuery( t( 'widget.dn.autoclosed' ), 'closed', '', false, SYSTEM_USER, 'comment', item.thread_id || 'NULL' );
                 }
             } );
         } );

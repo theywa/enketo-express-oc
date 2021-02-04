@@ -9,7 +9,7 @@ events.Heartbeat = function() {
 };
 
 events.Hiding = function() {
-    return new CustomEvent ( 'hiding.oc' );
+    return new CustomEvent ( 'hiding' );
 };
 
 events.QueueSubmissionSuccess = function( detail ) {
