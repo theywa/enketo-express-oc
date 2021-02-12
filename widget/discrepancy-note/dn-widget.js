@@ -376,7 +376,7 @@ class Comment extends Widget {
         const that = this;
         if ( settings.reasonForChange && !that.linkedQuestionReadonly ) {
             this.linkedQuestion.addEventListener( events.ReasonChange().type, function( event ) {
-                if ( event.detail && event.type === 'remove' ){
+                if ( event.detail && event.detail.type === 'remove' ){
                     if ( event.detail.reason ) {
                         that._addReason( event.detail.reason );
                         reasons.removeField( this );
