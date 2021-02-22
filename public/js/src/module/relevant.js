@@ -53,9 +53,12 @@ branchModule.enable = function( branchNode, path ) {
 branchModule.disable = function( branchNode, path ) {
     let changed = false;
 
-    if ( this.selfRelevant( branchNode ) ) {
+    // In OC, we also want to clear values from branches that have never been enabled (i.e. contain the pre-init class)
+    // This is needed to:
+    // - clear any values that were added during loading when the branch was briefly enabled but later disabled before loading finished
+    // - clear any values that were loaded from records that were perhaps created from a different version of the form (to correct this)
+    if ( !branchNode.classList.contains( 'disabled' ) && !branchNode.classList.contains( 'invalid-relevant' ) ) {
         changed = true;
-
         this.clear( branchNode, path );
         this.deactivate( branchNode );
     } else {
@@ -72,15 +75,20 @@ branchModule.disable = function( branchNode, path ) {
  * Overwrite clear function
  *
  * @param branchNode
- * @param path
  */
 branchModule.clear = function( branchNode ) {
     // Only user can clear values from user-input fields in OC.
     // TODO: when readonly becomes dynamic, we'll have to fix this.
     // Only for readonly items in OC fork:
     [ ...branchNode.querySelectorAll( 'input[readonly]:not(.ignore), select[readonly]:not(.ignore), textarea[readonly]:not(.ignore)' ) ]
-        .map( control => control.closest( '.question' ) )
-        .forEach( question => this.form.input.clear( question, events.Change(), events.InputUpdate() ) );
+        .forEach( control => {
+            // We do not use input.clear() here because the eventhandlers that trigger clearing the model values are not yet in place and in OC
+            // the clearing may need to happen during form instantiation.
+            // TODO: inefficiently the index is determined in both clear() and deactivate() functions.
+            const dataObj = this.form.model.node( this.form.input.getName( control ), this.form.input.getIndex( control ) );
+            dataObj.setVal( '' );
+            this.form.input.setVal( control, '' );
+        } );
 
     // Also changed from Enketo Core, we never update calculated items if relevancy changes:
 };
