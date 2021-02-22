@@ -195,3 +195,5 @@ branchModule.deactivate = function( branchNode ) {
         }
     }
 };
+
+export default branchModule;

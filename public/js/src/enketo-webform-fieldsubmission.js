@@ -6,6 +6,7 @@ import connection from './module/connection';
 import { init as initTranslator, t, localize } from './module/translator';
 import calculationModule from 'enketo-core/src/js/calculate';
 import preloadModule from 'enketo-core/src/js/preload';
+import relevantModule from './module/relevant';
 import oc from './module/custom';
 
 const loader = document.querySelector( '.main-loader' );
@@ -103,6 +104,11 @@ function _convertToReadonly( formParts, notesEnabled ) {
     // Completely disable preload items
     console.info( 'Preloaders disabled.' );
     preloadModule.init = () => {};
+
+    // Disable clearing (and submissions) of non-relevant readonly values
+    console.info( 'Clearing of non-relevant values disabled.' );
+    relevantModule.clear = ( ) => {};
+
     // change status message
     const msg = notesEnabled ? t( 'fieldsubmission.noteonly.msg' ) : t( 'fieldsubmission.readonly.msg' );
     formheader.prepend( range.createContextualFragment( `<div class="fieldsubmission-status readonly">${msg}</div>` ) );
