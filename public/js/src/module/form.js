@@ -58,6 +58,7 @@ const constraintUpdate = function( updated ) {
 const relevantErrorUpdate = function( updated ) {
     const nodes = this.getRelatedNodes( 'data-relevant', '', updated ).get()
         .concat( this.getRelatedNodes( 'name', '[data-relevant]', updated ).get() )
+        .concat( this.getRelatedNodes( 'data-name', '[data-relevant]', updated ).get() )
         .filter( control => !!control.closest( '.invalid-relevant' ) )
         .map( n => {
             return n.matches( '[data-relevant]' ) ? n : n.querySelector( '[data-relevant]' );
