@@ -145,13 +145,17 @@ branchModule.deactivate = function( branchNode ) {
 
     } else if ( branchNode.matches( '.or-group, .or-group-data' ) ) {
         const name = this.form.input.getName( branchNode );
-        const index = this.form.input.getIndex( branchNode );
+        let index;
         /*
          * We need to check if any of the fields with a form control or calculations
-         * (ie. excl discrepancy note questions) has a value.
+         * (excl discrepancy note questions) has a value.
          * The best way is to do this in the model.
          * Note that we need to check ALL repeats if the repeat parent (with the same /path/to/repeat) has a relevant!
-         *
+         */
+        if ( !branchNode.querySelector( `.or-repeat[name="${name}"]` ) ){
+            index = this.form.input.getIndex( branchNode );
+        }
+        /*
          * First get all the leaf nodes (nodes without children) and then check if there is a calculation
          * or dn question, or readonly question for this node.
          *
