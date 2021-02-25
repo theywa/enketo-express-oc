@@ -137,7 +137,10 @@ class Comment extends Widget {
             event.preventDefault();
             if ( this._isCommentModalShown( this.linkedQuestion ) ) {
                 this._hideCommentModal( this.linkedQuestion );
-            } else {
+                // Note there is an edge case where a disabled (non-relevant) question (as page) does not get hidden
+                // and we need to make sure the DN widget get disabled in that case.
+                // https://github.com/OpenClinica/enketo-express-oc/issues/459
+            } else if ( !this.linkedQuestion.matches( '.disabled' ) ){
                 this.linkedQuestionErrorMsg = this._getCurrentErrorMsg();
                 this._showCommentModal();
             }
