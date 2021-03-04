@@ -337,7 +337,12 @@ class Comment extends Widget {
         let control;
 
         if ( values[0] ){
-            if ( this.linkedQuestion.classList.contains( 'simple-select' ) ){
+            if ( this.linkedQuestion.classList.contains( 'simple-select' ) 
+                // support horizontal-compact and no-buttons appearance
+                // https://github.com/OpenClinica/enketo-express-oc/issues/460
+                // https://jira.openclinica.com/browse/OC-14577
+                || this.linkedQuestion.classList.contains( 'or-appearance-horizontal-compact' ) 
+                || this.linkedQuestion.classList.contains( 'or-appearance-no-buttons' ) ){
                 // checkboxes, radio buttons
                 values.forEach( val => {
                     const input = this.linkedQuestion.querySelector( `[value="${val}"]` );
@@ -364,7 +369,7 @@ class Comment extends Widget {
                         labels.push( optionEl.getAttribute( 'value' ) );
                     }
                 }
-            }
+            } 
         }
 
         // If length is unequal just give up. I think this cannot occur.
