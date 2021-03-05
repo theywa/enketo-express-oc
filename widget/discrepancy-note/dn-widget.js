@@ -569,11 +569,13 @@ class Comment extends Widget {
         } );
 
         // Scroll directly to Query modal if not enough height for user to view the Query modal
-        const queryModal = this.linkedQuestion.querySelector( '.widget.or-comment-widget' );
-        if ( window.innerHeight - this.linkedQuestion.offsetHeight < queryModal.offsetHeight ) {
-            queryModal.scrollIntoView( { behavior: 'smooth', block: 'start', inline: 'nearest' } );
+        // https://github.com/OpenClinica/enketo-express-oc/issues/378
+        if ( this.linkedQuestion.classList.contains( 'or-appearance-image-map' ) ) {
+            setTimeout( () => {
+                this._scrollToview();
+            }, 500);
         } else {
-            this.linkedQuestion.scrollIntoView( { behavior: 'smooth', block: 'start', inline: 'nearest' } );
+            this._scrollToview();
         }
 
         const closeButton = widget.querySelector( '.or-comment-widget__content__btn-close-x' );
@@ -586,6 +588,16 @@ class Comment extends Widget {
             } );
         } );
 
+    }
+
+    _scrollToview() {
+        const queryModal = this.linkedQuestion.querySelector( '.widget.or-comment-widget' );
+        const option = { behavior: 'smooth', block: 'start', inline: 'nearest' }
+        if ( window.innerHeight - this.linkedQuestion.offsetHeight < queryModal.offsetHeight ) {
+            queryModal.scrollIntoView( option );
+        } else {
+            this.linkedQuestion.scrollIntoView( option );
+        }
     }
 
     // switches the right pane of the widget that shows the form (optionally) and the thread content
