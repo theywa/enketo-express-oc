@@ -564,22 +564,26 @@ function getPrintDialogComponents() {
     };
 }
 
-function printGrid( format ) {
+function printGrid( format, delay = 800 ) {
     const swapped = printHelper.styleToAll();
-
-    return printHelper.fixGrid( format )
-        .then( window.print )
-        .catch( console.error )
-        .then( () => {
-            if ( swapped ) {
-                return new Promise( resolve => {
-                    setTimeout( () => {
-                        printHelper.styleReset();
-                        resolve();
-                    }, 500 );
+    // https://github.com/OpenClinica/enketo-express-oc/issues/456
+    // changing style on chrome takes longer than other browser
+    return new Promise( resolve => setTimeout( () => {
+            printHelper.fixGrid( format )
+                .then( window.print )
+                .catch( console.error )
+                .then( () => {
+                    if ( swapped ) {
+                        return new Promise( resolve => {
+                            setTimeout( () => {
+                                printHelper.styleReset();
+                                resolve();
+                            }, 500 );
+                        } );
+                    }
                 } );
-            }
-        } );
+            resolve();
+        }, delay ) );
 }
 
 /**
