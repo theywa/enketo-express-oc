@@ -132,8 +132,12 @@ branchModule.deactivate = function( branchNode ) {
         value = this.form.model.node( name, index ).getVal();
 
         if ( value !== '' ) {
-            //$branchNode.removeClass( 'disabled' );
             this.form.setInvalid( control, 'relevant' );
+            // In enketo-core we don't remove the "pre-init" class until question gets enabled, but
+            // in OC a record loaded with a non-relevant value, would need to pre-init class to be
+            // removed to display properly.
+            // https://github.com/OpenClinica/enketo-express-oc/issues/465
+            branchNode.classList.remove( 'pre-init' );
             // After setting invalid-relevant remove any previous errors.
             this.form.setValid( control, 'constraint' );
             this.form.setValid( control, 'required' );
@@ -190,6 +194,10 @@ branchModule.deactivate = function( branchNode ) {
         }
 
         if ( value ) {
+            // In enketo-core we don't remove the "pre-init" class until the branch gets enabled, but
+            // in OC a record loaded with a non-relevant value, would need to pre-init class to be
+            // removed to display properly.
+            branchNode.classList.remove( 'pre-init' );
             this.form.setInvalid( branchNode, 'relevant' );
         } else {
             this.form.setValid( branchNode, 'relevant' );
