@@ -337,18 +337,24 @@ class Comment extends Widget {
         let control;
 
         if ( values[0] ){
-            if ( this.linkedQuestion.classList.contains( 'simple-select' ) 
+            if ( this.linkedQuestion.classList.contains( 'simple-select' )
                 // support horizontal-compact and no-buttons appearance
                 // https://github.com/OpenClinica/enketo-express-oc/issues/460
                 // https://jira.openclinica.com/browse/OC-14577
-                || this.linkedQuestion.classList.contains( 'or-appearance-horizontal-compact' ) 
+                || this.linkedQuestion.classList.contains( 'or-appearance-horizontal-compact' )
                 || this.linkedQuestion.classList.contains( 'or-appearance-no-buttons' ) ){
                 // checkboxes, radio buttons
                 values.forEach( val => {
                     const input = this.linkedQuestion.querySelector( `[value="${val}"]` );
-                    const labelEls = getSiblingElements( input, '.option-label.active' );
-                    if( labelEls.length ) {
-                        labels.push( labelEls[0].textContent );
+                    // If the list of options was updated (choice-filter / predicate), the input
+                    // may not exist. https://github.com/OpenClinica/enketo-express-oc/issues/467
+                    // This means we cannot lookup the label and will just return the value instead.
+                    // If not acceptable we'd have to cache the labels of previous values. Probably prone to bugs.
+                    if ( input ){
+                        const labelEls = getSiblingElements( input, '.option-label.active' );
+                        if( labelEls.length ) {
+                            labels.push( labelEls[0].textContent );
+                        }
                     }
                 } );
             } else if ( (  control = this.linkedQuestion.querySelector( 'select:not(.ignore)' ) ) ){
@@ -369,7 +375,7 @@ class Comment extends Widget {
                         labels.push( optionEl.getAttribute( 'value' ) );
                     }
                 }
-            } 
+            }
         }
 
         // If length is unequal just give up. I think this cannot occur.
@@ -573,7 +579,7 @@ class Comment extends Widget {
         if ( this.linkedQuestion.classList.contains( 'or-appearance-image-map' ) ) {
             setTimeout( () => {
                 this._scrollToview();
-            }, 500);
+            }, 500 );
         } else {
             this._scrollToview();
         }
@@ -592,7 +598,7 @@ class Comment extends Widget {
 
     _scrollToview() {
         const queryModal = this.linkedQuestion.querySelector( '.widget.or-comment-widget' );
-        const option = { behavior: 'smooth', block: 'start', inline: 'nearest' }
+        const option = { behavior: 'smooth', block: 'start', inline: 'nearest' };
         if ( window.innerHeight - this.linkedQuestion.offsetHeight < queryModal.offsetHeight ) {
             queryModal.scrollIntoView( option );
         } else {
