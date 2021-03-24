@@ -2,6 +2,50 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+----------------------
+##### Change
+- Default form languages will now be shown upon load regards of browser language.
+
+[2.6.3] - 2021-03-18
+----------------------
+##### Fixed
+- Exception occurs with lazy evaluation of and-or statements.
+
+[2.6.2] - 2021-03-02
+--------------------
+##### Fixed
+- Setvalue/xforms-value-changed inside a select multiple question is not working.
+- Setvalue/xforms-value-changed with trigger inside a repeat and target outside the repeat does not work.
+- A calculation without form control inside a non-relevant repeat with 0 instances, fails to prune non-relevant nodes.
+- Misplaced image-map when used in conjunction with complex custom comment widgets (OC).
+- The function jr:choice-name causes an exception if the choices list of radiobuttons or checkboxes is empty.
+- The function jr:choice-name causes an exception if the choices list of pulldown selects is empty.
+
+[2.6.1] - 2021-02-04
+--------------------
+##### Changed
+- The uuid() XPath function implementation has improved with a reduced chance of collisions.
+
+##### Fixed
+- Readonly views with triggered calculations load with a TypeError.
+- Action setvalue/odk-instance-first-load and setvalue/odk-new-repeat actions are not properly added for radiobutton and checkbox questions (in enketo-transformer).
+- Lazy and/or evaluation within function arguments (in openrosa-xpath-evaluator).
+- Action setvalue/odk-new-repeat does not run non-form-control actions before form controls (since 5.17.0).
+- Static itemsets with radio buttons inside multiple repeat instances do not load correctly.
+- Draw widget changes file name whenever browser window resizes.
+- Draw widget updates file name when canvas loses focus if drawing hasn't changed.
+- Nested XPath expressions with dead branches cause an exception (since 2.6.0).
+- Installation issue in Travis-CI, possible affecting other servers as well.
+
+[2.6.0] - 2020-12-28
+----------------------
+##### Added
+- Support for digest() function.
+
+##### Changed
+- **Vastly improved performance for most slow forms by replacing the XPath evaluator**. See (https://blog.enketo.org/performance-leap/).
+
 [2.5.6] - 2020-12-23
 -----------------------
 ##### Fixed
