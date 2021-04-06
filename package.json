@@ -52,7 +52,7 @@
         "debug": "^4.3.1",
         "enketo-core": "5.17.4",
         "enketo-transformer": "1.42.0",
-        "enketo-xpath-extensions-oc": "github:OpenClinica/enketo-xpath-extensions-oc#f3dd803",
+        "enketo-xpath-extensions-oc": "github:OpenClinica/enketo-xpath-extensions-oc#727803c",
         "evp_bytestokey": "^1.0.3",
         "express": "^4.17.1",
         "grunt": "^1.3.0",
