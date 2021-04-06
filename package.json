@@ -133,7 +133,8 @@
         "enketo/widgets": "./public/js/build/widgets",
         "enketo/translator": "./public/js/src/module/translator",
         "enketo/dialog": "./public/js/src/module/gui",
-        "enketo/file-manager": "./public/js/src/module/file-manager"
+        "enketo/file-manager": "./public/js/src/module/file-manager",
+        "enketo/xpath-evaluator-binding": "./public/js/src/module/xpath-evaluator-binding"
     },
     "entries": [
         "public/js/src/enketo-webform.js",
