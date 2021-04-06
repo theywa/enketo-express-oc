@@ -58,7 +58,7 @@ module.exports = grunt => {
         watch: {
             sass: {
                 files: [ 'app/views/styles/**/*.scss', 'widget/**/*.scss', '!app/views/styles/component/_system_variables.scss' ],
-                tasks: [ 'sass' ],
+                tasks: [ 'shell:clean-css', 'sass' ],
                 options: {
                     spawn: false,
                     livereload: true
@@ -73,11 +73,11 @@ module.exports = grunt => {
             },
             language: {
                 files: [ 'app/views/**/*.pug', 'app/controllers/**/*.js', 'app/models/**/*.js', 'public/js/src/**/*.js' ],
-                tasks: [ /*'shell:translation', 'i18next'*/]
+                tasks: [ 'shell:clean-locales', 'shell:translation', 'i18next' ]
             },
             js: {
                 files: [ 'public/js/src/**/*.js', 'widget/**/*.js' ],
-                tasks: [ 'js' ],
+                tasks: [ 'shell:clean-js', 'js' ],
                 options: {
                     spawn: false,
                     livereload: true
@@ -213,7 +213,7 @@ module.exports = grunt => {
                 },
                 dest: 'locales/build/'
             }
-        }, 
+        },
         replace: {
             // https://github.com/OpenClinica/enketo-express-oc/issues/426
             // widget.name is not working properly on IE 11 win 10
@@ -221,11 +221,11 @@ module.exports = grunt => {
                 src: [ 'public/js/build/*ie11-bundle.js' ],
                 overwrite: true,
                 replacements: [ {
-                    from: "Widget.name",
-                    to: "Widget.selector"
+                    from: 'Widget.name',
+                    to: 'Widget.selector'
                 }, {
-                    from: "have a name",
-                    to: "have a selector"
+                    from: 'have a name',
+                    to: 'have a selector'
                 } ]
             }
         }
@@ -299,12 +299,13 @@ module.exports = grunt => {
         grunt.log.writeln( `File ${WIDGETS_SASS} created` );
     } );
 
-    grunt.registerTask( 'default', [ 'locales', 'widgets', 'css', 'js', 'terser' ] );
-    grunt.registerTask( 'locales', [ 'shell:clean-locales', 'i18next' ] );
-    grunt.registerTask( 'js', [ 'shell:clean-js', 'widgets', 'shell:rollup' ] );
+    grunt.registerTask( 'default', [ 'clean', 'locales', 'widgets', 'css', 'js', 'terser' ] );
+    grunt.registerTask( 'clean', [ 'shell:clean-js','shell:clean-css' , 'shell:clean-locales' ] );
+    grunt.registerTask( 'locales', [ 'i18next' ] );
+    grunt.registerTask( 'js', [ 'widgets', 'shell:rollup' ] );
     grunt.registerTask( 'js-ie11', [ 'shell:polyfill-ie11', 'shell:babel-ie11', 'shell:browserify-ie11', 'replace:widgets-controller' ] );
     grunt.registerTask( 'build-ie11', [ 'js-ie11', 'terser' ] );
-    grunt.registerTask( 'css', [ 'shell:clean-css', 'system-sass-variables:create', 'sass' ] );
+    grunt.registerTask( 'css', [ 'system-sass-variables:create', 'sass' ] );
     grunt.registerTask( 'test', [ 'env:test', 'transforms', 'js', 'css', 'nyc:cover', 'karma:headless', 'shell:buildReadmeBadge', 'eslint:check' ] );
     grunt.registerTask( 'test-browser', [ 'env:test', 'transforms', 'css', 'karma:browsers' ] );
     grunt.registerTask( 'develop', [ 'env:develop', 'i18next', 'js', 'css', 'concurrent:develop' ] );
