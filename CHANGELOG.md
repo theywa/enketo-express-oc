@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+[2.7.1] - 2021-04-07
+----------------------
+##### Changed
+- Completed Turkish translation.
+
+##### Fixed
+- Some unlaunched previews (using a `form` queryparameter) fail to load.
+
 [2.7.0] - 2021-04-02
 ----------------------
 ##### Changed
