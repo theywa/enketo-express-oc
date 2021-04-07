@@ -83,7 +83,7 @@ Model.prototype.isMarkedComplete = function() {
         return attribute && attribute === 'true';
     } else {
         // This is proper
-        return this.evaluate( `/node()/@${nsPrefix}:complete = "true"`, 'boolean', null, null, false );
+        return this.evaluate( `/*/@${nsPrefix}:complete = "true"`, 'boolean', null, null, false );
     }
 };
 
