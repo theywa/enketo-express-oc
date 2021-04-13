@@ -112,15 +112,20 @@ module.exports = grunt => {
             rollup: {
                 command: 'npx rollup --config'
             },
+            'rollup-ie11': {
+                command: 'npx rollup --config rollup-ie11.config.js'
+            },
             'babel-ie11': {
                 command: bundles
-                    .map( bundle => `npx babel ${bundle} --config-file ./babel-ie11.config.js --out-file ${bundle.replace( '-bundle.', '-ie11-temp-bundle.' )}` )
+                    .map( bundle => bundle.replace( '-bundle.js',  '-ie11-src-bundle.js' ) )
+                    .map( bundle => `npx babel ${bundle} --config-file ./babel-ie11.config.js --out-file ${bundle.replace( '-ie11-src-bundle.', '-ie11-babel-bundle.' )}` )
                     .join( '&&' )
             },
             'browserify-ie11': {
                 command: bundles
-                    .map( bundle => `npx browserify node_modules/enketo-core/src/js/workarounds-ie11.js ${bundle.replace( '-bundle.', '-ie11-temp-bundle.' )} -o ${bundle.replace( '-bundle.', '-ie11-bundle.' )}` )
-                    .concat( [ 'rm -f public/js/build/*ie11-temp-bundle.js' ] )
+                    .map( bundle => bundle.replace( '-bundle.js',  '-ie11-babel-bundle.js' ) )
+                    .map( bundle => `npx browserify node_modules/enketo-core/src/js/workarounds-ie11.js ${bundle} -o ${bundle.replace( '-ie11-babel-bundle.', '-ie11-bundle.' )}` )
+                    .concat( [ 'rm -f public/js/build/*ie11-*-bundle.js' ] )
                     .join( '&&' )
             },
         },
@@ -303,7 +308,7 @@ module.exports = grunt => {
     grunt.registerTask( 'clean', [ 'shell:clean-js','shell:clean-css' , 'shell:clean-locales' ] );
     grunt.registerTask( 'locales', [ 'i18next' ] );
     grunt.registerTask( 'js', [ 'widgets', 'shell:rollup' ] );
-    grunt.registerTask( 'js-ie11', [ 'shell:polyfill-ie11', 'shell:babel-ie11', 'shell:browserify-ie11', 'replace:widgets-controller' ] );
+    grunt.registerTask( 'js-ie11', [ 'shell:rollup-ie11', 'shell:polyfill-ie11', 'shell:babel-ie11', 'shell:browserify-ie11', 'replace:widgets-controller' ] );
     grunt.registerTask( 'build-ie11', [ 'js-ie11', 'terser' ] );
     grunt.registerTask( 'css', [ 'system-sass-variables:create', 'sass' ] );
     grunt.registerTask( 'test', [ 'env:test', 'transforms', 'js', 'css', 'nyc:cover', 'karma:headless', 'shell:buildReadmeBadge', 'eslint:check' ] );
