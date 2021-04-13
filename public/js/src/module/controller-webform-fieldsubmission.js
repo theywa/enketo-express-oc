@@ -227,6 +227,7 @@ function init( formEl, data, loadErrors = [] ) {
                 let action;
                 console.log( 'doing headless things' );
                 gui.prompt = () => Promise.resolve( true );
+                gui.confirm = () => Promise.resolve( true );
                 const resultFragment = document.createRange().createContextualFragment(
                     `<div
                         id="headless-result"
