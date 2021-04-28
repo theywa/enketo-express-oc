@@ -89,7 +89,7 @@ if ( window.location.pathname.includes( '/preview/' ) || window.location.pathnam
 settings.dnCloseButton = window.location.pathname.indexOf( '/c/' ) !== -1;
 
 // headless?
-if ( window.location.pathname.indexOf( '/pdf' ) > 0 || window.location.pathname.indexOf( '/headless' ) > 0 ) {
+if ( window.location.pathname.includes( '/pdf' ) > 0 || window.location.pathname.includes( '/headless' ) ) {
     settings.headless = true;
 }
 
