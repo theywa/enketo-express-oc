@@ -42,7 +42,10 @@ initTranslator( survey )
         return formParts;
     } )
     .then( formParts => {
-        if ( formParts.form && formParts.model ) {
+        // don't use settings.headless here because this also includes pdf views
+        if ( window.location.pathname.includes( '/headless' ) ){
+            return formParts;
+        } else if ( formParts.form && formParts.model ) {
             return gui.swapTheme( formParts );
         } else {
             throw new Error( t( 'error.unknown' ) );
