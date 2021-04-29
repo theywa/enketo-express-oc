@@ -4,6 +4,7 @@ import gui from './gui';
 import settings from './settings';
 import events from 'enketo-core/src/js/event';
 import config from 'enketo/config';
+import './calculate';
 import './relevant';
 import './required';
 import './page';
